@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Img2Img Creator | โปรแกรมสร้างภาพด้วย AI</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles for the robot theme and animations */
+        body {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            background-color: #f0f7ff; /* Light blue base */
+            overflow: hidden; /* Hide scrollbars from the main page */
+        }
+
+        /* 3D floating emoji background */
+        .emoji-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            perspective: 1000px; /* Add perspective for 3D effect */
+        }
+
+        .emoji {
+            position: absolute;
+            font-size: 2.5rem; /* Emoji size */
+            animation: float 30s infinite linear;
+            opacity: 0.6;
+            text-shadow: 0 0 10px rgba(0,0,0,0.2);
+            transform-style: preserve-3d; /* Important for 3D transforms */
+        }
+
+        @keyframes float {
+            0% { 
+                transform: translateY(110vh) translateZ(0) rotateX(0deg) rotateY(0deg); 
+            }
+            100% { 
+                transform: translateY(-10vh) translateZ(400px) rotateX(720deg) rotateY(360deg); 
+            }
+        }
+
+        /* Rainbow text effect for the title */
+        .text-rainbow {
+            background-image: linear-gradient(-45deg, #a1c4fd, #c2e9fb, #a8e063, #fbc2eb, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow-flow 10s ease infinite;
+        }
+
+        @keyframes rainbow-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        /* Custom button styling */
+        .btn-modern {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-green {
+            background-color: #e0f2f1; /* Soft green */
+            border-color: #a7d8d4;
+        }
+        .btn-green:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(45, 156, 219, 0.3);
+            background-color: #c8e6c9;
+        }
+
+        .btn-yellow {
+            background-color: #fffde7; /* Soft yellow */
+            border-color: #fff59d;
+        }
+        .btn-yellow:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(249, 168, 37, 0.3);
+            background-color: #fff9c4;
+        }
+        
+        /* Custom class for the main card */
+        .main-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+    </style>
+</head>
+<body class="w-full h-screen flex items-center justify-center p-4">
+
+    <!-- Floating Emoji Background -->
+    <div class="emoji-background"></div>
+
+    <main class="main-card w-full max-w-6xl h-full max-h-[95vh] p-4 sm:p-6 md:p-8 flex flex-col gap-4 overflow-y-auto">
+        <header class="text-center mb-4">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center justify-center">
+                <span>🤖</span>
+                <span class="text-rainbow ml-3">AI Img2Img Creator</span>
+            </h1>
+            <p class="text-gray-600 mt-2">อัปโหลดภาพ, ปรับแต่ง Prompt, แล้วให้ AI สร้างสรรค์ผลงานใหม่ให้คุณ</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow">
+            <!-- Left Side: Controls and Prompt -->
+            <div class="flex flex-col gap-4">
+                <!-- Image Upload -->
+                <div>
+                    <label class="block text-lg font-medium text-gray-700 mb-2">1. อัปโหลดภาพต้นฉบับ</label>
+                    <div id="image-preview-container" class="w-full aspect-square bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex items-center justify-center text-center cursor-pointer hover:bg-blue-100 transition">
+                        <input type="file" id="image-upload" accept="image/*" class="hidden">
+                        <div id="upload-prompt" class="text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            <p class="mt-2">คลิกเพื่ออัปโหลด หรือลากไฟล์มาวาง</p>
+                        </div>
+                        <img id="image-preview" src="" alt="Image Preview" class="hidden w-full h-full object-contain rounded-xl"/>
+                    </div>
+                </div>
+
+                <!-- Additional Prompt -->
+                <div>
+                    <label for="additional-prompt" class="block text-lg font-medium text-gray-700">2. Prompt เพิ่มเติม (ไม่บังคับ)</label>
+                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'in style of van gogh', '4k'"></textarea>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ 1. สร้าง Prompt</button>
+                    <button id="generate-image-btn" class="btn-modern btn-yellow w-full">🚀 2. สร้างภาพ</button>
+                </div>
+
+                 <!-- Generated Prompt -->
+                <div class="flex flex-col gap-2 flex-grow">
+                    <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์</label>
+                    <div id="generated-prompt-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
+                        <span class="text-gray-400">รอการสร้าง Prompt...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Generated Image -->
+            <div class="flex flex-col items-center justify-start">
+                 <label class="block text-lg font-medium text-gray-700 mb-2 w-full">🎨 ผลลัพธ์ภาพใหม่</label>
+                <div id="result-image-container" class="w-full aspect-square bg-gray-900/10 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
+                    <div id="image-placeholder" class="text-center text-gray-500">
+                        <p class="text-4xl">🖼️</p>
+                        <p>ภาพที่สร้างจะแสดงที่นี่</p>
+                    </div>
+                    <img id="result-image" src="" class="hidden w-full h-full object-contain rounded-xl"/>
+                </div>
+                <a id="save-image-btn" href="#" download="ai-generated-image.png" class="btn-modern btn-green w-full text-center hidden mt-4">💾 บันทึกรูปภาพ</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- CONFIGURATION ---
+        const PROMPT_API_KEY = "AIzaSyAPzP3da8pDTT9iUZBGIljAg0bgB2W8Zig"; // For describing the image
+        const IMAGE_API_KEY = "AIzaSyCS5F2wBrtb63-EYPvAx07kL6LKbTuKdBs"; // For generating the image
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_OddzqbIKW4ijhyQWlubTrMBKzL_JX8fo6ZwMbeNfcivZRghlNlB4nfaMFAQDU9uEFA/exec';
+
+        // --- DOM ELEMENTS ---
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const imagePreview = document.getElementById('image-preview');
+        const additionalPromptInput = document.getElementById('additional-prompt');
+        const generatePromptBtn = document.getElementById('generate-prompt-btn');
+        const generateImageBtn = document.getElementById('generate-image-btn');
+        const generatedPromptContainer = document.getElementById('generated-prompt-container');
+        const resultImageContainer = document.getElementById('result-image-container');
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        const resultImage = document.getElementById('result-image');
+        const saveImageBtn = document.getElementById('save-image-btn');
+
+        // --- STATE ---
+        let base64Image = null;
+        let generatedPrompt = '';
+
+        // --- LOCAL STORAGE ---
+        function saveToLocalStorage() {
+            localStorage.setItem('img2img_additionalPrompt', additionalPromptInput.value);
+            localStorage.setItem('img2img_generatedPrompt', generatedPromptContainer.innerHTML);
+        }
+
+        function loadFromLocalStorage() {
+            const savedAdditional = localStorage.getItem('img2img_additionalPrompt');
+            const savedGenerated = localStorage.getItem('img2img_generatedPrompt');
+            if (savedAdditional) {
+                additionalPromptInput.value = savedAdditional;
+            }
+            if (savedGenerated) {
+                generatedPromptContainer.innerHTML = savedGenerated;
+                generatedPrompt = generatedPromptContainer.textContent;
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        imagePreviewContainer.addEventListener('click', () => imageUpload.click());
+        imagePreviewContainer.addEventListener('dragover', (e) => { e.preventDefault(); imagePreviewContainer.classList.add('bg-blue-200'); });
+        imagePreviewContainer.addEventListener('dragleave', () => { imagePreviewContainer.classList.remove('bg-blue-200'); });
+        imagePreviewContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imagePreviewContainer.classList.remove('bg-blue-200');
+            if (e.dataTransfer.files.length) {
+                imageUpload.files = e.dataTransfer.files;
+                handleImageUpload({ target: imageUpload });
+            }
+        });
+
+        imageUpload.addEventListener('change', handleImageUpload);
+        generatePromptBtn.addEventListener('click', handleGeneratePrompt);
+        generateImageBtn.addEventListener('click', handleGenerateImage);
+
+        // --- FUNCTIONS ---
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                base64Image = e.target.result;
+                imagePreview.src = base64Image;
+                imagePreview.classList.remove('hidden');
+                uploadPrompt.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function handleGeneratePrompt() {
+            if (!base64Image) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณาอัปโหลดภาพก่อนครับ', 'error');
+                return;
+            }
+            Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
+                const payload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error((await response.json()).error.message);
+                
+                const result = await response.json();
+                const description = result.candidates[0].content.parts[0].text;
+                const additionalPrompt = additionalPromptInput.value.trim();
+                generatedPrompt = additionalPrompt ? `${description}, ${additionalPrompt}` : description;
+                generatedPromptContainer.textContent = generatedPrompt;
+                saveToLocalStorage();
+                Swal.fire('สำเร็จ!', 'สร้าง Prompt ที่สมบูรณ์แล้ว!', 'success');
+            } catch (error) {
+                console.error("Error generating prompt:", error);
+                Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้าง Prompt ได้: ${error.message}`, 'error');
+                generatedPromptContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาด: ${error.message}</span>`;
+            }
+        }
+        
+        async function handleGenerateImage() {
+            const finalPrompt = generatedPromptContainer.textContent;
+            if (!finalPrompt || finalPrompt.startsWith('รอการสร้าง') || finalPrompt.startsWith('เกิดข้อผิดพลาด')) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณาสร้าง Prompt ให้เรียบร้อยก่อนครับ', 'error');
+                return;
+            }
+            
+            let timerInterval;
+            Swal.fire({
+                title: 'กำลังสร้างภาพใหม่...',
+                html: `
+                    <p>AI กำลังใช้เวทมนตร์ โปรดรอสักครู่...</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                      <div id="swal-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <b id="swal-progress-text" class="py-2">0%</b>
+                `,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    const progressBar = document.getElementById('swal-progress-bar');
+                    const progressText = document.getElementById('swal-progress-text');
+                    let progress = 0;
+                    timerInterval = setInterval(() => {
+                        progress = Math.min(progress + 5, 95); // Simulate progress, stop at 95%
+                        if(progressBar) progressBar.style.width = progress + '%';
+                        if(progressText) progressText.textContent = progress + '%';
+                    }, 400);
+                },
+                willClose: () => {
+                    clearInterval(timerInterval);
+                }
+            });
+
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${IMAGE_API_KEY}`;
+                const payload = { instances: [{ prompt: finalPrompt }], parameters: { "sampleCount": 1 } };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                
+                clearInterval(timerInterval);
+                const progressBar = document.getElementById('swal-progress-bar');
+                const progressText = document.getElementById('swal-progress-text');
+                if(progressBar) progressBar.style.width = '100%';
+                if(progressText) progressText.textContent = '100%';
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error ? error.error.message : 'Unknown API error');
+                }
+
+                const result = await response.json();
+                if (result.predictions && result.predictions.length > 0) {
+                    const newBase64Image = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    resultImage.src = newBase64Image;
+                    resultImage.classList.remove('hidden');
+                    imagePlaceholder.classList.add('hidden');
+                    saveImageBtn.href = newBase64Image;
+                    saveImageBtn.classList.remove('hidden');
+                    
+                    await Swal.update({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!' });
+                    await saveToGoogle(newBase64Image, finalPrompt);
+                } else {
+                    throw new Error('API did not return an image.');
+                }
+            } catch (error) {
+                 console.error("Error generating image:", error);
+                 Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้างภาพได้: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveToGoogle(imageData, promptText) {
+            // This part runs after the image is displayed.
+            // We show a small, non-blocking notification for this background task.
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
+            });
+            Toast.fire({
+              icon: 'info',
+              title: 'กำลังบันทึกไปยัง Google Drive...'
+            });
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: imageData, prompt: promptText })
+                });
+                Toast.fire({ icon: 'success', title: 'บันทึกเรียบร้อย!' });
+            } catch (error) {
+                 console.error("Error saving to Google:", error);
+                 Toast.fire({ icon: 'error', title: 'การบันทึกล้มเหลว' });
+            }
+        }
+
+        // --- BACKGROUND ANIMATION ---
+        function createEmojiBackground() {
+            const background = document.querySelector('.emoji-background');
+            if (!background) return;
+            const emojis = ['🤖', '⚙️', '💡', '🎨', '✨', '🚀', '🖼️', '💾'];
+            const numEmojis = 30;
+            for (let i = 0; i < numEmojis; i++) {
+                let emoji = document.createElement('div');
+                emoji.classList.add('emoji');
+                emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.animationDuration = `${Math.random() * 15 + 20}s`;
+                emoji.style.animationDelay = `${Math.random() * 15}s`;
+                background.appendChild(emoji);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            createEmojiBackground();
+            loadFromLocalStorage();
+        };
+    </script>
+</body>
+</html>
