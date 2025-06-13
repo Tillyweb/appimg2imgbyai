@@ -8,9 +8,6 @@
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- SweetAlert2 for notifications -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,7 +141,7 @@
                 <!-- Additional Prompt -->
                 <div>
                     <label for="additional-prompt" class="block text-lg font-medium text-gray-700">2. Prompt เพิ่มเติม (ไม่บังคับ)</label>
-                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'in style of van gogh', '4k'"></textarea>
+                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'a brown dog' หรือ 'in cartoon style'"></textarea>
                 </div>
                 
                 <!-- Action Buttons -->
@@ -155,7 +152,7 @@
 
                  <!-- Generated Prompt -->
                 <div class="flex flex-col gap-2 flex-grow">
-                    <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์</label>
+                    <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์ (English)</label>
                     <div id="generated-prompt-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
                         <span class="text-gray-400">รอการสร้าง Prompt...</span>
                     </div>
@@ -177,9 +174,11 @@
         </div>
     </main>
 
+    <!-- SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // --- CONFIGURATION ---
-        const PROMPT_API_KEY = "AIzaSyAPzP3da8pDTT9iUZBGIljAg0bgB2W8Zig"; // For describing the image
+        const PROMPT_API_KEY = "AIzaSyAPzP3da8pDTT9iUZBGIljAg0bgB2W8Zig"; // For describing the image and analysis
         const IMAGE_API_KEY = "AIzaSyCS5F2wBrtb63-EYPvAx07kL6LKbTuKdBs"; // For generating the image
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_OddzqbIKW4ijhyQWlubTrMBKzL_JX8fo6ZwMbeNfcivZRghlNlB4nfaMFAQDU9uEFA/exec';
 
@@ -258,15 +257,71 @@
             Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
-                const payload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error((await response.json()).error.message);
+                // Step 1: Get the initial image description (still needed as a base)
+                const descriptionApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
+                const descriptionPayload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
+                const descriptionResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(descriptionPayload) });
+                if (!descriptionResponse.ok) throw new Error(`Description API Error: ${(await descriptionResponse.json()).error.message}`);
                 
-                const result = await response.json();
-                const description = result.candidates[0].content.parts[0].text;
+                const descriptionResult = await descriptionResponse.json();
+                const imageDescription = descriptionResult.candidates[0].content.parts[0].text;
+                
+                // Step 2: Get the user's additional prompt
                 const additionalPrompt = additionalPromptInput.value.trim();
-                generatedPrompt = additionalPrompt ? `${description}, ${additionalPrompt}` : description;
+
+                // Step 3: Decide the logic based on the additional prompt
+                if (!additionalPrompt) {
+                    // If no additional prompt, just use the image description translated to English
+                    generatedPrompt = imageDescription;
+                } else {
+                    // If there IS an additional prompt, perform the intelligent merge.
+                    Swal.update({
+                        title: 'กำลังวิเคราะห์ Prompt...',
+                        text: 'AI กำลังรวมข้อมูลและปรับแต่ง Prompt ให้สมบูรณ์...',
+                    });
+
+                    const analysisApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
+                    
+                    const analysisInstruction = `
+                        You are a highly skilled prompt engineer. Your mission is to intelligently merge two pieces of information into one single, highly detailed, and effective image generation prompt in English.
+
+                        INPUTS:
+                        1.  \`Image Description\`: This is a detailed description of an existing image. It provides the base scene, subject, and environment.
+                        2.  \`Additional Prompt\`: This is a user's modification or core idea. This input has HIGHER PRIORITY.
+
+                        YOUR TASK:
+                        - Analyze both inputs.
+                        - Create a new, unified prompt that uses the \`Image Description\` as the foundation but creatively and seamlessly integrates the core idea from the \`Additional Prompt\`.
+                        - The final prompt must be a very detailed visual description, retaining as many details from the \`Image Description\` as possible (like background, lighting, and composition) while making the user's \`Additional Prompt\` the main subject or action.
+                        - The final output MUST be only the resulting English prompt. Do not add any extra text, labels, or explanations.
+
+                        ---
+                        EXAMPLE 1:
+                        - Image Description: "A photorealistic image of a fluffy orange cat sitting on a red sofa in a living room."
+                        - Additional Prompt: "an astronaut"
+                        - DESIRED FINAL PROMPT: "A photorealistic image of a fluffy orange cat dressed in a detailed astronaut suit, complete with a helmet, sitting on a red sofa in a living room, looking out a window at the stars."
+
+                        EXAMPLE 2:
+                        - Image Description: "A man standing in a city street at night."
+                        - Additional Prompt: "ให้เขากลายเป็นอัศวิน" (Make him a knight)
+                        - DESIRED FINAL PROMPT: "A knight in shining, ornate armor, standing in the middle of a dark, rain-slicked city street at night, with neon lights reflecting off his helmet."
+                        ---
+
+                        INPUTS FOR THIS TASK:
+                        - Image Description: "${imageDescription}"
+                        - Additional Prompt: "${additionalPrompt}"
+                        ---
+                        FINAL ENGLISH PROMPT:
+                    `;
+
+                    const analysisPayload = { contents: [{ parts: [{ text: analysisInstruction }] }] };
+                    const analysisResponse = await fetch(analysisApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisPayload) });
+                    if (!analysisResponse.ok) throw new Error(`Analysis API Error: ${(await analysisResponse.json()).error.message}`);
+
+                    const analysisResult = await analysisResponse.json();
+                    generatedPrompt = analysisResult.candidates[0].content.parts[0].text.trim();
+                }
+
                 generatedPromptContainer.textContent = generatedPrompt;
                 saveToLocalStorage();
                 Swal.fire('สำเร็จ!', 'สร้าง Prompt ที่สมบูรณ์แล้ว!', 'success');
@@ -383,7 +438,7 @@
         function createEmojiBackground() {
             const background = document.querySelector('.emoji-background');
             if (!background) return;
-            const emojis = ['🤖', '⚙️', '💡', '🎨', '✨', '🚀', '🖼️', '💾'];
+            const emojis = ['🤖', '⚙️', '�', '🎨', '✨', '🚀', '🖼️', '💾'];
             const numEmojis = 30;
             for (let i = 0; i < numEmojis; i++) {
                 let emoji = document.createElement('div');
@@ -404,3 +459,4 @@
     </script>
 </body>
 </html>
+�
