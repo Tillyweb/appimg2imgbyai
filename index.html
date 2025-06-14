@@ -106,6 +106,13 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
+        /* Custom radio button styles */
+        .aspect-ratio-selector input:checked + label,
+        .size-selector input:checked + label {
+            background-color: #a1c4fd;
+            color: #fff;
+            border-color: #7badd3;
+        }
     </style>
 </head>
 <body class="w-full h-screen flex items-center justify-center p-4">
@@ -122,34 +129,83 @@
             <p class="text-gray-600 mt-2">อัปโหลดภาพ, ปรับแต่ง Prompt, แล้วให้ AI สร้างสรรค์ผลงานใหม่ให้คุณ</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 flex-grow">
             <!-- Left Side: Controls and Prompt -->
             <div class="flex flex-col gap-4">
                 <!-- Image Upload -->
                 <div>
                     <label class="block text-lg font-medium text-gray-700 mb-2">1. อัปโหลดภาพต้นฉบับ</label>
-                    <div id="image-preview-container" class="w-full aspect-square bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex items-center justify-center text-center cursor-pointer hover:bg-blue-100 transition">
+                    <div id="image-preview-container" class="w-full aspect-square bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex items-center justify-center text-center cursor-pointer hover:bg-blue-100 transition-all duration-300">
                         <input type="file" id="image-upload" accept="image/*" class="hidden">
                         <div id="upload-prompt" class="text-gray-500">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            <p class="mt-2">คลิกเพื่ออัปโหลด หรือลากไฟล์มาวาง</p>
+                            <p class="mt-2">คลิกเพื่ออัปโหลด</p>
                         </div>
                         <img id="image-preview" src="" alt="Image Preview" class="hidden w-full h-full object-contain rounded-xl"/>
                     </div>
                 </div>
 
+                <!-- Aspect Ratio & Size Selector -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-lg font-medium text-gray-700">2. เลือกอัตราส่วน</label>
+                        <div class="mt-2 flex flex-wrap gap-2 aspect-ratio-selector">
+                            <input type="radio" name="aspect-ratio" value="aspect-square" id="ar-square" class="hidden" checked>
+                            <label for="ar-square" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">1:1</label>
+                            
+                            <input type="radio" name="aspect-ratio" value="aspect-video" id="ar-landscape" class="hidden">
+                            <label for="ar-landscape" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">16:9</label>
+
+                            <input type="radio" name="aspect-ratio" value="aspect-[9/16]" id="ar-portrait" class="hidden">
+                            <label for="ar-portrait" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">9:16</label>
+
+                            <input type="radio" name="aspect-ratio" value="aspect-[4/3]" id="ar-4-3" class="hidden">
+                            <label for="ar-4-3" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">4:3</label>
+                            
+                            <input type="radio" name="aspect-ratio" value="aspect-[3/4]" id="ar-3-4" class="hidden">
+                            <label for="ar-3-4" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">3:4</label>
+                        </div>
+                    </div>
+                     <div>
+                        <label class="block text-lg font-medium text-gray-700">3. เลือกความละเอียด</label>
+                        <div class="mt-2 grid grid-cols-2 gap-2 size-selector">
+                            <input type="radio" name="image-size" value="standard" id="size-standard" class="hidden" checked>
+                            <label for="size-standard" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">มาตรฐาน</label>
+                            
+                            <input type="radio" name="image-size" value="large" id="size-large" class="hidden">
+                            <label for="size-large" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">คุณภาพสูง</label>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- Additional Prompt -->
                 <div>
-                    <label for="additional-prompt" class="block text-lg font-medium text-gray-700">2. Prompt เพิ่มเติม (ไม่บังคับ)</label>
-                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'a brown dog' หรือ 'in cartoon style'"></textarea>
+                    <label for="additional-prompt" class="block text-lg font-medium text-gray-700">4. Prompt เพิ่มเติม (ไม่บังคับ)</label>
+                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'สุนัขสีน้ำตาล' หรือ 'สไตล์ภาพวาดการ์ตูน'"></textarea>
                 </div>
                 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ 1. สร้าง Prompt</button>
-                    <button id="generate-image-btn" class="btn-modern btn-yellow w-full">🚀 2. สร้างภาพ</button>
+                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ สร้าง Prompt</button>
+                    <button id="generate-image-btn" class="btn-modern btn-yellow w-full">🚀 สร้างภาพ</button>
                 </div>
+            </div>
 
+            <!-- Right Side: Generated Image and Prompt -->
+            <div class="flex flex-col gap-4">
+                 <!-- Generated Image -->
+                <div class="flex flex-col items-center justify-start">
+                     <label class="block text-lg font-medium text-gray-700 mb-2 w-full">🎨 ผลลัพธ์ภาพใหม่</label>
+                    <div id="result-image-container" class="w-full aspect-square bg-gray-900/10 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300">
+                        <div id="image-placeholder" class="text-center text-gray-500">
+                            <p class="text-4xl">🖼️</p>
+                            <p>ภาพที่สร้างจะแสดงที่นี่</p>
+                        </div>
+                        <img id="result-image" src="" class="hidden w-full h-full object-contain rounded-xl"/>
+                    </div>
+                    <a id="save-image-btn" href="#" download="ai-generated-image.png" class="btn-modern btn-green w-full text-center hidden mt-4">💾 บันทึกรูปภาพ</a>
+                </div>
                  <!-- Generated Prompt -->
                 <div class="flex flex-col gap-2 flex-grow">
                     <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์ (English)</label>
@@ -157,19 +213,6 @@
                         <span class="text-gray-400">รอการสร้าง Prompt...</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Right Side: Generated Image -->
-            <div class="flex flex-col items-center justify-start">
-                 <label class="block text-lg font-medium text-gray-700 mb-2 w-full">🎨 ผลลัพธ์ภาพใหม่</label>
-                <div id="result-image-container" class="w-full aspect-square bg-gray-900/10 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
-                    <div id="image-placeholder" class="text-center text-gray-500">
-                        <p class="text-4xl">🖼️</p>
-                        <p>ภาพที่สร้างจะแสดงที่นี่</p>
-                    </div>
-                    <img id="result-image" src="" class="hidden w-full h-full object-contain rounded-xl"/>
-                </div>
-                <a id="save-image-btn" href="#" download="ai-generated-image.png" class="btn-modern btn-green w-full text-center hidden mt-4">💾 บันทึกรูปภาพ</a>
             </div>
         </div>
     </main>
@@ -195,6 +238,9 @@
         const imagePlaceholder = document.getElementById('image-placeholder');
         const resultImage = document.getElementById('result-image');
         const saveImageBtn = document.getElementById('save-image-btn');
+        const aspectRatioRadios = document.querySelectorAll('input[name="aspect-ratio"]');
+        const sizeRadios = document.querySelectorAll('input[name="image-size"]');
+
 
         // --- STATE ---
         let base64Image = null;
@@ -204,17 +250,37 @@
         function saveToLocalStorage() {
             localStorage.setItem('img2img_additionalPrompt', additionalPromptInput.value);
             localStorage.setItem('img2img_generatedPrompt', generatedPromptContainer.innerHTML);
+            const selectedRatio = document.querySelector('input[name="aspect-ratio"]:checked');
+            if (selectedRatio) {
+                localStorage.setItem('img2img_aspectRatio', selectedRatio.value);
+            }
+            const selectedSize = document.querySelector('input[name="image-size"]:checked');
+            if (selectedSize) {
+                localStorage.setItem('img2img_imageSize', selectedSize.value);
+            }
         }
 
         function loadFromLocalStorage() {
             const savedAdditional = localStorage.getItem('img2img_additionalPrompt');
             const savedGenerated = localStorage.getItem('img2img_generatedPrompt');
+            const savedRatio = localStorage.getItem('img2img_aspectRatio') || 'aspect-square';
+            const savedSize = localStorage.getItem('img2img_imageSize') || 'standard';
+
             if (savedAdditional) {
                 additionalPromptInput.value = savedAdditional;
             }
             if (savedGenerated) {
                 generatedPromptContainer.innerHTML = savedGenerated;
                 generatedPrompt = generatedPromptContainer.textContent;
+            }
+            const ratioRadioToCheck = document.querySelector(`input[value="${savedRatio}"]`);
+            if(ratioRadioToCheck) {
+                ratioRadioToCheck.checked = true;
+                setAspectRatio(savedRatio);
+            }
+            const sizeRadioToCheck = document.querySelector(`input[value="${savedSize}"]`);
+            if(sizeRadioToCheck) {
+                sizeRadioToCheck.checked = true;
             }
         }
         
@@ -234,8 +300,31 @@
         imageUpload.addEventListener('change', handleImageUpload);
         generatePromptBtn.addEventListener('click', handleGeneratePrompt);
         generateImageBtn.addEventListener('click', handleGenerateImage);
+        
+        aspectRatioRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                setAspectRatio(e.target.value);
+                saveToLocalStorage();
+            });
+        });
+
+        sizeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                saveToLocalStorage();
+            });
+        });
+
 
         // --- FUNCTIONS ---
+        function setAspectRatio(ratioClass) {
+            const aspectRatios = ['aspect-square', 'aspect-video', 'aspect-[9/16]', 'aspect-[4/3]', 'aspect-[3/4]'];
+            imagePreviewContainer.classList.remove(...aspectRatios);
+            resultImageContainer.classList.remove(...aspectRatios);
+            
+            imagePreviewContainer.classList.add(ratioClass);
+            resultImageContainer.classList.add(ratioClass);
+        }
+
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -257,7 +346,6 @@
             Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
-                // Step 1: Get the initial image description (still needed as a base)
                 const descriptionApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
                 const descriptionPayload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
                 const descriptionResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(descriptionPayload) });
@@ -266,15 +354,11 @@
                 const descriptionResult = await descriptionResponse.json();
                 const imageDescription = descriptionResult.candidates[0].content.parts[0].text;
                 
-                // Step 2: Get the user's additional prompt
                 const additionalPrompt = additionalPromptInput.value.trim();
 
-                // Step 3: Decide the logic based on the additional prompt
                 if (!additionalPrompt) {
-                    // If no additional prompt, just use the image description translated to English
                     generatedPrompt = imageDescription;
                 } else {
-                    // If there IS an additional prompt, perform the intelligent merge.
                     Swal.update({
                         title: 'กำลังวิเคราะห์ Prompt...',
                         text: 'AI กำลังรวมข้อมูลและปรับแต่ง Prompt ให้สมบูรณ์...',
@@ -333,12 +417,31 @@
         }
         
         async function handleGenerateImage() {
-            const finalPrompt = generatedPromptContainer.textContent;
+            let finalPrompt = generatedPromptContainer.textContent;
             if (!finalPrompt || finalPrompt.startsWith('รอการสร้าง') || finalPrompt.startsWith('เกิดข้อผิดพลาด')) {
                 Swal.fire('ข้อผิดพลาด', 'กรุณาสร้าง Prompt ให้เรียบร้อยก่อนครับ', 'error');
                 return;
             }
+
+            // Get the selected aspect ratio for the API call
+            const selectedRatioInput = document.querySelector('input[name="aspect-ratio"]:checked');
+            let apiAspectRatio = "1:1"; // Default value
+            if (selectedRatioInput) {
+                switch (selectedRatioInput.value) {
+                    case 'aspect-video': apiAspectRatio = '16:9'; break;
+                    case 'aspect-[9/16]': apiAspectRatio = '9:16'; break;
+                    case 'aspect-[4/3]': apiAspectRatio = '4:3'; break;
+                    case 'aspect-[3/4]': apiAspectRatio = '3:4'; break;
+                    case 'aspect-square': default: apiAspectRatio = '1:1'; break;
+                }
+            }
             
+            // Get the selected size and modify prompt if "large"
+            const selectedSizeInput = document.querySelector('input[name="image-size"]:checked');
+            if (selectedSizeInput && selectedSizeInput.value === 'large') {
+                finalPrompt += ", 8k, photorealistic, ultra high detail, masterpiece, professional lighting";
+            }
+
             let timerInterval;
             Swal.fire({
                 title: 'กำลังสร้างภาพใหม่...',
@@ -355,19 +458,23 @@
                     const progressText = document.getElementById('swal-progress-text');
                     let progress = 0;
                     timerInterval = setInterval(() => {
-                        progress = Math.min(progress + 5, 95); // Simulate progress, stop at 95%
+                        progress = Math.min(progress + 5, 95); // Simulate progress
                         if(progressBar) progressBar.style.width = progress + '%';
                         if(progressText) progressText.textContent = progress + '%';
                     }, 400);
                 },
-                willClose: () => {
-                    clearInterval(timerInterval);
-                }
+                willClose: () => { clearInterval(timerInterval); }
             });
 
             try {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${IMAGE_API_KEY}`;
-                const payload = { instances: [{ prompt: finalPrompt }], parameters: { "sampleCount": 1 } };
+                const payload = { 
+                    instances: [{ prompt: finalPrompt }], 
+                    parameters: { 
+                        "sampleCount": 1,
+                        "aspectRatio": apiAspectRatio // Add the aspect ratio to the API call
+                    } 
+                };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 
                 clearInterval(timerInterval);
@@ -391,7 +498,7 @@
                     saveImageBtn.classList.remove('hidden');
                     
                     await Swal.update({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!' });
-                    await saveToGoogle(newBase64Image, finalPrompt);
+                    await saveToGoogle(newBase64Image, generatedPromptContainer.textContent); // Save original prompt
                 } else {
                     throw new Error('API did not return an image.');
                 }
@@ -402,8 +509,6 @@
         }
 
         async function saveToGoogle(imageData, promptText) {
-            // This part runs after the image is displayed.
-            // We show a small, non-blocking notification for this background task.
             const Toast = Swal.mixin({
               toast: true,
               position: 'top-end',
@@ -438,7 +543,7 @@
         function createEmojiBackground() {
             const background = document.querySelector('.emoji-background');
             if (!background) return;
-            const emojis = ['🤖', '⚙️', '�', '🎨', '✨', '🚀', '🖼️', '💾'];
+            const emojis = ['🤖', '⚙️', '💡', '🎨', '✨', '🚀', '🖼️', '💾'];
             const numEmojis = 30;
             for (let i = 0; i < numEmojis; i++) {
                 let emoji = document.createElement('div');
@@ -459,4 +564,3 @@
     </script>
 </body>
 </html>
-�
