@@ -208,7 +208,12 @@
                 </div>
                  <!-- Generated Prompt -->
                 <div class="flex flex-col gap-2 flex-grow">
-                    <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์ (English)</label>
+                     <div class="flex items-center justify-between">
+                        <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์ (English)</label>
+                        <button id="copy-prompt-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Prompt">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
                     <div id="generated-prompt-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
                         <span class="text-gray-400">รอการสร้าง Prompt...</span>
                     </div>
@@ -222,7 +227,7 @@
     <script>
         // --- CONFIGURATION ---
         const PROMPT_API_KEY = "AIzaSyAPzP3da8pDTT9iUZBGIljAg0bgB2W8Zig"; // For describing the image and analysis
-        const IMAGE_API_KEY = "AIzaSyDKj_b7duXUw7Q2pVGAbXYN47gHAf5QcSQ"; // For generating the image
+        const IMAGE_API_KEY = "AIzaSyCS5F2wBrtb63-EYPvAx07kL6LKbTuKdBs"; // For generating the image
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_OddzqbIKW4ijhyQWlubTrMBKzL_JX8fo6ZwMbeNfcivZRghlNlB4nfaMFAQDU9uEFA/exec';
 
         // --- DOM ELEMENTS ---
@@ -234,6 +239,7 @@
         const generatePromptBtn = document.getElementById('generate-prompt-btn');
         const generateImageBtn = document.getElementById('generate-image-btn');
         const generatedPromptContainer = document.getElementById('generated-prompt-container');
+        const copyPromptBtn = document.getElementById('copy-prompt-btn');
         const resultImageContainer = document.getElementById('result-image-container');
         const imagePlaceholder = document.getElementById('image-placeholder');
         const resultImage = document.getElementById('result-image');
@@ -269,10 +275,14 @@
             if (savedAdditional) {
                 additionalPromptInput.value = savedAdditional;
             }
-            if (savedGenerated) {
+            if (savedGenerated && !savedGenerated.includes('รอการสร้าง') && !savedGenerated.includes('เกิดข้อผิดพลาด')) {
                 generatedPromptContainer.innerHTML = savedGenerated;
                 generatedPrompt = generatedPromptContainer.textContent;
+                copyPromptBtn.classList.remove('hidden');
+            } else {
+                 copyPromptBtn.classList.add('hidden');
             }
+
             const ratioRadioToCheck = document.querySelector(`input[value="${savedRatio}"]`);
             if(ratioRadioToCheck) {
                 ratioRadioToCheck.checked = true;
@@ -300,6 +310,7 @@
         imageUpload.addEventListener('change', handleImageUpload);
         generatePromptBtn.addEventListener('click', handleGeneratePrompt);
         generateImageBtn.addEventListener('click', handleGenerateImage);
+        copyPromptBtn.addEventListener('click', handleCopyPrompt);
         
         aspectRatioRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -337,12 +348,40 @@
             };
             reader.readAsDataURL(file);
         }
+        
+        function handleCopyPrompt() {
+            const promptText = generatedPromptContainer.textContent;
+            if (promptText && !promptText.startsWith('รอการสร้าง') && !promptText.startsWith('เกิดข้อผิดพลาด')) {
+                const textArea = document.createElement("textarea");
+                textArea.value = promptText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 2000,
+                      timerProgressBar: true,
+                    });
+                    Toast.fire({
+                      icon: 'success',
+                      title: 'คัดลอก Prompt แล้ว!'
+                    });
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
 
         async function handleGeneratePrompt() {
             if (!base64Image) {
                 Swal.fire('ข้อผิดพลาด', 'กรุณาอัปโหลดภาพก่อนครับ', 'error');
                 return;
             }
+            copyPromptBtn.classList.add('hidden');
             Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
@@ -378,19 +417,7 @@
                         - Create a new, unified prompt that uses the \`Image Description\` as the foundation but creatively and seamlessly integrates the core idea from the \`Additional Prompt\`.
                         - The final prompt must be a very detailed visual description, retaining as many details from the \`Image Description\` as possible (like background, lighting, and composition) while making the user's \`Additional Prompt\` the main subject or action.
                         - The final output MUST be only the resulting English prompt. Do not add any extra text, labels, or explanations.
-
                         ---
-                        EXAMPLE 1:
-                        - Image Description: "A photorealistic image of a fluffy orange cat sitting on a red sofa in a living room."
-                        - Additional Prompt: "an astronaut"
-                        - DESIRED FINAL PROMPT: "A photorealistic image of a fluffy orange cat dressed in a detailed astronaut suit, complete with a helmet, sitting on a red sofa in a living room, looking out a window at the stars."
-
-                        EXAMPLE 2:
-                        - Image Description: "A man standing in a city street at night."
-                        - Additional Prompt: "ให้เขากลายเป็นอัศวิน" (Make him a knight)
-                        - DESIRED FINAL PROMPT: "A knight in shining, ornate armor, standing in the middle of a dark, rain-slicked city street at night, with neon lights reflecting off his helmet."
-                        ---
-
                         INPUTS FOR THIS TASK:
                         - Image Description: "${imageDescription}"
                         - Additional Prompt: "${additionalPrompt}"
@@ -407,6 +434,7 @@
                 }
 
                 generatedPromptContainer.textContent = generatedPrompt;
+                copyPromptBtn.classList.remove('hidden');
                 saveToLocalStorage();
                 Swal.fire('สำเร็จ!', 'สร้าง Prompt ที่สมบูรณ์แล้ว!', 'success');
             } catch (error) {
@@ -423,9 +451,8 @@
                 return;
             }
 
-            // Get the selected aspect ratio for the API call
             const selectedRatioInput = document.querySelector('input[name="aspect-ratio"]:checked');
-            let apiAspectRatio = "1:1"; // Default value
+            let apiAspectRatio = "1:1";
             if (selectedRatioInput) {
                 switch (selectedRatioInput.value) {
                     case 'aspect-video': apiAspectRatio = '16:9'; break;
@@ -436,7 +463,6 @@
                 }
             }
             
-            // Get the selected size and modify prompt if "large"
             const selectedSizeInput = document.querySelector('input[name="image-size"]:checked');
             if (selectedSizeInput && selectedSizeInput.value === 'large') {
                 finalPrompt += ", 8k, photorealistic, ultra high detail, masterpiece, professional lighting";
@@ -458,7 +484,7 @@
                     const progressText = document.getElementById('swal-progress-text');
                     let progress = 0;
                     timerInterval = setInterval(() => {
-                        progress = Math.min(progress + 5, 95); // Simulate progress
+                        progress = Math.min(progress + 5, 95);
                         if(progressBar) progressBar.style.width = progress + '%';
                         if(progressText) progressText.textContent = progress + '%';
                     }, 400);
@@ -472,7 +498,7 @@
                     instances: [{ prompt: finalPrompt }], 
                     parameters: { 
                         "sampleCount": 1,
-                        "aspectRatio": apiAspectRatio // Add the aspect ratio to the API call
+                        "aspectRatio": apiAspectRatio
                     } 
                 };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -498,7 +524,7 @@
                     saveImageBtn.classList.remove('hidden');
                     
                     await Swal.update({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!' });
-                    await saveToGoogle(newBase64Image, generatedPromptContainer.textContent); // Save original prompt
+                    await saveToGoogle(newBase64Image, generatedPromptContainer.textContent);
                 } else {
                     throw new Error('API did not return an image.');
                 }
@@ -564,3 +590,4 @@
     </script>
 </body>
 </html>
+
