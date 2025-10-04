@@ -230,7 +230,7 @@
                 <!-- Keywords -->
                  <div class="flex flex-col gap-2">
                      <div class="flex items-center justify-between">
-                        <label class="block text-lg font-medium text-gray-700">Keywords สำหรับ Adobe Stock (49 คำ)</label>
+                        <label class="block text-lg font-medium text-gray-700">Keywords สำหรับ Adobe Stock (45 คำ)</label>
                         <button id="copy-keywords-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Keywords">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </button>
@@ -404,7 +404,7 @@
             keywordsContainer.innerHTML = '<span class="text-gray-400">กำลังสร้าง Keywords...</span>';
             try {
                 const keywordsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
-                const keywordsInstruction = `Based on the following image description, generate exactly 49 relevant keywords for selling this image on a stock photo site like Adobe Stock. The keywords must be in English, separated by commas, and cover subjects, concepts, style, and composition. Do not number them. Do not write anything else, just the keywords. \n\nDESCRIPTION: "${promptForKeywords}"\n\nKEYWORDS:`;
+                const keywordsInstruction = `Based on the following image description, generate exactly 45 relevant keywords for selling this image on a stock photo site like Adobe Stock. The keywords must be in English, separated by commas, and cover subjects, concepts, style, and composition. Do not number them. Do not write anything else, just the keywords. \n\nDESCRIPTION: "${promptForKeywords}"\n\nKEYWORDS:`;
                 const keywordsPayload = { contents: [{ parts: [{ text: keywordsInstruction }] }] };
                 const keywordsResponse = await fetch(keywordsApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(keywordsPayload) });
                 if (!keywordsResponse.ok) throw new Error(`Keywords API Error: ${(await keywordsResponse.json()).error.message}`);
