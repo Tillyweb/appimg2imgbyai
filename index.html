@@ -120,7 +120,7 @@
     <!-- Floating Emoji Background -->
     <div class="emoji-background"></div>
 
-    <main class="main-card w-full max-w-6xl h-full max-h-[95vh] p-4 sm:p-6 md:p-8 flex flex-col gap-4 overflow-y-auto">
+    <main class="main-card w-full max-w-7xl h-full max-h-[95vh] p-4 sm:p-6 md:p-8 flex flex-col gap-4 overflow-y-auto">
         <header class="text-center mb-4">
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center justify-center">
                 <span>🤖</span>
@@ -187,7 +187,7 @@
                 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ สร้าง Prompt</button>
+                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ สร้างข้อมูลภาพ</button>
                     <button id="generate-image-btn" class="btn-modern btn-yellow w-full">🚀 สร้างภาพ</button>
                 </div>
             </div>
@@ -206,16 +206,37 @@
                     </div>
                     <a id="save-image-btn" href="#" download="ai-generated-image.png" class="btn-modern btn-green w-full text-center hidden mt-4">💾 บันทึกรูปภาพ</a>
                 </div>
-                 <!-- Generated Prompt -->
-                <div class="flex flex-col gap-2 flex-grow">
+                 <!-- Generated Data Section -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Image Title -->
+                    <div>
+                        <label for="image-title" class="block text-lg font-medium text-gray-700">ชื่อรูป</label>
+                        <input type="text" id="image-title" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="ตั้งชื่อรูปของคุณ...">
+                    </div>
+                    <!-- Generated Prompt -->
+                    <div class="flex flex-col gap-2">
+                         <div class="flex items-center justify-between">
+                            <label class="block text-lg font-medium text-gray-700">Prompt (English)</label>
+                            <button id="copy-prompt-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Prompt">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                        <div id="generated-prompt-container" class="w-full h-full min-h-[50px] bg-gray-50 p-2 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
+                            <span class="text-gray-400">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keywords -->
+                 <div class="flex flex-col gap-2">
                      <div class="flex items-center justify-between">
-                        <label class="block text-lg font-medium text-gray-700">📝 Prompt ที่สมบูรณ์ (English)</label>
-                        <button id="copy-prompt-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Prompt">
+                        <label class="block text-lg font-medium text-gray-700">Keywords สำหรับ Adobe Stock (49 คำ)</label>
+                        <button id="copy-keywords-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Keywords">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </button>
                     </div>
-                    <div id="generated-prompt-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
-                        <span class="text-gray-400">รอการสร้าง Prompt...</span>
+                    <div id="keywords-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
+                        <span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>
                     </div>
                 </div>
             </div>
@@ -238,8 +259,14 @@
         const additionalPromptInput = document.getElementById('additional-prompt');
         const generatePromptBtn = document.getElementById('generate-prompt-btn');
         const generateImageBtn = document.getElementById('generate-image-btn');
+        
         const generatedPromptContainer = document.getElementById('generated-prompt-container');
         const copyPromptBtn = document.getElementById('copy-prompt-btn');
+        
+        const imageTitleInput = document.getElementById('image-title');
+        const keywordsContainer = document.getElementById('keywords-container');
+        const copyKeywordsBtn = document.getElementById('copy-keywords-btn');
+        
         const resultImageContainer = document.getElementById('result-image-container');
         const imagePlaceholder = document.getElementById('image-placeholder');
         const resultImage = document.getElementById('result-image');
@@ -250,48 +277,53 @@
 
         // --- STATE ---
         let base64Image = null;
-        let generatedPrompt = '';
 
         // --- LOCAL STORAGE ---
         function saveToLocalStorage() {
             localStorage.setItem('img2img_additionalPrompt', additionalPromptInput.value);
             localStorage.setItem('img2img_generatedPrompt', generatedPromptContainer.innerHTML);
+            localStorage.setItem('img2img_imageTitle', imageTitleInput.value);
+            localStorage.setItem('img2img_keywords', keywordsContainer.innerHTML);
+
             const selectedRatio = document.querySelector('input[name="aspect-ratio"]:checked');
-            if (selectedRatio) {
-                localStorage.setItem('img2img_aspectRatio', selectedRatio.value);
-            }
+            if (selectedRatio) localStorage.setItem('img2img_aspectRatio', selectedRatio.value);
+            
             const selectedSize = document.querySelector('input[name="image-size"]:checked');
-            if (selectedSize) {
-                localStorage.setItem('img2img_imageSize', selectedSize.value);
-            }
+            if (selectedSize) localStorage.setItem('img2img_imageSize', selectedSize.value);
         }
 
         function loadFromLocalStorage() {
-            const savedAdditional = localStorage.getItem('img2img_additionalPrompt');
+            additionalPromptInput.value = localStorage.getItem('img2img_additionalPrompt') || '';
+            imageTitleInput.value = localStorage.getItem('img2img_imageTitle') || '';
+            
             const savedGenerated = localStorage.getItem('img2img_generatedPrompt');
-            const savedRatio = localStorage.getItem('img2img_aspectRatio') || 'aspect-square';
-            const savedSize = localStorage.getItem('img2img_imageSize') || 'standard';
-
-            if (savedAdditional) {
-                additionalPromptInput.value = savedAdditional;
-            }
-            if (savedGenerated && !savedGenerated.includes('รอการสร้าง') && !savedGenerated.includes('เกิดข้อผิดพลาด')) {
+            if (savedGenerated && !savedGenerated.includes('รอการสร้าง') && !savedGenerated.includes('...')) {
                 generatedPromptContainer.innerHTML = savedGenerated;
-                generatedPrompt = generatedPromptContainer.textContent;
                 copyPromptBtn.classList.remove('hidden');
             } else {
                  copyPromptBtn.classList.add('hidden');
+                 generatedPromptContainer.innerHTML = '<span class="text-gray-400">...</span>';
             }
 
+            const savedKeywords = localStorage.getItem('img2img_keywords');
+             if (savedKeywords && !savedKeywords.includes('รอการสร้าง') && !savedKeywords.includes('...')) {
+                keywordsContainer.innerHTML = savedKeywords;
+                copyKeywordsBtn.classList.remove('hidden');
+            } else {
+                 copyKeywordsBtn.classList.add('hidden');
+                 keywordsContainer.innerHTML = '<span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>';
+            }
+
+            const savedRatio = localStorage.getItem('img2img_aspectRatio') || 'aspect-square';
             const ratioRadioToCheck = document.querySelector(`input[value="${savedRatio}"]`);
             if(ratioRadioToCheck) {
                 ratioRadioToCheck.checked = true;
                 setAspectRatio(savedRatio);
             }
+
+            const savedSize = localStorage.getItem('img2img_imageSize') || 'standard';
             const sizeRadioToCheck = document.querySelector(`input[value="${savedSize}"]`);
-            if(sizeRadioToCheck) {
-                sizeRadioToCheck.checked = true;
-            }
+            if(sizeRadioToCheck) sizeRadioToCheck.checked = true;
         }
         
         // --- EVENT LISTENERS ---
@@ -310,20 +342,12 @@
         imageUpload.addEventListener('change', handleImageUpload);
         generatePromptBtn.addEventListener('click', handleGeneratePrompt);
         generateImageBtn.addEventListener('click', handleGenerateImage);
-        copyPromptBtn.addEventListener('click', handleCopyPrompt);
+        copyPromptBtn.addEventListener('click', () => copyContent(generatedPromptContainer, 'Prompt'));
+        copyKeywordsBtn.addEventListener('click', () => copyContent(keywordsContainer, 'Keywords'));
+        imageTitleInput.addEventListener('input', updateSaveButtonFilename);
         
-        aspectRatioRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                setAspectRatio(e.target.value);
-                saveToLocalStorage();
-            });
-        });
-
-        sizeRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                saveToLocalStorage();
-            });
-        });
+        aspectRatioRadios.forEach(radio => radio.addEventListener('change', (e) => { setAspectRatio(e.target.value); saveToLocalStorage(); }));
+        sizeRadios.forEach(radio => radio.addEventListener('change', () => saveToLocalStorage()));
 
 
         // --- FUNCTIONS ---
@@ -331,7 +355,6 @@
             const aspectRatios = ['aspect-square', 'aspect-video', 'aspect-[9/16]', 'aspect-[4/3]', 'aspect-[3/4]'];
             imagePreviewContainer.classList.remove(...aspectRatios);
             resultImageContainer.classList.remove(...aspectRatios);
-            
             imagePreviewContainer.classList.add(ratioClass);
             resultImageContainer.classList.add(ratioClass);
         }
@@ -349,30 +372,49 @@
             reader.readAsDataURL(file);
         }
         
-        function handleCopyPrompt() {
-            const promptText = generatedPromptContainer.textContent;
-            if (promptText && !promptText.startsWith('รอการสร้าง') && !promptText.startsWith('เกิดข้อผิดพลาด')) {
+        function copyContent(container, contentType) {
+            const text = container.textContent;
+            if (text && !text.includes('รอการสร้าง') && !text.includes('...') && !text.includes('เกิดข้อผิดพลาด')) {
                 const textArea = document.createElement("textarea");
-                textArea.value = promptText;
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    const Toast = Swal.mixin({
-                      toast: true,
-                      position: 'top-end',
-                      showConfirmButton: false,
-                      timer: 2000,
-                      timerProgressBar: true,
-                    });
-                    Toast.fire({
-                      icon: 'success',
-                      title: 'คัดลอก Prompt แล้ว!'
-                    });
+                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true });
+                    Toast.fire({ icon: 'success', title: `คัดลอก ${contentType} แล้ว!` });
                 } catch (err) {
                     console.error('Failed to copy text: ', err);
                 }
                 document.body.removeChild(textArea);
+            }
+        }
+
+        function updateSaveButtonFilename() {
+            let filename = imageTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            if (!filename) {
+                filename = 'ai-generated-image';
+            }
+            saveImageBtn.download = `${filename}.png`;
+            saveToLocalStorage();
+        }
+
+        async function generateKeywords(promptForKeywords) {
+            copyKeywordsBtn.classList.add('hidden');
+            keywordsContainer.innerHTML = '<span class="text-gray-400">กำลังสร้าง Keywords...</span>';
+            try {
+                const keywordsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
+                const keywordsInstruction = `Based on the following image description, generate exactly 49 relevant keywords for selling this image on a stock photo site like Adobe Stock. The keywords must be in English, separated by commas, and cover subjects, concepts, style, and composition. Do not number them. Do not write anything else, just the keywords. \n\nDESCRIPTION: "${promptForKeywords}"\n\nKEYWORDS:`;
+                const keywordsPayload = { contents: [{ parts: [{ text: keywordsInstruction }] }] };
+                const keywordsResponse = await fetch(keywordsApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(keywordsPayload) });
+                if (!keywordsResponse.ok) throw new Error(`Keywords API Error: ${(await keywordsResponse.json()).error.message}`);
+                const keywordsResult = await keywordsResponse.json();
+                const keywords = keywordsResult.candidates[0].content.parts[0].text.trim();
+                keywordsContainer.textContent = keywords;
+                copyKeywordsBtn.classList.remove('hidden');
+            } catch(error) {
+                console.error("Error generating keywords:", error);
+                keywordsContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาดในการสร้าง Keywords</span>`;
             }
         }
 
@@ -382,72 +424,66 @@
                 return;
             }
             copyPromptBtn.classList.add('hidden');
+            copyKeywordsBtn.classList.add('hidden');
+            keywordsContainer.innerHTML = '<span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>';
+
+
             Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
+                // Step 1: Get image description
                 const descriptionApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
                 const descriptionPayload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
                 const descriptionResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(descriptionPayload) });
                 if (!descriptionResponse.ok) throw new Error(`Description API Error: ${(await descriptionResponse.json()).error.message}`);
-                
                 const descriptionResult = await descriptionResponse.json();
                 const imageDescription = descriptionResult.candidates[0].content.parts[0].text;
                 
                 const additionalPrompt = additionalPromptInput.value.trim();
+                let finalPrompt;
 
                 if (!additionalPrompt) {
-                    generatedPrompt = imageDescription;
+                    finalPrompt = imageDescription;
                 } else {
-                    Swal.update({
-                        title: 'กำลังวิเคราะห์ Prompt...',
-                        text: 'AI กำลังรวมข้อมูลและปรับแต่ง Prompt ให้สมบูรณ์...',
-                    });
-
-                    const analysisApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
-                    
-                    const analysisInstruction = `
-                        You are a highly skilled prompt engineer. Your mission is to intelligently merge two pieces of information into one single, highly detailed, and effective image generation prompt in English.
-
-                        INPUTS:
-                        1.  \`Image Description\`: This is a detailed description of an existing image. It provides the base scene, subject, and environment.
-                        2.  \`Additional Prompt\`: This is a user's modification or core idea. This input has HIGHER PRIORITY.
-
-                        YOUR TASK:
-                        - Analyze both inputs.
-                        - Create a new, unified prompt that uses the \`Image Description\` as the foundation but creatively and seamlessly integrates the core idea from the \`Additional Prompt\`.
-                        - The final prompt must be a very detailed visual description, retaining as many details from the \`Image Description\` as possible (like background, lighting, and composition) while making the user's \`Additional Prompt\` the main subject or action.
-                        - The final output MUST be only the resulting English prompt. Do not add any extra text, labels, or explanations.
-                        ---
-                        INPUTS FOR THIS TASK:
-                        - Image Description: "${imageDescription}"
-                        - Additional Prompt: "${additionalPrompt}"
-                        ---
-                        FINAL ENGLISH PROMPT:
-                    `;
-
+                    Swal.update({ title: 'กำลังวิเคราะห์ Prompt...', text: 'AI กำลังรวมข้อมูลและปรับแต่ง Prompt ให้สมบูรณ์...' });
+                    const analysisInstruction = `You are a highly skilled prompt engineer. Your mission is to intelligently merge two pieces of information into one single, highly detailed, and effective image generation prompt in English. The \`Additional Prompt\` has HIGHER PRIORITY. Retain details from the \`Image Description\` that are compatible with the new core idea. The final output MUST be only the resulting English prompt. \n\nImage Description: "${imageDescription}"\nAdditional Prompt: "${additionalPrompt}"\n\nFINAL ENGLISH PROMPT:`;
                     const analysisPayload = { contents: [{ parts: [{ text: analysisInstruction }] }] };
-                    const analysisResponse = await fetch(analysisApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisPayload) });
+                    const analysisResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisPayload) });
                     if (!analysisResponse.ok) throw new Error(`Analysis API Error: ${(await analysisResponse.json()).error.message}`);
-
                     const analysisResult = await analysisResponse.json();
-                    generatedPrompt = analysisResult.candidates[0].content.parts[0].text.trim();
+                    finalPrompt = analysisResult.candidates[0].content.parts[0].text.trim();
                 }
 
-                generatedPromptContainer.textContent = generatedPrompt;
+                generatedPromptContainer.textContent = finalPrompt;
                 copyPromptBtn.classList.remove('hidden');
+                
+                // Step 2: Generate Title from the final prompt
+                 Swal.update({ title: 'กำลังสร้างข้อมูลภาพ...', text: 'AI กำลังคิดชื่อที่เหมาะสม...' });
+                 const titleInstruction = `Based on this image prompt, create a short, catchy, and descriptive title in English. The title should be no more than 10 words. Output ONLY the title text. \n\nPROMPT: "${finalPrompt}" \n\nTITLE:`;
+                 const titlePayload = { contents: [{ parts: [{ text: titleInstruction }] }] };
+                 const titleResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(titlePayload) });
+                 if (!titleResponse.ok) throw new Error(`Title API Error: ${(await titleResponse.json()).error.message}`);
+                 const titleResult = await titleResponse.json();
+                 imageTitleInput.value = titleResult.candidates[0].content.parts[0].text.trim();
+                 updateSaveButtonFilename();
+
+                // Step 3: Generate Keywords right after
+                Swal.update({ title: 'กำลังสร้างข้อมูลภาพ...', text: 'AI กำลังสร้าง Keywords ที่เกี่ยวข้อง...' });
+                await generateKeywords(finalPrompt);
+
                 saveToLocalStorage();
-                Swal.fire('สำเร็จ!', 'สร้าง Prompt ที่สมบูรณ์แล้ว!', 'success');
+                Swal.fire('สำเร็จ!', 'สร้างข้อมูลภาพและ Keywords เรียบร้อย!', 'success');
             } catch (error) {
-                console.error("Error generating prompt:", error);
-                Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้าง Prompt ได้: ${error.message}`, 'error');
-                generatedPromptContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาด: ${error.message}</span>`;
+                console.error("Error generating prompt/title/keywords:", error);
+                Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้างข้อมูลได้: ${error.message}`, 'error');
+                generatedPromptContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาด</span>`;
             }
         }
         
         async function handleGenerateImage() {
             let finalPrompt = generatedPromptContainer.textContent;
-            if (!finalPrompt || finalPrompt.startsWith('รอการสร้าง') || finalPrompt.startsWith('เกิดข้อผิดพลาด')) {
-                Swal.fire('ข้อผิดพลาด', 'กรุณาสร้าง Prompt ให้เรียบร้อยก่อนครับ', 'error');
+            if (!finalPrompt || finalPrompt.startsWith('...') || finalPrompt.startsWith('เกิดข้อผิดพลาด')) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณาสร้างข้อมูลภาพให้เรียบร้อยก่อนครับ', 'error');
                 return;
             }
 
@@ -471,13 +507,7 @@
             let timerInterval;
             Swal.fire({
                 title: 'กำลังสร้างภาพใหม่...',
-                html: `
-                    <p>AI กำลังใช้เวทมนตร์ โปรดรอสักครู่...</p>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-                      <div id="swal-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <b id="swal-progress-text" class="py-2">0%</b>
-                `,
+                html: `<p>AI กำลังใช้เวทมนตร์ โปรดรอสักครู่...</p><div class="w-full bg-gray-200 rounded-full h-2.5 mt-4"><div id="swal-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div><b id="swal-progress-text" class="py-2">0%</b>`,
                 allowOutsideClick: false,
                 didOpen: () => {
                     const progressBar = document.getElementById('swal-progress-bar');
@@ -494,13 +524,7 @@
 
             try {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${IMAGE_API_KEY}`;
-                const payload = { 
-                    instances: [{ prompt: finalPrompt }], 
-                    parameters: { 
-                        "sampleCount": 1,
-                        "aspectRatio": apiAspectRatio
-                    } 
-                };
+                const payload = { instances: [{ prompt: finalPrompt }], parameters: { "sampleCount": 1, "aspectRatio": apiAspectRatio } };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 
                 clearInterval(timerInterval);
@@ -523,7 +547,8 @@
                     saveImageBtn.href = newBase64Image;
                     saveImageBtn.classList.remove('hidden');
                     
-                    await Swal.update({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!' });
+                    await Swal.fire({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!', icon: 'success' });
+                    // Keywords are already generated, no need to call it here.
                     await saveToGoogle(newBase64Image, generatedPromptContainer.textContent);
                 } else {
                     throw new Error('API did not return an image.');
@@ -536,26 +561,14 @@
 
         async function saveToGoogle(imageData, promptText) {
             const Toast = Swal.mixin({
-              toast: true,
-              position: 'top-end',
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-              }
+              toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+              didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
             });
-            Toast.fire({
-              icon: 'info',
-              title: 'กำลังบันทึกไปยัง Google Drive...'
-            });
+            Toast.fire({ icon: 'info', title: 'กำลังบันทึกไปยัง Google Drive...' });
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image: imageData, prompt: promptText })
                 });
                 Toast.fire({ icon: 'success', title: 'บันทึกเรียบร้อย!' });
