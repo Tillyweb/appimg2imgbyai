@@ -53,7 +53,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function generateWithRetry(url: string, payload: any, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(`${url}?key=${apiKey}`, {
+      const response = await fetch(`${url}&key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -68,7 +68,7 @@ async function generateWithRetry(url: string, payload: any, retries = 3) {
 }
 
 export const generateImage = async (prompt: string, aspectRatio: AspectRatio): Promise<string> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
   
   const payload = {
     instances: [
@@ -81,7 +81,7 @@ export const generateImage = async (prompt: string, aspectRatio: AspectRatio): P
   };
 
   try {
-    const response = await fetch(`${url}?key=${apiKey}`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
