@@ -1,606 +1,636 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 AI Img2Img Creator | โปรแกรมสร้างภาพด้วย AI</title>
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  Sparkles, 
+  Image as ImageIcon, 
+  Wand2, 
+  Download, 
+  Copy, 
+  RefreshCw, 
+  Zap, 
+  AlertCircle,
+  LayoutTemplate,
+  Check,
+  Camera,
+  Briefcase,
+  Coffee,
+  Palette,
+  X // เพิ่มไอคอน X สำหรับปุ่ม Clear
+} from 'lucide-react';
+
+/**
+ * ------------------------------------------------------------------
+ * TYPES
+ * ------------------------------------------------------------------
+ */
+export enum AppState {
+  IDLE = 'IDLE',
+  GENERATING_TEXT = 'GENERATING_TEXT',
+  GENERATING_IMAGE = 'GENERATING_IMAGE',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR'
+}
+
+export interface GeneratedImage {
+  id: string;
+  url: string;
+  prompt: string;
+  createdAt: number;
+}
+
+export type AspectRatio = '1:1' | '3:4' | '4:3' | '16:9' | '9:16';
+export type StockStyle = 'General' | 'Business' | 'Lifestyle' | 'Beauty';
+
+/**
+ * ------------------------------------------------------------------
+ * SERVICES (Gemini API Integration)
+ * ------------------------------------------------------------------
+ */
+const apiKey = ""; // API Key injected by environment
+
+// Helper for delays/retries
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function generateWithRetry(url: string, payload: any, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(`${url}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
+      return await response.json();
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await delay(1000 * Math.pow(2, i));
+    }
+  }
+}
+
+export const generateImage = async (prompt: string, aspectRatio: AspectRatio): Promise<string> => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`;
+  
+  const payload = {
+    instances: [
+      { prompt: `${prompt} --aspect-ratio ${aspectRatio}` }
+    ],
+    parameters: {
+      sampleCount: 1,
+      aspectRatio: aspectRatio
+    }
+  };
+
+  try {
+    const response = await fetch(`${url}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
     
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    const result = await response.json();
+    if (result.error) throw new Error(result.error.message);
     
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <style>
-        /* Custom styles for the robot theme and animations */
-        body {
-            font-family: 'IBM Plex Sans Thai', sans-serif;
-            background-color: #f0f7ff; /* Light blue base */
-            overflow: hidden; /* Hide scrollbars from the main page */
-        }
+    const base64 = result.predictions?.[0]?.bytesBase64Encoded;
+    if (base64) {
+      return `data:image/png;base64,${base64}`;
+    }
+    throw new Error("No image data returned");
+  } catch (error) {
+    console.error("Image generation error:", error);
+    throw error;
+  }
+};
 
-        /* 3D floating emoji background */
-        .emoji-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            perspective: 1000px; /* Add perspective for 3D effect */
-        }
+export const enhancePrompt = async (originalPrompt: string): Promise<string> => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`;
+  
+  const systemPrompt = "You are an expert prompt engineer for AI image generation (Imagen/Midjourney). Your goal is to rewrite the user's simple prompt into a highly detailed, descriptive, and artistic prompt that yields high-quality, realistic, or stylized results depending on context. Focus on lighting, texture, composition, and mood. Respond ONLY with the enhanced prompt text.";
+  
+  const payload = {
+    contents: [{ parts: [{ text: `Enhance this prompt for an AI image generator: "${originalPrompt}"` }] }],
+    systemInstruction: { parts: [{ text: systemPrompt }] }
+  };
 
-        .emoji {
-            position: absolute;
-            font-size: 2.5rem; /* Emoji size */
-            animation: float 30s infinite linear;
-            opacity: 0.6;
-            text-shadow: 0 0 10px rgba(0,0,0,0.2);
-            transform-style: preserve-3d; /* Important for 3D transforms */
-        }
+  try {
+    const data = await generateWithRetry(url, payload);
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || originalPrompt;
+  } catch (error) {
+    console.error("Enhance prompt error:", error);
+    return originalPrompt; // Fallback
+  }
+};
 
-        @keyframes float {
-            0% { 
-                transform: translateY(110vh) translateZ(0) rotateX(0deg) rotateY(0deg); 
-            }
-            100% { 
-                transform: translateY(-10vh) translateZ(400px) rotateX(720deg) rotateY(360deg); 
-            }
-        }
+export const generateStockPrompt = async (topic: string, style: StockStyle): Promise<string> => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`;
+  
+  const styleGuides = {
+    'General': 'versatile, commercial, high quality',
+    'Business': 'professional, corporate, office setting, confident, success',
+    'Lifestyle': 'candid, authentic, daily life, warm lighting, natural',
+    'Beauty': 'high fashion, skincare, clean lighting, elegant, macro details'
+  };
 
-        /* Rainbow text effect for the title */
-        .text-rainbow {
-            background-image: linear-gradient(-45deg, #a1c4fd, #c2e9fb, #a8e063, #fbc2eb, #a1c4fd, #c2e9fb);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: rainbow-flow 10s ease infinite;
-        }
+  const systemPrompt = `You are a professional stock photographer and prompt engineer. Create a commercially viable stock photo prompt for the topic provided. 
+  Style: ${style} (${styleGuides[style]}).
+  Include technical keywords like '8k resolution', 'highly detailed', 'soft lighting', 'depth of field'.
+  Respond ONLY with the prompt text.`;
 
-        @keyframes rainbow-flow {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
+  const payload = {
+    contents: [{ parts: [{ text: `Create a stock photo prompt for the topic: "${topic}"` }] }],
+    systemInstruction: { parts: [{ text: systemPrompt }] }
+  };
 
-        /* Custom button styling */
-        .btn-modern {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            color: #333;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+  try {
+    const data = await generateWithRetry(url, payload);
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || topic;
+  } catch (error) {
+    console.error("Stock prompt error:", error);
+    throw error;
+  }
+};
 
-        .btn-green {
-            background-color: #e0f2f1; /* Soft green */
-            border-color: #a7d8d4;
-        }
-        .btn-green:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(45, 156, 219, 0.3);
-            background-color: #c8e6c9;
-        }
+/**
+ * ------------------------------------------------------------------
+ * COMPONENTS
+ * ------------------------------------------------------------------
+ */
 
-        .btn-yellow {
-            background-color: #fffde7; /* Soft yellow */
-            border-color: #fff59d;
-        }
-        .btn-yellow:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(249, 168, 37, 0.3);
-            background-color: #fff9c4;
-        }
+const Header = () => (
+  <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 rounded-lg text-white">
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="font-bold text-xl text-slate-800 tracking-tight">Gemini Creative Studio</h1>
+          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">AI Powered Workspace</p>
+        </div>
+      </div>
+      <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-600">
+        <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full border border-slate-200">
+          <Zap className="w-3.5 h-3.5 text-amber-500" />
+          <span>Pro Mode Active</span>
+        </span>
+      </div>
+    </div>
+  </header>
+);
+
+const PromptInput = ({ 
+  prompt, 
+  setPrompt, 
+  aspectRatio, 
+  setAspectRatio, 
+  onGenerate, 
+  onEnhance, 
+  onGenerateStockPrompt, 
+  onAutoRun, 
+  isGenerating, 
+  isEnhancing, 
+  isGeneratingStock, 
+  isAutoRunning 
+}: any) => {
+  const [stockTopic, setStockTopic] = useState('');
+
+  const aspectRatios: { value: AspectRatio; label: string; icon: any }[] = [
+    { value: '1:1', label: 'Square (1:1)', icon: LayoutTemplate },
+    { value: '3:4', label: 'Portrait (3:4)', icon: LayoutTemplate },
+    { value: '4:3', label: 'Landscape (4:3)', icon: LayoutTemplate },
+    { value: '9:16', label: 'Story (9:16)', icon: LayoutTemplate },
+    { value: '16:9', label: 'Cinema (16:9)', icon: LayoutTemplate },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Main Prompt Area */}
+      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex justify-between items-center mb-3">
+          <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+            <Wand2 className="w-4 h-4 text-indigo-500" />
+            คำสั่งสร้างรูป (Prompt)
+          </label>
+          <button 
+            onClick={onEnhance}
+            disabled={isEnhancing || !prompt}
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-md transition-colors flex items-center gap-1 disabled:opacity-50"
+          >
+            {isEnhancing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            ช่วยคิดคำให้สวย
+          </button>
+        </div>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="อธิบายรูปภาพที่คุณต้องการ... (เช่น: แมวเปอร์เซียใส่แว่นกันแดด นั่งอยู่ริมชายหาดตอนพระอาทิตย์ตก)"
+          className="w-full h-32 p-4 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none transition-all placeholder:text-slate-400 text-sm leading-relaxed"
+        />
         
-        /* Custom class for the main card */
-        .main-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        /* Custom radio button styles */
-        .aspect-ratio-selector input:checked + label,
-        .size-selector input:checked + label {
-            background-color: #a1c4fd;
-            color: #fff;
-            border-color: #7badd3;
-        }
-    </style>
-</head>
-<body class="w-full h-screen flex items-center justify-center p-4">
-
-    <!-- Floating Emoji Background -->
-    <div class="emoji-background"></div>
-
-    <main class="main-card w-full max-w-7xl h-full max-h-[95vh] p-4 sm:p-6 md:p-8 flex flex-col gap-4 overflow-y-auto">
-        <header class="text-center mb-4">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center justify-center">
-                <span>🤖</span>
-                <span class="text-rainbow ml-3">AI Img2Img Creator</span>
-            </h1>
-            <p class="text-gray-600 mt-2">อัปโหลดภาพ, ปรับแต่ง Prompt, แล้วให้ AI สร้างสรรค์ผลงานใหม่ให้คุณ</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 flex-grow">
-            <!-- Left Side: Controls and Prompt -->
-            <div class="flex flex-col gap-4">
-                <!-- Image Upload -->
-                <div>
-                    <label class="block text-lg font-medium text-gray-700 mb-2">1. อัปโหลดภาพต้นฉบับ</label>
-                    <div id="image-preview-container" class="w-full aspect-square bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex items-center justify-center text-center cursor-pointer hover:bg-blue-100 transition-all duration-300">
-                        <input type="file" id="image-upload" accept="image/*" class="hidden">
-                        <div id="upload-prompt" class="text-gray-500">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            <p class="mt-2">คลิกเพื่ออัปโหลด</p>
-                        </div>
-                        <img id="image-preview" src="" alt="Image Preview" class="hidden w-full h-full object-contain rounded-xl"/>
-                    </div>
-                </div>
-
-                <!-- Aspect Ratio & Size Selector -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-lg font-medium text-gray-700">2. เลือกอัตราส่วน</label>
-                        <div class="mt-2 flex flex-wrap gap-2 aspect-ratio-selector">
-                            <input type="radio" name="aspect-ratio" value="aspect-square" id="ar-square" class="hidden" checked>
-                            <label for="ar-square" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">1:1</label>
-                            
-                            <input type="radio" name="aspect-ratio" value="aspect-video" id="ar-landscape" class="hidden">
-                            <label for="ar-landscape" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">16:9</label>
-
-                            <input type="radio" name="aspect-ratio" value="aspect-[9/16]" id="ar-portrait" class="hidden">
-                            <label for="ar-portrait" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">9:16</label>
-
-                            <input type="radio" name="aspect-ratio" value="aspect-[4/3]" id="ar-4-3" class="hidden">
-                            <label for="ar-4-3" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">4:3</label>
-                            
-                            <input type="radio" name="aspect-ratio" value="aspect-[3/4]" id="ar-3-4" class="hidden">
-                            <label for="ar-3-4" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition flex-grow">3:4</label>
-                        </div>
-                    </div>
-                     <div>
-                        <label class="block text-lg font-medium text-gray-700">3. เลือกความละเอียด</label>
-                        <div class="mt-2 grid grid-cols-2 gap-2 size-selector">
-                            <input type="radio" name="image-size" value="standard" id="size-standard" class="hidden" checked>
-                            <label for="size-standard" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">มาตรฐาน</label>
-                            
-                            <input type="radio" name="image-size" value="large" id="size-large" class="hidden">
-                            <label for="size-large" class="cursor-pointer text-center p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">คุณภาพสูง</label>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Additional Prompt -->
-                <div>
-                    <label for="additional-prompt" class="block text-lg font-medium text-gray-700">4. Prompt เพิ่มเติม (ไม่บังคับ)</label>
-                    <textarea id="additional-prompt" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="เช่น 'สุนัขสีน้ำตาล' หรือ 'สไตล์ภาพวาดการ์ตูน'"></textarea>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="generate-prompt-btn" class="btn-modern btn-green w-full">✨ สร้างข้อมูลภาพ</button>
-                    <button id="generate-image-btn" class="btn-modern btn-yellow w-full">🚀 สร้างภาพ</button>
-                </div>
-            </div>
-
-            <!-- Right Side: Generated Image and Prompt -->
-            <div class="flex flex-col gap-4">
-                 <!-- Generated Image -->
-                <div class="flex flex-col items-center justify-start">
-                     <label class="block text-lg font-medium text-gray-700 mb-2 w-full">🎨 ผลลัพธ์ภาพใหม่</label>
-                    <div id="result-image-container" class="w-full aspect-square bg-gray-900/10 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300">
-                        <div id="image-placeholder" class="text-center text-gray-500">
-                            <p class="text-4xl">🖼️</p>
-                            <p>ภาพที่สร้างจะแสดงที่นี่</p>
-                        </div>
-                        <img id="result-image" src="" class="hidden w-full h-full object-contain rounded-xl"/>
-                    </div>
-                    <a id="save-image-btn" href="#" download="ai-generated-image.png" class="btn-modern btn-green w-full text-center hidden mt-4">💾 บันทึกรูปภาพ</a>
-                </div>
-                 <!-- Generated Data Section -->
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Image Title -->
-                    <div>
-                        <label for="image-title" class="block text-lg font-medium text-gray-700">ชื่อรูป</label>
-                        <input type="text" id="image-title" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" placeholder="ตั้งชื่อรูปของคุณ...">
-                    </div>
-                    <!-- Generated Prompt -->
-                    <div class="flex flex-col gap-2">
-                         <div class="flex items-center justify-between">
-                            <label class="block text-lg font-medium text-gray-700">Prompt (English)</label>
-                            <button id="copy-prompt-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Prompt">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
-                        </div>
-                        <div id="generated-prompt-container" class="w-full h-full min-h-[50px] bg-gray-50 p-2 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
-                            <span class="text-gray-400">...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Keywords -->
-                 <div class="flex flex-col gap-2">
-                     <div class="flex items-center justify-between">
-                        <label class="block text-lg font-medium text-gray-700">Keywords สำหรับ Adobe Stock (45 คำ)</label>
-                        <button id="copy-keywords-btn" class="hidden p-2 rounded-full hover:bg-gray-200 transition-colors" title="คัดลอก Keywords">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        </button>
-                    </div>
-                    <div id="keywords-container" class="w-full h-full min-h-[100px] bg-gray-50 p-4 border border-gray-200 rounded-xl text-gray-700 overflow-y-auto">
-                        <span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>
-                    </div>
-                </div>
+        <div className="mt-4 flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+              {aspectRatios.map((ratio) => (
+                <button
+                  key={ratio.value}
+                  onClick={() => setAspectRatio(ratio.value)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all whitespace-nowrap ${
+                    aspectRatio === ratio.value
+                      ? 'bg-slate-800 text-white border-slate-800'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <span className={`block w-3 h-3 border border-current rounded-sm ${
+                    ratio.value === '1:1' ? 'aspect-square' :
+                    ratio.value === '3:4' ? 'aspect-[3/4]' :
+                    ratio.value === '4:3' ? 'aspect-[4/3]' :
+                    ratio.value === '9:16' ? 'aspect-[9/16]' : 'aspect-video'
+                  }`} />
+                  {ratio.label}
+                </button>
+              ))}
             </div>
         </div>
-    </main>
 
-    <!-- SweetAlert2 for notifications -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // --- CONFIGURATION ---
-        const PROMPT_API_KEY = "AIzaSyAPzP3da8pDTT9iUZBGIljAg0bgB2W8Zig"; // For describing the image and analysis
-        const IMAGE_API_KEY = "AIzaSyCS5F2wBrtb63-EYPvAx07kL6LKbTuKdBs"; // For generating the image
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_OddzqbIKW4ijhyQWlubTrMBKzL_JX8fo6ZwMbeNfcivZRghlNlB4nfaMFAQDU9uEFA/exec';
+        <button
+          onClick={onGenerate}
+          disabled={isGenerating || !prompt}
+          className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+        >
+          {isGenerating ? (
+            <>
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              กำลังสร้างสรรค์ผลงาน...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5" />
+              สร้างรูปภาพ (Generate)
+            </>
+          )}
+        </button>
+      </div>
 
-        // --- DOM ELEMENTS ---
-        const imageUpload = document.getElementById('image-upload');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const uploadPrompt = document.getElementById('upload-prompt');
-        const imagePreview = document.getElementById('image-preview');
-        const additionalPromptInput = document.getElementById('additional-prompt');
-        const generatePromptBtn = document.getElementById('generate-prompt-btn');
-        const generateImageBtn = document.getElementById('generate-image-btn');
+      {/* Stock Photo Helper Section */}
+      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+        <div className="absolute top-0 right-0 p-3 opacity-5 pointer-events-none">
+          <Camera className="w-32 h-32" />
+        </div>
         
-        const generatedPromptContainer = document.getElementById('generated-prompt-container');
-        const copyPromptBtn = document.getElementById('copy-prompt-btn');
-        
-        const imageTitleInput = document.getElementById('image-title');
-        const keywordsContainer = document.getElementById('keywords-container');
-        const copyKeywordsBtn = document.getElementById('copy-keywords-btn');
-        
-        const resultImageContainer = document.getElementById('result-image-container');
-        const imagePlaceholder = document.getElementById('image-placeholder');
-        const resultImage = document.getElementById('result-image');
-        const saveImageBtn = document.getElementById('save-image-btn');
-        const aspectRatioRadios = document.querySelectorAll('input[name="aspect-ratio"]');
-        const sizeRadios = document.querySelectorAll('input[name="image-size"]');
+        <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <Camera className="w-4 h-4 text-emerald-600" />
+          Stock Photo Generator
+        </h3>
 
+        <div className="space-y-3">
+          <div className="relative">
+            <input
+              type="text"
+              value={stockTopic}
+              onChange={(e) => setStockTopic(e.target.value)}
+              placeholder="หัวข้อภาพ Stock (เช่น: ประชุมงาน, กาแฟยามเช้า, ออกกำลังกาย)"
+              className="w-full px-4 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+            {stockTopic && (
+              <button
+                onClick={() => setStockTopic('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 bg-transparent hover:bg-slate-100 rounded-full transition-colors"
+                title="ล้างข้อความ"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
-        // --- STATE ---
-        let base64Image = null;
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+             {[
+               { id: 'General', icon: ImageIcon, label: 'ทั่วไป' },
+               { id: 'Business', icon: Briefcase, label: 'ธุรกิจ' },
+               { id: 'Lifestyle', icon: Coffee, label: 'ไลฟ์สไตล์' },
+               { id: 'Beauty', icon: Palette, label: 'บิวตี้' }
+             ].map((item) => (
+               <button
+                 key={item.id}
+                 onClick={() => onGenerateStockPrompt(stockTopic || item.label, item.id as StockStyle)}
+                 disabled={isGeneratingStock}
+                 className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 text-slate-600 hover:text-emerald-700 transition-all text-xs font-medium active:scale-95"
+               >
+                 {/* @ts-ignore */}
+                 <item.icon className="w-4 h-4 mb-0.5" />
+                 {item.label}
+               </button>
+             ))}
+          </div>
 
-        // --- LOCAL STORAGE ---
-        function saveToLocalStorage() {
-            localStorage.setItem('img2img_additionalPrompt', additionalPromptInput.value);
-            localStorage.setItem('img2img_generatedPrompt', generatedPromptContainer.innerHTML);
-            localStorage.setItem('img2img_imageTitle', imageTitleInput.value);
-            localStorage.setItem('img2img_keywords', keywordsContainer.innerHTML);
+          <button
+            onClick={async () => {
+              await onAutoRun(stockTopic || 'Business Meeting', 'Business');
+              setStockTopic('');
+            }}
+            disabled={isAutoRunning}
+            className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+             {isAutoRunning ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Auto Running...
+                </>
+             ) : (
+                <>
+                  <Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />
+                  Run Auto (คิดคำ + สร้างรูป + โหลด)
+                </>
+             )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-            const selectedRatio = document.querySelector('input[name="aspect-ratio"]:checked');
-            if (selectedRatio) localStorage.setItem('img2img_aspectRatio', selectedRatio.value);
-            
-            const selectedSize = document.querySelector('input[name="image-size"]:checked');
-            if (selectedSize) localStorage.setItem('img2img_imageSize', selectedSize.value);
+const ImageResult = ({ image, loading }: { image: GeneratedImage | null, loading: boolean }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyPrompt = () => {
+    if (image?.prompt) {
+      // Use document.execCommand('copy') as a fallback for iframe restrictions
+      // where navigator.clipboard might be blocked
+      const textArea = document.createElement("textarea");
+      textArea.value = image.prompt;
+      
+      // Ensure the textarea is not visible but part of the DOM
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      textArea.style.top = "0";
+      document.body.appendChild(textArea);
+      
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } else {
+           console.error('Fallback: Copying text command was unsuccessful');
         }
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+  };
 
-        function loadFromLocalStorage() {
-            additionalPromptInput.value = localStorage.getItem('img2img_additionalPrompt') || '';
-            imageTitleInput.value = localStorage.getItem('img2img_imageTitle') || '';
-            
-            const savedGenerated = localStorage.getItem('img2img_generatedPrompt');
-            if (savedGenerated && !savedGenerated.includes('รอการสร้าง') && !savedGenerated.includes('...')) {
-                generatedPromptContainer.innerHTML = savedGenerated;
-                copyPromptBtn.classList.remove('hidden');
-            } else {
-                 copyPromptBtn.classList.add('hidden');
-                 generatedPromptContainer.innerHTML = '<span class="text-gray-400">...</span>';
-            }
+  const handleDownload = () => {
+    if (image?.url) {
+      const link = document.createElement('a');
+      link.href = image.url;
+      link.download = `gemini-create-${image.id}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
-            const savedKeywords = localStorage.getItem('img2img_keywords');
-             if (savedKeywords && !savedKeywords.includes('รอการสร้าง') && !savedKeywords.includes('...')) {
-                keywordsContainer.innerHTML = savedKeywords;
-                copyKeywordsBtn.classList.remove('hidden');
-            } else {
-                 copyKeywordsBtn.classList.add('hidden');
-                 keywordsContainer.innerHTML = '<span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>';
-            }
+  return (
+    <div className="h-full min-h-[500px] flex flex-col">
+      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative group">
+        {loading ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-10">
+            <div className="relative w-20 h-20 mb-4">
+              <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p className="text-slate-500 font-medium animate-pulse">กำลังวาดภาพจินตนาการ...</p>
+            <p className="text-xs text-slate-400 mt-2">Gemini AI</p>
+          </div>
+        ) : image ? (
+          <div className="relative h-full flex items-center justify-center bg-slate-900">
+             <img 
+               src={image.url} 
+               alt="Generated" 
+               className="max-w-full max-h-full object-contain shadow-2xl"
+             />
+             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button 
+                  onClick={handleDownload}
+                  className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white text-slate-700 shadow-lg transition-all"
+                  title="Download"
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+             </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50">
+             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4 border border-slate-200">
+               <ImageIcon className="w-10 h-10 opacity-50" />
+             </div>
+             <p className="font-medium text-slate-500">ยังไม่มีรูปภาพ</p>
+             <p className="text-sm">พิมพ์คำสั่งแล้วกดสร้างรูปได้เลย</p>
+          </div>
+        )}
+      </div>
 
-            const savedRatio = localStorage.getItem('img2img_aspectRatio') || 'aspect-square';
-            const ratioRadioToCheck = document.querySelector(`input[value="${savedRatio}"]`);
-            if(ratioRadioToCheck) {
-                ratioRadioToCheck.checked = true;
-                setAspectRatio(savedRatio);
-            }
+      {image && !loading && (
+        <div className="mt-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+           <div className="flex justify-between items-start gap-4">
+             <div>
+               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Prompt Used</h4>
+               <p className="text-sm text-slate-700 leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">
+                 {image.prompt}
+               </p>
+             </div>
+             <button 
+               onClick={handleCopyPrompt}
+               className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors flex-shrink-0"
+               title="Copy Prompt"
+             >
+               {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+             </button>
+           </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-            const savedSize = localStorage.getItem('img2img_imageSize') || 'standard';
-            const sizeRadioToCheck = document.querySelector(`input[value="${savedSize}"]`);
-            if(sizeRadioToCheck) sizeRadioToCheck.checked = true;
-        }
-        
-        // --- EVENT LISTENERS ---
-        imagePreviewContainer.addEventListener('click', () => imageUpload.click());
-        imagePreviewContainer.addEventListener('dragover', (e) => { e.preventDefault(); imagePreviewContainer.classList.add('bg-blue-200'); });
-        imagePreviewContainer.addEventListener('dragleave', () => { imagePreviewContainer.classList.remove('bg-blue-200'); });
-        imagePreviewContainer.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imagePreviewContainer.classList.remove('bg-blue-200');
-            if (e.dataTransfer.files.length) {
-                imageUpload.files = e.dataTransfer.files;
-                handleImageUpload({ target: imageUpload });
-            }
-        });
+/**
+ * ------------------------------------------------------------------
+ * MAIN APP COMPONENT
+ * ------------------------------------------------------------------
+ */
+const App: React.FC = () => {
+  const [prompt, setPrompt] = useState<string>('');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:4'); // Default to 3:4 for stock vertical
+  const [appState, setAppState] = useState<AppState>(AppState.IDLE);
+  const [currentImage, setCurrentImage] = useState<GeneratedImage | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isGeneratingStock, setIsGeneratingStock] = useState(false);
+  const [isAutoRunning, setIsAutoRunning] = useState(false);
 
-        imageUpload.addEventListener('change', handleImageUpload);
-        generatePromptBtn.addEventListener('click', handleGeneratePrompt);
-        generateImageBtn.addEventListener('click', handleGenerateImage);
-        copyPromptBtn.addEventListener('click', () => copyContent(generatedPromptContainer, 'Prompt'));
-        copyKeywordsBtn.addEventListener('click', () => copyContent(keywordsContainer, 'Keywords'));
-        imageTitleInput.addEventListener('input', updateSaveButtonFilename);
-        
-        aspectRatioRadios.forEach(radio => radio.addEventListener('change', (e) => { setAspectRatio(e.target.value); saveToLocalStorage(); }));
-        sizeRadios.forEach(radio => radio.addEventListener('change', () => saveToLocalStorage()));
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return;
 
+    setAppState(AppState.GENERATING_IMAGE);
+    setError(null);
 
-        // --- FUNCTIONS ---
-        function setAspectRatio(ratioClass) {
-            const aspectRatios = ['aspect-square', 'aspect-video', 'aspect-[9/16]', 'aspect-[4/3]', 'aspect-[3/4]'];
-            imagePreviewContainer.classList.remove(...aspectRatios);
-            resultImageContainer.classList.remove(...aspectRatios);
-            imagePreviewContainer.classList.add(ratioClass);
-            resultImageContainer.classList.add(ratioClass);
-        }
+    try {
+      const imageUrl = await generateImage(prompt, aspectRatio);
+      const newImage: GeneratedImage = {
+        id: crypto.randomUUID(),
+        url: imageUrl,
+        prompt: prompt,
+        createdAt: Date.now(),
+      };
+      setCurrentImage(newImage);
+      setAppState(AppState.SUCCESS);
+    } catch (e: any) {
+      console.error(e);
+      setAppState(AppState.ERROR);
+      setError("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง หรือลองเปลี่ยนคำสั่ง (API อาจไม่ตอบสนอง)");
+    }
+  };
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                base64Image = e.target.result;
-                imagePreview.src = base64Image;
-                imagePreview.classList.remove('hidden');
-                uploadPrompt.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function copyContent(container, contentType) {
-            const text = container.textContent;
-            if (text && !text.includes('รอการสร้าง') && !text.includes('...') && !text.includes('เกิดข้อผิดพลาด')) {
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true });
-                    Toast.fire({ icon: 'success', title: `คัดลอก ${contentType} แล้ว!` });
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                }
-                document.body.removeChild(textArea);
-            }
-        }
+  const handleEnhancePrompt = async () => {
+    if (!prompt.trim()) return;
+    
+    setAppState(AppState.GENERATING_TEXT);
+    try {
+      const enhanced = await enhancePrompt(prompt);
+      setPrompt(enhanced);
+      setAppState(AppState.IDLE);
+    } catch (e) {
+      console.error("Enhance failed", e);
+      setAppState(AppState.IDLE);
+    }
+  };
 
-        function updateSaveButtonFilename() {
-            let filename = imageTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            if (!filename) {
-                filename = 'ai-generated-image';
-            }
-            saveImageBtn.download = `${filename}.png`;
-            saveToLocalStorage();
-        }
+  const handleGenerateStockPrompt = async (topic: string, style: StockStyle) => {
+    setIsGeneratingStock(true);
+    try {
+      const stockPrompt = await generateStockPrompt(topic, style);
+      setPrompt(stockPrompt);
+    } catch (e) {
+      console.error("Stock prompt generation failed", e);
+      setError("ไม่สามารถสร้าง Prompt ได้ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setIsGeneratingStock(false);
+    }
+  };
 
-        async function generateKeywords(promptForKeywords) {
-            copyKeywordsBtn.classList.add('hidden');
-            keywordsContainer.innerHTML = '<span class="text-gray-400">กำลังสร้าง Keywords...</span>';
-            try {
-                const keywordsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
-                const keywordsInstruction = `Based on the following image description, generate exactly 45 relevant keywords for selling this image on a stock photo site like Adobe Stock. The keywords must be in English, separated by commas, and cover subjects, concepts, style, and composition. Do not number them. Do not write anything else, just the keywords. \n\nDESCRIPTION: "${promptForKeywords}"\n\nKEYWORDS:`;
-                const keywordsPayload = { contents: [{ parts: [{ text: keywordsInstruction }] }] };
-                const keywordsResponse = await fetch(keywordsApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(keywordsPayload) });
-                if (!keywordsResponse.ok) throw new Error(`Keywords API Error: ${(await keywordsResponse.json()).error.message}`);
-                const keywordsResult = await keywordsResponse.json();
-                const keywords = keywordsResult.candidates[0].content.parts[0].text.trim();
-                keywordsContainer.textContent = keywords;
-                copyKeywordsBtn.classList.remove('hidden');
-            } catch(error) {
-                console.error("Error generating keywords:", error);
-                keywordsContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาดในการสร้าง Keywords</span>`;
-            }
-        }
+  const handleAutoRun = async (topic: string, style: StockStyle) => {
+    if (!topic.trim()) return;
 
-        async function handleGeneratePrompt() {
-            if (!base64Image) {
-                Swal.fire('ข้อผิดพลาด', 'กรุณาอัปโหลดภาพก่อนครับ', 'error');
-                return;
-            }
-            copyPromptBtn.classList.add('hidden');
-            copyKeywordsBtn.classList.add('hidden');
-            keywordsContainer.innerHTML = '<span class="text-gray-400">Keywords จะถูกสร้างขึ้นหลังจากสร้างข้อมูลภาพ...</span>';
+    setIsAutoRunning(true);
+    setError(null);
+    setAppState(AppState.GENERATING_TEXT); // Start with text generation state
 
+    try {
+      // Step 1: Generate Prompt
+      const stockPrompt = await generateStockPrompt(topic, style);
+      setPrompt(stockPrompt);
 
-            Swal.fire({ title: 'กำลังวิเคราะห์ภาพ...', text: 'AI กำลังสร้างคำบรรยาย...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      // Step 2: Generate Image
+      setAppState(AppState.GENERATING_IMAGE);
+      // Small delay to ensure state updates visually if needed
+      await new Promise(resolve => setTimeout(resolve, 800)); 
+      
+      const imageUrl = await generateImage(stockPrompt, aspectRatio);
+      const newImage: GeneratedImage = {
+        id: crypto.randomUUID(),
+        url: imageUrl,
+        prompt: stockPrompt,
+        createdAt: Date.now(),
+      };
+      setCurrentImage(newImage);
+      setAppState(AppState.SUCCESS);
 
-            try {
-                // Step 1: Get image description
-                const descriptionApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${PROMPT_API_KEY}`;
-                const descriptionPayload = { contents: [{ parts: [{ text: "Describe this image in extreme detail for an image generation prompt. Focus on objects, characters, environment, colors, and style." }, { inline_data: { mime_type: "image/jpeg", data: base64Image.split(',')[1] } }] }] };
-                const descriptionResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(descriptionPayload) });
-                if (!descriptionResponse.ok) throw new Error(`Description API Error: ${(await descriptionResponse.json()).error.message}`);
-                const descriptionResult = await descriptionResponse.json();
-                const imageDescription = descriptionResult.candidates[0].content.parts[0].text;
-                
-                const additionalPrompt = additionalPromptInput.value.trim();
-                let finalPrompt;
+      // Step 3: Auto Download
+      // Note: In some iframe environments auto-download might be blocked, but we'll try.
+      try {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `gemini-stock-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (dlError) {
+        console.warn("Auto download blocked:", dlError);
+      }
 
-                if (!additionalPrompt) {
-                    finalPrompt = imageDescription;
-                } else {
-                    Swal.update({ title: 'กำลังวิเคราะห์ Prompt...', text: 'AI กำลังรวมข้อมูลและปรับแต่ง Prompt ให้สมบูรณ์...' });
-                    const analysisInstruction = `You are a highly skilled prompt engineer. Your mission is to intelligently merge two pieces of information into one single, highly detailed, and effective image generation prompt in English. The \`Additional Prompt\` has HIGHER PRIORITY. Retain details from the \`Image Description\` that are compatible with the new core idea. The final output MUST be only the resulting English prompt. \n\nImage Description: "${imageDescription}"\nAdditional Prompt: "${additionalPrompt}"\n\nFINAL ENGLISH PROMPT:`;
-                    const analysisPayload = { contents: [{ parts: [{ text: analysisInstruction }] }] };
-                    const analysisResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisPayload) });
-                    if (!analysisResponse.ok) throw new Error(`Analysis API Error: ${(await analysisResponse.json()).error.message}`);
-                    const analysisResult = await analysisResponse.json();
-                    finalPrompt = analysisResult.candidates[0].content.parts[0].text.trim();
-                }
+    } catch (e) {
+      console.error("Auto Run Failed", e);
+      setAppState(AppState.ERROR);
+      setError("เกิดข้อผิดพลาดในขั้นตอน Auto Run กรุณาลองใหม่");
+    } finally {
+      setIsAutoRunning(false);
+      setIsGeneratingStock(false); 
+      // appState will remain SUCCESS or ERROR based on flow
+    }
+  };
 
-                generatedPromptContainer.textContent = finalPrompt;
-                copyPromptBtn.classList.remove('hidden');
-                
-                // Step 2: Generate Title from the final prompt
-                 Swal.update({ title: 'กำลังสร้างข้อมูลภาพ...', text: 'AI กำลังคิดชื่อที่เหมาะสม...' });
-                 const titleInstruction = `Based on this image prompt, create a short, catchy, and descriptive title in English. The title should be no more than 10 words. Output ONLY the title text. \n\nPROMPT: "${finalPrompt}" \n\nTITLE:`;
-                 const titlePayload = { contents: [{ parts: [{ text: titleInstruction }] }] };
-                 const titleResponse = await fetch(descriptionApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(titlePayload) });
-                 if (!titleResponse.ok) throw new Error(`Title API Error: ${(await titleResponse.json()).error.message}`);
-                 const titleResult = await titleResponse.json();
-                 imageTitleInput.value = titleResult.candidates[0].content.parts[0].text.trim();
-                 updateSaveButtonFilename();
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] font-sans text-slate-900">
+      <Header />
 
-                // Step 3: Generate Keywords right after
-                Swal.update({ title: 'กำลังสร้างข้อมูลภาพ...', text: 'AI กำลังสร้าง Keywords ที่เกี่ยวข้อง...' });
-                await generateKeywords(finalPrompt);
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn shadow-sm">
+            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-medium text-sm">เกิดข้อผิดพลาด</h3>
+              <p className="text-sm mt-1 text-red-600 opacity-90">{error}</p>
+            </div>
+          </div>
+        )}
 
-                saveToLocalStorage();
-                Swal.fire('สำเร็จ!', 'สร้างข้อมูลภาพและ Keywords เรียบร้อย!', 'success');
-            } catch (error) {
-                console.error("Error generating prompt/title/keywords:", error);
-                Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้างข้อมูลได้: ${error.message}`, 'error');
-                generatedPromptContainer.innerHTML = `<span class="text-red-500">เกิดข้อผิดพลาด</span>`;
-            }
-        }
-        
-        async function handleGenerateImage() {
-            let finalPrompt = generatedPromptContainer.textContent;
-            if (!finalPrompt || finalPrompt.startsWith('...') || finalPrompt.startsWith('เกิดข้อผิดพลาด')) {
-                Swal.fire('ข้อผิดพลาด', 'กรุณาสร้างข้อมูลภาพให้เรียบร้อยก่อนครับ', 'error');
-                return;
-            }
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Controls */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="sticky top-24 space-y-6">
+               <PromptInput 
+                 prompt={prompt}
+                 setPrompt={setPrompt}
+                 aspectRatio={aspectRatio}
+                 setAspectRatio={setAspectRatio}
+                 onGenerate={handleGenerate}
+                 onEnhance={handleEnhancePrompt}
+                 onGenerateStockPrompt={handleGenerateStockPrompt}
+                 onAutoRun={handleAutoRun}
+                 isGenerating={appState === AppState.GENERATING_IMAGE}
+                 isEnhancing={appState === AppState.GENERATING_TEXT}
+                 isGeneratingStock={isGeneratingStock}
+                 isAutoRunning={isAutoRunning}
+               />
+               
+               <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-xl p-5 shadow-sm">
+                  <h4 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-600" />
+                    เคล็ดลับมือโปร (Pro Tips)
+                  </h4>
+                  <ul className="text-xs sm:text-sm text-amber-800 space-y-2 list-disc list-inside opacity-90 leading-relaxed">
+                    <li>ฟีเจอร์ใหม่! ใส่แค่ "หัวข้อ" ด้านบน แล้วให้ AI คิด Prompt แบบมืออาชีพให้</li>
+                    <li><strong>ปุ่ม ⚡ Run Auto:</strong> เหมาะสำหรับทำ Stock Photo ระบบจะคิดคำ+สร้าง+โหลดให้ทันที</li>
+                    <li>ระบบจะใส่ Tag สำคัญ (8k resolution, photorealistic) ให้โดยอัตโนมัติในโหมด Stock</li>
+                    <li>สัดส่วนภาพแนะนำ: 3:4 (แนวตั้งขายดี) หรือ 16:9 (Cinematic)</li>
+                  </ul>
+               </div>
+            </div>
+          </div>
 
-            const selectedRatioInput = document.querySelector('input[name="aspect-ratio"]:checked');
-            let apiAspectRatio = "1:1";
-            if (selectedRatioInput) {
-                switch (selectedRatioInput.value) {
-                    case 'aspect-video': apiAspectRatio = '16:9'; break;
-                    case 'aspect-[9/16]': apiAspectRatio = '9:16'; break;
-                    case 'aspect-[4/3]': apiAspectRatio = '4:3'; break;
-                    case 'aspect-[3/4]': apiAspectRatio = '3:4'; break;
-                    case 'aspect-square': default: apiAspectRatio = '1:1'; break;
-                }
-            }
-            
-            const selectedSizeInput = document.querySelector('input[name="image-size"]:checked');
-            if (selectedSizeInput && selectedSizeInput.value === 'large') {
-                finalPrompt += ", 8k, photorealistic, ultra high detail, masterpiece, professional lighting";
-            }
+          {/* Right Column: Result */}
+          <div className="lg:col-span-7">
+            <ImageResult 
+              image={currentImage} 
+              loading={appState === AppState.GENERATING_IMAGE} 
+            />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
 
-            let timerInterval;
-            Swal.fire({
-                title: 'กำลังสร้างภาพใหม่...',
-                html: `<p>AI กำลังใช้เวทมนตร์ โปรดรอสักครู่...</p><div class="w-full bg-gray-200 rounded-full h-2.5 mt-4"><div id="swal-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div><b id="swal-progress-text" class="py-2">0%</b>`,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    const progressBar = document.getElementById('swal-progress-bar');
-                    const progressText = document.getElementById('swal-progress-text');
-                    let progress = 0;
-                    timerInterval = setInterval(() => {
-                        progress = Math.min(progress + 5, 95);
-                        if(progressBar) progressBar.style.width = progress + '%';
-                        if(progressText) progressText.textContent = progress + '%';
-                    }, 400);
-                },
-                willClose: () => { clearInterval(timerInterval); }
-            });
-
-            try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${IMAGE_API_KEY}`;
-                const payload = { instances: [{ prompt: finalPrompt }], parameters: { "sampleCount": 1, "aspectRatio": apiAspectRatio } };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                
-                clearInterval(timerInterval);
-                const progressBar = document.getElementById('swal-progress-bar');
-                const progressText = document.getElementById('swal-progress-text');
-                if(progressBar) progressBar.style.width = '100%';
-                if(progressText) progressText.textContent = '100%';
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error ? error.error.message : 'Unknown API error');
-                }
-
-                const result = await response.json();
-                if (result.predictions && result.predictions.length > 0) {
-                    const newBase64Image = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    resultImage.src = newBase64Image;
-                    resultImage.classList.remove('hidden');
-                    imagePlaceholder.classList.add('hidden');
-                    saveImageBtn.href = newBase64Image;
-                    saveImageBtn.classList.remove('hidden');
-                    
-                    await Swal.fire({ title: 'สร้างภาพสำเร็จ!', html: 'ภาพของคุณพร้อมแล้ว!', icon: 'success' });
-                    // Keywords are already generated, no need to call it here.
-                    await saveToGoogle(newBase64Image, generatedPromptContainer.textContent);
-                } else {
-                    throw new Error('API did not return an image.');
-                }
-            } catch (error) {
-                 console.error("Error generating image:", error);
-                 Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถสร้างภาพได้: ${error.message}`, 'error');
-            }
-        }
-
-        async function saveToGoogle(imageData, promptText) {
-            const Toast = Swal.mixin({
-              toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
-              didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
-            });
-            Toast.fire({ icon: 'info', title: 'กำลังบันทึกไปยัง Google Drive...' });
-
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: imageData, prompt: promptText })
-                });
-                Toast.fire({ icon: 'success', title: 'บันทึกเรียบร้อย!' });
-            } catch (error) {
-                 console.error("Error saving to Google:", error);
-                 Toast.fire({ icon: 'error', title: 'การบันทึกล้มเหลว' });
-            }
-        }
-
-        // --- BACKGROUND ANIMATION ---
-        function createEmojiBackground() {
-            const background = document.querySelector('.emoji-background');
-            if (!background) return;
-            const emojis = ['🤖', '⚙️', '💡', '🎨', '✨', '🚀', '🖼️', '💾'];
-            const numEmojis = 30;
-            for (let i = 0; i < numEmojis; i++) {
-                let emoji = document.createElement('div');
-                emoji.classList.add('emoji');
-                emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                emoji.style.left = `${Math.random() * 100}vw`;
-                emoji.style.animationDuration = `${Math.random() * 15 + 20}s`;
-                emoji.style.animationDelay = `${Math.random() * 15}s`;
-                background.appendChild(emoji);
-            }
-        }
-
-        // --- INITIALIZATION ---
-        window.onload = () => {
-            createEmojiBackground();
-            loadFromLocalStorage();
-        };
-    </script>
-</body>
-</html>
-
+export default App;
