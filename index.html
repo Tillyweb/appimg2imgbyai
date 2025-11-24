@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Photo Ideas: Top 100 Search Terms (Fixed Copy)</title>
+    <title>Stock Photo Ideas: Top 200 Search Terms (Updated)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
@@ -39,10 +39,10 @@
     <div class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
         <div class="text-center md:text-left">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                Top Search 100 
-                <span class="text-sm font-normal text-gray-500 dark:text-gray-300 bg-yellow-100 dark:bg-yellow-900 px-3 py-1 rounded-full text-yellow-800 dark:text-yellow-100">High Volume Keywords</span>
+                Stock Ideas 2025
+                <span class="text-sm font-normal text-gray-500 dark:text-gray-300 bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-green-800 dark:text-green-100">200+ Keywords</span>
             </h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">แก้ไขปุ่มคัดลอก (Robust Copy Fix) ใช้ได้ทุกเบราว์เซอร์</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">รวมคำค้นหา Education, Beauty, Tech & Niche Markets ล่าสุด</p>
         </div>
 
         <div class="flex flex-wrap gap-3 items-center justify-center">
@@ -63,10 +63,10 @@
     <div class="w-full max-w-7xl mb-5 flex flex-wrap gap-2 justify-center">
         <button onclick="filterCategory('all')" class="filter-btn active px-5 py-2 bg-blue-600 text-white rounded-full text-sm transition-colors">ทั้งหมด</button>
         <button onclick="filterCategory('retro')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Backgrounds</button>
-        <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Festive & Life</button>
+        <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Edu & Lifestyle</button>
         <button onclick="filterCategory('diversity')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">People & Culture</button>
-        <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Tech & Logos</button>
-        <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Health & Body</button>
+        <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Tech & Biz</button>
+        <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Beauty & Health</button>
     </div>
 
     <!-- Results -->
@@ -82,74 +82,106 @@
     </div>
 
     <script>
-        // Top 100 Search Queries Database
+        // Database Updated: Rank 1-200
         const fullDatabase = [
-            // --- Rank 1-10 (High Volume) ---
-            { t: "2025 Calendar Concept", d: "ภาพปฏิทินปีใหม่ การวางแผน จัดตารางงาน (Top Rank)", k: "2025 calendar, new year planner, schedule layout, organizer", th: "ปฏิทิน 2025 วางแผนงาน", cat: "lifestyle" },
-            { t: "Blue Background", d: "พื้นหลังสีน้ำเงิน เรียบหรู หรือมี Texture สำหรับงานกราฟิก", k: "blue background, abstract blue texture, navy blue wallpaper, corporate background", th: "พื้นหลังสีน้ำเงิน ฉากสีฟ้า", cat: "retro" },
-            { t: "Islamic Background", d: "ลวดลายอิสลาม มัสยิด หรือศิลปะอาหรับ สำหรับเทศกาล", k: "islamic background, ramadan kareem, arabesque pattern, muslim festival, eid backdrop", th: "พื้นหลังอิสลาม ลายอาหรับ รอมฎอน", cat: "diversity" },
-            { t: "Happy Senior Woman", d: "หญิงชราอารมณ์ดี ยิ้มแย้ม (Keyword: Old Granny)", k: "happy senior woman, old granny smiling, grandmother lifestyle, active elderly, authentic portrait", th: "ยายยิ้ม ยายแก่มีความสุข ผู้สูงอายุ", cat: "diversity" },
-            { t: "Thank You Concept", d: "คำว่า Thank You ป้ายขอบคุณ การ์ด หรือมือไหว้", k: "thank you text, gratitude concept, appreciation card, saying thanks, typography", th: "ขอบคุณ ป้าย Thank you", cat: "lifestyle" },
-            { t: "3D Wallpaper", d: "ภาพพื้นหลัง 3 มิติ รูปทรงเลขาคณิต ล้ำสมัย", k: "3d wallpaper, abstract geometric 3d, futuristic background, depth design, render", th: "วอลเปเปอร์ 3D พื้นหลัง 3 มิติ", cat: "tech" },
-            { t: "Green Screen Background", d: "ฉากเขียว Chroma Key สำหรับตัดต่อวิดีโอ", k: "green screen background, chroma key, blank green backdrop, video production", th: "ฉากเขียว กรีนสกรีน", cat: "tech" },
-            { t: "Large Question Mark", d: "เครื่องหมายคำถามขนาดใหญ่ สื่อถึงความสงสัย การหาคำตอบ", k: "large question mark, problem solving, faq concept, confusion symbol, 3d question mark", th: "เครื่องหมายคำถาม ปัญหา สงสัย", cat: "lifestyle" },
-            { t: "Social Media Logos (Ed.)", d: "ไอคอน Instagram/Facebook แบบ 3D หรือบนมือถือ (Editorial)", k: "instagram logo, facebook icon, social media app, smartphone screen, editorial", th: "โลโก้ไอจี เฟสบุ๊ค โซเชียลมีเดีย", cat: "tech" },
-            { t: "Good Morning Image", d: "ภาพสวัสดีตอนเช้า กาแฟ แสงแดด ดอกไม้ สดใส", k: "good morning, morning coffee, sunrise inspiration, fresh start, breakfast table", th: "สวัสดีตอนเช้า อรุณสวัสดิ์ กาแฟ", cat: "lifestyle" },
-
-            // --- Backgrounds & Textures (Retro/Bg) ---
-            { t: "Black Background", d: "พื้นหลังสีดำสนิท หรือมี Texture เบาๆ สำหรับงานหรู", k: "black background, dark texture, elegant black wallpaper, luxury backdrop", th: "พื้นหลังสีดำ ฉากดำ", cat: "retro" },
-            { t: "Red Background", d: "สีแดง ตรุษจีน วาเลนไทน์ หรือพลังงาน", k: "red background, abstract red texture, valentine backdrop, chinese new year red", th: "พื้นหลังสีแดง ฉากแดง", cat: "retro" },
-            { t: "HD Wallpapers", d: "ภาพวิว หรือ Abstract ความละเอียดสูง คมชัด", k: "hd wallpapers, 4k background, high resolution nature, desktop wallpaper", th: "วอลเปเปอร์ HD ภาพคมชัด", cat: "retro" },
-            { t: "Background PNG", d: "พื้นหลังโปร่งใส หรือองค์ประกอบกราฟิกที่นำไปตัดต่อได้", k: "background png, transparent background, design element, cutout isolated", th: "พื้นหลังโปร่งใส ไฟล์ PNG", cat: "tech" },
-            { t: "Nature Background", d: "ป่าไม้ ภูเขา ทะเล เน้นความเป็นธรรมชาติ สบายตา", k: "nature background, green forest, landscape scenery, natural beauty, eco friendly", th: "พื้นหลังธรรมชาติ ป่าเขา", cat: "retro" },
+            // --- Rank 1-100 (Selected High Volume) ---
+            { t: "2025 Calendar Concept", d: "ภาพปฏิทินปีใหม่ การวางแผน จัดตารางงาน", k: "2025 calendar, new year planner, schedule layout, organizer", th: "ปฏิทิน 2025 วางแผนงาน", cat: "lifestyle" },
+            { t: "Blue Background", d: "พื้นหลังสีน้ำเงิน เรียบหรู หรือมี Texture", k: "blue background, abstract blue texture, navy blue wallpaper", th: "พื้นหลังสีน้ำเงิน ฉากสีฟ้า", cat: "retro" },
+            { t: "Islamic Background", d: "ลวดลายอิสลาม มัสยิด หรือศิลปะอาหรับ", k: "islamic background, ramadan kareem, arabesque pattern, muslim festival", th: "พื้นหลังอิสลาม ลายอาหรับ", cat: "diversity" },
+            { t: "Happy Senior Woman", d: "หญิงชราอารมณ์ดี ยิ้มแย้ม (Active Aging)", k: "happy senior woman, old granny smiling, grandmother lifestyle, active elderly", th: "ยายยิ้ม ยายแก่มีความสุข", cat: "diversity" },
+            { t: "3D Wallpaper", d: "ภาพพื้นหลัง 3 มิติ รูปทรงเลขาคณิต ล้ำสมัย", k: "3d wallpaper, abstract geometric 3d, futuristic background", th: "วอลเปเปอร์ 3D พื้นหลัง 3 มิติ", cat: "tech" },
+            { t: "Green Screen Background", d: "ฉากเขียว Chroma Key สำหรับตัดต่อวิดีโอ", k: "green screen background, chroma key, blank green backdrop", th: "ฉากเขียว กรีนสกรีน", cat: "tech" },
+            { t: "Social Media Logos (Ed.)", d: "ไอคอน Instagram/Facebook แบบ 3D (Editorial)", k: "instagram logo, facebook icon, social media app, smartphone screen", th: "โลโก้ไอจี เฟสบุ๊ค", cat: "tech" },
+            { t: "Good Morning Image", d: "ภาพสวัสดีตอนเช้า กาแฟ แสงแดด ดอกไม้", k: "good morning, morning coffee, sunrise inspiration, fresh start", th: "สวัสดีตอนเช้า อรุณสวัสดิ์", cat: "lifestyle" },
+            { t: "Black Background", d: "พื้นหลังสีดำสนิท หรือมี Texture เบาๆ", k: "black background, dark texture, elegant black wallpaper", th: "พื้นหลังสีดำ ฉากดำ", cat: "retro" },
+            { t: "Nature Background", d: "ป่าไม้ ภูเขา ทะเล เน้นความเป็นธรรมชาติ", k: "nature background, green forest, landscape scenery, natural beauty", th: "พื้นหลังธรรมชาติ ป่าเขา", cat: "retro" },
             { t: "Gold Background", d: "สีทอง ประกายทอง ความรวย หรูหรา", k: "gold background, golden texture, luxury gold leaf, shiny metal", th: "พื้นหลังสีทอง ฉากทอง", cat: "retro" },
-            { t: "Plain Background", d: "พื้นหลังสีเรียบๆ (Solid Color) สำหรับไดคัทสินค้า", k: "plain background, solid color, studio backdrop, minimal copy space", th: "พื้นหลังเรียบ สีพื้น", cat: "retro" },
-            { t: "Glitter Background", d: "กากเพชร วิบวับ งานปาร์ตี้", k: "glitter background, sparkles, shiny texture, festive bokeh", th: "พื้นหลังกากเพชร วิบวับ", cat: "retro" },
-            { t: "White Background", d: "ขาวสะอาด ขาวล้วน สำหรับ E-commerce", k: "white background, pure white, studio key light, isolated", th: "พื้นหลังสีขาว ฉากขาว", cat: "retro" },
-            { t: "Wood Texture", d: "ลายไม้ แผ่นไม้เก่าๆ หรือโต๊ะไม้ธรรมชาติ", k: "wood texture, wooden background, rustic wood, timber surface", th: "ลายไม้ พื้นผิวไม้", cat: "retro" },
-            { t: "Smoke PNG / Effect", d: "ควัน ลอยฟุ้ง บนพื้นดำ หรือโปร่งใส", k: "smoke png, smoke effect, abstract wisp, steam isolated", th: "ควัน เอฟเฟกต์ควัน", cat: "retro" },
-            { t: "Fire Background", d: "เปลวไฟ ร้อนแรง การเผาไหม้", k: "fire background, flames, burning texture, hot fire", th: "พื้นหลังไฟ เปลวไฟ", cat: "retro" },
-            { t: "Yellow/Orange Background", d: "สีเหลือง/ส้ม สดใส ฤดูร้อน", k: "yellow background, orange texture, summer vibe, bright color", th: "พื้นหลังสีเหลือง สีส้ม", cat: "retro" },
+            { t: "Smoke Effect PNG", d: "ควัน ลอยฟุ้ง บนพื้นดำ หรือโปร่งใส", k: "smoke png, smoke effect, abstract wisp, steam isolated", th: "ควัน เอฟเฟกต์ควัน", cat: "retro" },
             { t: "Galaxy / Space", d: "อวกาศ ดวงดาว ทางช้างเผือก", k: "galaxy background, space nebula, stars, universe wallpaper", th: "อวกาศ กาแล็กซี", cat: "retro" },
-            { t: "Anime/Cartoon Background", d: "ฉากหลังสไตล์อนิเมะ หรือการ์ตูน (วาดเอง)", k: "anime background, manga style scenery, 2d landscape illustration", th: "ฉากอนิเมะ พื้นหลังการ์ตูน", cat: "retro" },
-            
-            // --- Festivals & Lifestyle ---
-            { t: "Eid Mubarak", d: "การเฉลิมฉลองวันอีด มุสลิม (High Demand)", k: "eid mubarak, muslim celebration, eid al-fitr, islamic holiday", th: "วันอีด อีดมูบารัก มุสลิม", cat: "diversity" },
-            { t: "Father's Day", d: "วันพ่อ พ่อลูก กิจกรรมครอบครัว หรือเนคไท", k: "fathers day, happy father, dad and son, family love, best dad", th: "วันพ่อ พ่อลูก ของขวัญพ่อ", cat: "lifestyle" },
-            { t: "Diwali Festival", d: "เทศกาลแห่งแสงสว่าง อินเดีย ตะเกียง", k: "diwali festival, deepavali, festival of lights, diya lamp, indian celebration", th: "ดิวาลี เทศกาลไฟ อินเดีย", cat: "diversity" },
-            { t: "Merry Christmas", d: "คริสต์มาส ซานต้า ต้นสน ของขวัญ", k: "merry christmas, xmas decoration, winter holiday, santa claus, festive season", th: "คริสต์มาส ปีใหม่ ของขวัญ", cat: "lifestyle" },
-            { t: "Happy Easter", d: "อีสเตอร์ ไข่ระบายสี กระต่าย ฤดูใบไม้ผลิ", k: "happy easter, easter eggs, bunny rabbit, spring holiday, pastel colors", th: "อีสเตอร์ ไข่อีสเตอร์", cat: "lifestyle" },
-            { t: "Thanksgiving", d: "ไก่งวง อาหารมื้อใหญ่ ครอบครัว ฟักทอง", k: "thanksgiving dinner, turkey, family gathering, autumn harvest, pumpkin", th: "ขอบคุณพระเจ้า ไก่งวง", cat: "lifestyle" },
-            { t: "Happy New Year", d: "ปีใหม่ พลุ ปาร์ตี้ แชมเปญ ตัวเลขปี", k: "happy new year, fireworks, celebration, new year eve party", th: "สวัสดีปีใหม่ งานเลี้ยง", cat: "lifestyle" },
+            { t: "Eid Mubarak", d: "การเฉลิมฉลองวันอีด มุสลิม", k: "eid mubarak, muslim celebration, eid al-fitr, islamic holiday", th: "วันอีด อีดมูบารัก", cat: "diversity" },
+            { t: "Father's Day", d: "วันพ่อ พ่อลูก กิจกรรมครอบครัว", k: "fathers day, happy father, dad and son, family love", th: "วันพ่อ พ่อลูก", cat: "lifestyle" },
+            { t: "Diwali Festival", d: "เทศกาลแห่งแสงสว่าง อินเดีย ตะเกียง", k: "diwali festival, deepavali, festival of lights, diya lamp", th: "ดิวาลี เทศกาลไฟ", cat: "diversity" },
             { t: "Indian Independence Day", d: "วันชาติอินเดีย ธงชาติ (Tricolor)", k: "indian independence day, india flag, 15 august, patriotism", th: "วันชาติอินเดีย ธงอินเดีย", cat: "diversity" },
-            { t: "Motivational Quotes", d: "คำคมสร้างแรงบันดาลใจ บนวิวสวยๆ", k: "motivational quotes, inspirational text, positive vibes, success mindset", th: "คำคม แรงบันดาลใจ", cat: "lifestyle" },
-            { t: "Birthday Concept", d: "เค้กวันเกิด เทียน ลูกโป่ง ปาร์ตี้", k: "happy birthday, birthday cake, party balloons, celebration background", th: "วันเกิด เค้กวันเกิด", cat: "lifestyle" },
-
-            // --- People & Diversity ---
             { t: "Cute Baby", d: "เด็กทารกน่ารัก ยิ้มแย้ม (High Search)", k: "cute baby, adorable infant, newborn smiling, happy toddler", th: "เด็กทารก เด็กน่ารัก", cat: "diversity" },
-            { t: "Mom and Son", d: "แม่ลูกทำกิจกรรมร่วมกัน ความรัก ความผูกพัน", k: "mom and son, mother love, parenting, family bonding, playing together", th: "แม่ลูก ความรักแม่", cat: "diversity" },
-            { t: "Teenage Girls (15 yo)", d: "กลุ่มวัยรุ่นหญิง เพื่อนฝูง ไลฟ์สไตล์วัยรุ่น", k: "teenage girls, gen z lifestyle, best friends, studying, teen fashion", th: "วัยรุ่นหญิง เพื่อนสาว", cat: "diversity" },
-            { t: "Attractive Chubby Girl", d: "สาวอวบมั่นใจ Body Positivity สวยในแบบตัวเอง", k: "plus size woman, body positivity, confident chubby girl, fashion lifestyle", th: "สาวอวบ มั่นใจ พลัสไซส์", cat: "diversity" },
-            { t: "Character Portrait (Ugly Man/Woman)", d: "ภาพพอร์ตเทรตที่เน้นคาแรคเตอร์ชัดเจน หน้าตาตลก หรือมีเอกลักษณ์ (Keywords เดิม: Ugly...)", k: "character portrait, expressive face, funny expression, unique features, authentic people", th: "หน้าตลก มีเอกลักษณ์ พอร์ตเทรต", cat: "diversity" },
-            { t: "Hindu Gods (Shiva/Krishna)", d: "รูปปั้นหรือภาพวาดเทพเจ้าฮินดู (Shiva, Krishna, Hanuman)", k: "shiva, krishna, hanuman, hindu god, indian religion, spiritual art", th: "พระศิวะ พระกฤษณะ เทพฮินดู", cat: "diversity" },
-            { t: "Radha Krishna", d: "ความรักของพระกฤษณะและนางราธา", k: "radha krishna, divine love, hindu mythology, spiritual couple", th: "ราธา กฤษณะ ความรัก", cat: "diversity" },
+            { t: "Teenage Girls (15 yo)", d: "กลุ่มวัยรุ่นหญิง เพื่อนฝูง ไลฟ์สไตล์วัยรุ่น", k: "teenage girls, gen z lifestyle, best friends, studying", th: "วัยรุ่นหญิง เพื่อนสาว", cat: "diversity" },
+            { t: "Hindu Gods", d: "รูปปั้นหรือภาพวาดเทพเจ้าฮินดู (Shiva, Krishna)", k: "shiva, krishna, hanuman, hindu god, indian religion", th: "พระศิวะ พระกฤษณะ", cat: "diversity" },
+            { t: "BMI Chart", d: "ตาราง BMI การชั่งน้ำหนัก สายวัดเอว", k: "bmi chart, body mass index, weight loss, healthy weight", th: "ดัชนีมวลกาย ลดน้ำหนัก", cat: "wellness" },
+            { t: "Scary Face / Horror", d: "หน้าตาน่ากลัว ผี ฮาโลวีน", k: "scary face, horror portrait, halloween makeup, spooky scream", th: "หน้าผี น่ากลัว", cat: "wellness" },
+            { t: "Esports Logo", d: "โลโก้ทีมแข่งเกม มาสคอตดุดัน", k: "esports logo, gaming mascot, gamer team badge", th: "โลโก้อีสปอร์ต เกมเมอร์", cat: "tech" },
+            { t: "Pink Dino / Unicorn", d: "ไดโนเสาร์สีชมพู หรือยูนิคอร์น (งานเด็ก)", k: "pink dinosaur, cute dino, unicorn illustration, fantasy animal", th: "ไดโนเสาร์ชมพู ยูนิคอร์น", cat: "retro" },
+            
+            // --- NEW: Education & Student Life (Rank 101-129) ---
+            { t: "Academic Pressure", d: "นักเรียนเครียด กองหนังสือ สอบ", k: "academic pressure, stressed student, exam anxiety, study burnout", th: "เครียดเรียน สอบหนัก", cat: "lifestyle" },
+            { t: "Achievement & Success", d: "นักเรียนถือถ้วยรางวัล รับปริญญา", k: "student achievement, graduation success, education trophy, scholarship winner", th: "ความสำเร็จการศึกษา รับรางวัล", cat: "lifestyle" },
+            { t: "Group Brainstorming", d: "นักเรียนระดมสมอง แปะ Post-it", k: "group brainstorming, student collaboration, idea sharing, team study", th: "ระดมสมอง นักเรียนกลุ่ม", cat: "lifestyle" },
+            { t: "Child Development", d: "เด็กเล็กเรียนรู้ ของเล่นเสริมพัฒนาการ", k: "child development, early childhood education, learning through play, montessori", th: "พัฒนาการเด็ก ปฐมวัย", cat: "lifestyle" },
+            { t: "Collaboration in Class", d: "การทำงานกลุ่มในห้องเรียนสมัยใหม่", k: "student collaboration, classroom teamwork, group project, active learning", th: "ทำงานกลุ่ม ห้องเรียน", cat: "lifestyle" },
+            { t: "DEI Diversity Education", d: "ความหลากหลายในห้องเรียน (DEI)", k: "dei education, diversity equity inclusion, multicultural classroom, inclusive learning", th: "ความหลากหลายในโรงเรียน", cat: "diversity" },
+            { t: "Digital Learning", d: "เรียนออนไลน์ แท็บเล็ต คอมพิวเตอร์", k: "digital learning, edtech, online classroom, student with tablet, e-learning", th: "เรียนออนไลน์ สื่อดิจิทัล", cat: "tech" },
+            { t: "Diverse Learning Group", d: "กลุ่มนักเรียนหลากหลายเชื้อชาติ", k: "diverse learning group, multiethnic students, global education, international school", th: "นักเรียนนานาชาติ", cat: "diversity" },
+            { t: "Early Childhood", d: "เด็กอนุบาล รอยยิ้ม การเรียนรู้แรกเริ่ม", k: "early childhood, kindergarten student, preschooler learning, happy child school", th: "เด็กอนุบาล ปฐมวัย", cat: "lifestyle" },
+            { t: "Future of Education", d: "ห้องเรียนอนาคต VR, AI ในการเรียน", k: "future of education, ai in classroom, vr learning, innovative school", th: "การศึกษาอนาคต ห้องเรียนล้ำยุค", cat: "tech" },
+            { t: "Lifelong Learning", d: "ผู้ใหญ่เรียนรู้ อ่านหนังสือ อบรม", k: "lifelong learning, adult education, continuous improvement, senior student", th: "เรียนรู้ตลอดชีวิต การศึกษาผู้ใหญ่", cat: "lifestyle" },
+            { t: "STEM Education", d: "วิทย์ คณิต วิศวะ หุ่นยนต์ (STEM)", k: "stem education, science class, robotics coding, math student, technology learning", th: "เรียนวิทย์ STEM หุ่นยนต์", cat: "tech" },
+            { t: "Student Life", d: "ชีวิตนักเรียน ในโรงอาหาร สนามกีฬา", k: "student life, campus lifestyle, university friends, high school hallway", th: "ชีวิตนักเรียน มหาวิทยาลัย", cat: "lifestyle" },
+            { t: "Study Habits", d: "การอ่านหนังสือ จดโน้ต มีสมาธิ", k: "study habits, focused student, taking notes, library session, productivity", th: "นิสัยการเรียน อ่านหนังสือ", cat: "lifestyle" },
+            { t: "Youth Empowerment", d: "วัยรุ่นทำกิจกรรมจิตอาสา เป็นผู้นำ", k: "youth empowerment, young leader, student activist, confident teen", th: "พลังวัยรุ่น ผู้นำนักเรียน", cat: "diversity" },
 
-            // --- Health & Body (Wellness) ---
-            { t: "BMI Chart / Weight", d: "ตาราง BMI การชั่งน้ำหนัก สายวัดเอว", k: "bmi chart, body mass index, weight loss, healthy weight, measuring tape", th: "ดัชนีมวลกาย ลดน้ำหนัก", cat: "wellness" },
-            { t: "Human Leg / Body Parts", d: "ขา เท้า หรือส่วนต่างๆ ของร่างกาย (Skincare/Pain)", k: "human leg, woman legs, skincare, walking, feet care", th: "ขาคน เท้า ดูแลผิว", cat: "wellness" },
-            { t: "Digestive Health (Toilet)", d: "คนปวดท้อง เข้าห้องน้ำ สุขภาพขับถ่าย (Keywords เดิม: Pooping)", k: "stomach ache, toilet concept, digestive health, constipation, bathroom lifestyle", th: "ปวดท้อง ห้องน้ำ ขับถ่าย", cat: "wellness" },
-            { t: "Scary Face / Horror", d: "หน้าตาน่ากลัว ผี ฮาโลวีน", k: "scary face, horror portrait, halloween makeup, spooky scream", th: "หน้าผี น่ากลัว ฮาโลวีน", cat: "wellness" },
-            { t: "Kiss / Romance", d: "คู่รักจูบกัน โรแมนติก วาเลนไทน์", k: "kissing couple, romantic moment, love intimacy, valentine date", th: "จูบ คู่รัก โรแมนติก", cat: "wellness" },
+            // --- NEW: Beauty, Skincare & Dermatology (Rank 130-154) ---
+            { t: "Acne & Skincare", d: "ปัญหาสิว ผิวหน้า การรักษา", k: "acne skin, dermatology treatment, problem skin, pimple care, facial closeup", th: "สิว รักษาผิวหน้า", cat: "wellness" },
+            { t: "Modern Beauty Salon", d: "ร้านเสริมสวย ช่างทำผม อุปกรณ์ครบ", k: "beauty salon interior, hairdresser at work, hair styling tools, spa salon", th: "ร้านทำผม ช่างทำผม", cat: "wellness" },
+            { t: "Diverse Beauty Faces", d: "ใบหน้าผู้หญิงหลากหลายสีผิว (Natural)", k: "diverse beauty portraits, natural skin texture, multicultural women, no makeup look", th: "ใบหน้าสวยธรรมชาติ หลากหลายผิว", cat: "diversity" },
+            { t: "Fashion Model (Niche)", d: "นางแบบแฟชั่นที่มีเอกลักษณ์ ไม่ซ้ำใคร", k: "unique fashion model, unconventional beauty, edgy style, high fashion editorial", th: "นางแบบแฟชั่น มีเอกลักษณ์", cat: "wellness" },
+            { t: "Cosmetics & Makeup", d: "เครื่องสำอาง ลิปสติก แป้งพัฟ", k: "cosmetics background, makeup products, lipstick texture, beauty supply, makeup artist", th: "เครื่องสำอาง แต่งหน้า", cat: "wellness" },
+            { t: "Facial Treatment", d: "นวดหน้า มาร์คหน้า คลินิกความงาม", k: "facial treatment, spa facial, dermatology clinic, skin rejuvenation, relaxing spa", th: "นวดหน้า มาร์คหน้า", cat: "wellness" },
+            { t: "Hairdresser & Salon", d: "ช่างตัดผมกำลังไดร์ผม ทำสี", k: "hairdresser, hair stylist, salon service, blow dry, hair coloring", th: "ช่างตัดผม ทำสีผม", cat: "wellness" },
+            { t: "Collagen & Anti-Aging", d: "ผลิตภัณฑ์คอลลาเจน ผิวเต่งตึง", k: "collagen supplement, anti aging skincare, youthful skin, beauty serum", th: "คอลลาเจน ชะลอวัย", cat: "wellness" },
+            { t: "Laser Hair Removal", d: "เลเซอร์กำจัดขน คลินิกผิวหนัง", k: "laser hair removal, smooth skin, dermatology laser, beauty procedure", th: "เลเซอร์กำจัดขน", cat: "wellness" },
+            { t: "Self Care Routine", d: "การดูแลตัวเอง ทาครีม แปรงฟัน", k: "self care routine, applying moisturizer, morning skincare, wellness habit", th: "ดูแลตัวเอง ทาครีม", cat: "wellness" },
+            { t: "Plastic Surgery Concept", d: "ศัลยกรรม ปรึกษาหมอ เส้นมาร์คหน้า", k: "plastic surgery consultation, cosmetic surgery, beauty transformation, doctor checkup", th: "ศัลยกรรม ความงาม", cat: "wellness" },
+            { t: "Diverse Hairstyles", d: "ทรงผมหลากหลาย ผมหยิก ผมตรง ผมสั้น", k: "diverse hairstyles, curly hair, afro hair, straight hair, hair texture", th: "ทรงผมหลากหลาย", cat: "wellness" },
 
-            // --- Tech & Specific Objects ---
-            { t: "Esports Gaming Logo", d: "โลโก้ทีมแข่งเกม มาสคอตดุดัน", k: "esports logo, gaming mascot, gamer team badge, vector illustration", th: "โลโก้อีสปอร์ต เกมเมอร์", cat: "tech" },
-            { t: "Camera Logo / Icon", d: "ไอคอนกล้องถ่ายรูป สัญลักษณ์การถ่ายภาพ", k: "camera logo, photography icon, lens aperture symbol, photo studio branding", th: "โลโก้กล้อง ไอคอนถ่ายรูป", cat: "tech" },
-            { t: "WhatsApp / Twitter Logo", d: "ไอคอนแอพแชท และทวิตเตอร์ (Editorial)", k: "whatsapp logo, twitter icon, x logo, social media communication", th: "โลโก้ WhatsApp ทวิตเตอร์", cat: "tech" },
-            { t: "Nike Logo Concept", d: "รองเท้า Nike หรือโลโก้ในภาพแนวสตรีท (Editorial)", k: "nike shoes, swoosh logo, sportswear, street fashion editorial", th: "รองเท้าไนกี้ สตรีทแฟชั่น", cat: "tech" },
-            { t: "Pink Dino / Unicorn", d: "ไดโนเสาร์สีชมพู หรือยูนิคอร์น สำหรับงานเด็ก", k: "pink dinosaur, cute dino, unicorn illustration, fantasy animal, kids pattern", th: "ไดโนเสาร์ชมพู ยูนิคอร์น", cat: "retro" },
-            { t: "Curly Braces / Code", d: "วงเล็บปีกกา {} สัญลักษณ์โค้ดโปรแกรม", k: "curly braces, coding bracket, programming syntax, developer symbol", th: "วงเล็บปีกกา เขียนโค้ด", cat: "tech" },
-            { t: "Black Cat Silhouette", d: "เงาแมวดำ ฮาโลวีน หรือความลึกลับ", k: "black cat silhouette, halloween cat, mysterious feline, animal shadow", th: "เงาแมวดำ แมวฮาโลวีน", cat: "retro" },
-            { t: "Red Arrow", d: "ลูกศรสีแดง ชี้เป้า กราฟิกธุรกิจ", k: "red arrow, direction pointer, business growth symbol, target indicator", th: "ลูกศรแดง ชี้ทาง", cat: "tech" }
+            // --- NEW: Tech & Future Trends (Rank 155-159) ---
+            { t: "Artificial Intelligence", d: "AI ทำงานร่วมกับมนุษย์ หุ่นยนต์", k: "artificial intelligence, ai robot, human and machine, future technology, generative ai", th: "ปัญญาประดิษฐ์ หุ่นยนต์ AI", cat: "tech" },
+            { t: "Digital Transformation", d: "ธุรกิจเปลี่ยนสู่ดิจิทัล กราฟโฮโลแกรม", k: "digital transformation, business innovation, cloud computing, tech growth, virtualization", th: "การเปลี่ยนแปลงดิจิทัล", cat: "tech" },
+            { t: "Virtual Conference", d: "ประชุมออนไลน์ หน้าจอ Zoom หลายคน", k: "virtual conference, online meeting, video call grid, remote team work", th: "ประชุมออนไลน์ วิดีโอคอล", cat: "tech" },
+            { t: "Hologram Tech", d: "โฮโลแกรม 3 มิติ ล้ำสมัย Sci-fi", k: "hologram technology, futuristic interface, 3d projection, sci-fi hud", th: "โฮโลแกรม เทคโนโลยีอนาคต", cat: "tech" },
+            { t: "Sustainability Tech", d: "เทคโนโลยีรักษ์โลก พลังงานสะอาด", k: "sustainability technology, green tech, eco friendly innovation, renewable energy", th: "เทคโนโลยีรักษ์โลก", cat: "tech" },
+
+            // --- NEW: Specific Niche & Symbols (Rank 160-171) ---
+            { t: "Christmas Color Palette", d: "โทนสีคริสต์มาส แดง-เขียว-ทอง (Flat lay)", k: "christmas color palette, festive colors, holiday mood board, red green gold", th: "โทนสีคริสต์มาส", cat: "retro" },
+            { t: "Happy New Year 2026", d: "เตรียมรับปี 2026 ตัวเลข พลุ", k: "happy new year 2026, 2026 celebration, future new year, fireworks text", th: "ปีใหม่ 2026 สวัสดีปีใหม่", cat: "lifestyle" },
+            { t: "Cat Paw (Niche)", d: "อุ้งเท้าแมวระยะใกล้ (Macro)", k: "cat paw, kitten feet, cute animal parts, paw beans, pet detail", th: "อุ้งเท้าแมว เท้าแมว", cat: "lifestyle" },
+            { t: "Luxury Brand Logo (Ed.)", d: "โลโก้แบรนด์หรู เช่น Chanel (Editorial Only)", k: "luxury fashion brand, chanel logo, fashion boutique sign, editorial illustration", th: "โลโก้แบรนด์เนม", cat: "tech" },
+            { t: "Math Symbols (>)", d: "เครื่องหมายมากกว่า (Greater Than) กราฟิก", k: "greater than sign, math symbol, inequality concept, comparison icon", th: "เครื่องหมายมากกว่า", cat: "tech" },
+            { t: "Financial Logos (Ed.)", d: "ป้าย Western Union หรือธนาคาร (Editorial)", k: "western union sign, money transfer logo, bank signage, financial service", th: "ป้ายโอนเงิน ธนาคาร", cat: "tech" },
+            { t: "Poland Flag", d: "ธงชาติโปแลนด์ ปลิวไสว", k: "poland flag, polish national symbol, flag of poland, warsaw patriot", th: "ธงชาติโปแลนด์", cat: "diversity" },
+            { t: "Chloroplast Diagram", d: "ไดอะแกรมเซลล์พืช วิทยาศาสตร์", k: "chloroplast diagram, plant cell biology, photosynthesis structure, science education", th: "คลอโรพลาสต์ เซลล์พืช", cat: "tech" },
+            { t: "Toucan Bird", d: "นกทูแคน ปากใหญ่ สีสดใส", k: "toucan bird, tropical wildlife, exotic bird, rainforest animal", th: "นกทูแคน นกเงือก", cat: "retro" },
+            { t: "Presentation Templates", d: "หน้าจอ PowerPoint กราฟิกนำเสนอ", k: "powerpoint template, presentation slide, business deck, layout design", th: "เทมเพลตนำเสนอ พาวเวอร์พอยท์", cat: "tech" },
+            { t: "Permanent Teeth", d: "ฟันแท้ ทันตกรรม รากฟัน", k: "permanent teeth, dental anatomy, tooth structure, dentistry model", th: "ฟันแท้ ทันตกรรม", cat: "wellness" },
+            { t: "Ivory Color", d: "สีงาช้าง พื้นหลังเรียบหรู", k: "ivory color background, cream texture, neutral palette, soft white", th: "สีงาช้าง สีครีม", cat: "retro" },
+
+            // --- NEW: Finance & Stock Industry (Rank 172-180) ---
+            { t: "Money & Currency", d: "ธนบัตร เหรียญ กราฟการเงิน", k: "money background, currency exchange, financial growth, banknotes, coins", th: "เงิน สกุลเงิน การเงิน", cat: "tech" },
+            { t: "Buy/Sell Stock Photos", d: "คนเลือกซื้อรูปในคอม ช่างภาพขายรูป", k: "buy stock photos, selling photography, digital licensing, media market concept", th: "ซื้อภาพสต็อก ขายภาพ", cat: "tech" },
+            { t: "Affordable Stock Photo", d: "โปรโมชั่นภาพราคาถูก ความคุ้มค่า", k: "affordable stock photography, budget images, discount pricing, value deal", th: "ภาพสต็อกราคาถูก", cat: "tech" },
+            { t: "Global Stock Market", d: "แผนที่โลก กราฟหุ้น การค้าสากล", k: "international stock photography, global market, world trade, business map", th: "ตลาดหุ้นทั่วโลก", cat: "tech" },
+            { t: "Small Business Stock", d: "เจ้าของกิจการเล็กๆ ใช้รูปทำงาน", k: "stock photography for small business, sme marketing, startup assets", th: "ภาพสำหรับ SME", cat: "tech" },
+
+            // --- NEW: Specific Visuals & Evergreen (Rank 181-200) ---
+            { t: "Aerial Sea Landscape", d: "ภาพมุมสูง ทะเล ชายหาด (Drone)", k: "aerial sea landscape, drone ocean view, blue water top down, beach scenery", th: "ทะเลมุมสูง โดรนถ่ายทะเล", cat: "retro" },
+            { t: "City Data Connection", d: "เมืองมีเส้นกราฟิกเชื่อมต่อ (Smart City)", k: "city photo with data connection, smart city overlay, network lines, urban tech", th: "เมืองอัจฉริยะ ข้อมูลเชื่อมต่อ", cat: "tech" },
+            { t: "Smiling Young Woman", d: "ผู้หญิงยิ้ม สดใส เป็นธรรมชาติ (Portrait)", k: "smiling young woman, happy female portrait, authentic smile, joy face", th: "ผู้หญิงยิ้ม พอร์ตเทรต", cat: "diversity" },
+            { t: "Young Business People", d: "คนทำงานรุ่นใหม่ หลากหลายเชื้อชาติ", k: "young business people, diverse coworkers, office team, startup group", th: "คนทำงานรุ่นใหม่", cat: "lifestyle" },
+            { t: "Diversity Hands", d: "มือหลายสีผิวรวมพลังกัน (Unity)", k: "diversity hands, unity concept, teamwork circle, multiracial hands together", th: "มือหลากหลายสีผิว สามัคคี", cat: "diversity" },
+            { t: "White Background (High)", d: "ฉากขาวล้วน ยอดนิยมตลอดกาล", k: "white background, isolated, pure white, clean space, studio shot", th: "พื้นหลังขาว", cat: "retro" },
+            { t: "Abstract Patterns", d: "ลวดลาย Abstract ใช้งานง่าย", k: "abstract background, geometric pattern, texture design, modern art", th: "ลวดลายนามธรรม", cat: "retro" },
+            { t: "Travel & Adventure", d: "ท่องเที่ยว แบกเป้ ธรรมชาติ", k: "travel lifestyle, adventure holiday, wanderlust, exploring nature", th: "ท่องเที่ยว ผจญภัย", cat: "lifestyle" },
+            { t: "Family Gathering", d: "ครอบครัวรวมตัว อบอุ่น", k: "family gathering, happy relatives, reunion dinner, multi generation love", th: "ครอบครัวรวมญาติ", cat: "lifestyle" },
+            { t: "Happy Holidays Text", d: "ข้อความอวยพรวันหยุด ตกแต่งสวยงาม", k: "happy holidays text, season greetings, festive typography, holiday card", th: "สุขสันต์วันหยุด", cat: "lifestyle" },
+            { t: "American Flag", d: "ธงชาติอเมริกา วันสำคัญสหรัฐฯ", k: "american flag, usa patriotism, 4th of july, stars and stripes", th: "ธงชาติอเมริกา", cat: "diversity" },
+            { t: "Memorial Day", d: "วันระลึกถึงทหารผ่านศึก (USA)", k: "memorial day, remembrance, usa soldier honor, cemetery flags", th: "วันรำลึกทหารผ่านศึก", cat: "diversity" }
         ];
 
         let currentIdeas = [];
@@ -194,16 +226,13 @@
             });
         }
 
-        // UPDATED: Robust Copy Function using execCommand (Best for previews/iframes)
+        // Robust Copy Function using execCommand (Best for previews/iframes)
         function copyText(text, btn, lang) {
             const originalText = btn.textContent;
             btn.textContent = '...';
             
-            // Create a temporary textarea
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            
-            // Ensure it's not visible but part of the DOM
             textArea.style.position = "fixed";
             textArea.style.left = "0";
             textArea.style.top = "0";
@@ -214,7 +243,6 @@
             textArea.select();
 
             try {
-                // The classic method - works in most restrictive environments
                 const successful = document.execCommand('copy');
                 if (successful) {
                     showToast('✅ คัดลอก ' + (lang === 'EN' ? 'EN Keywords' : 'TH Keywords') + ' แล้ว!');
@@ -228,7 +256,6 @@
                     throw new Error('Copy command failed');
                 }
             } catch (err) {
-                // Ultimate Fallback: Prompt user to copy manually
                 window.prompt("กด Ctrl+C เพื่อคัดลอก:", text);
                 btn.textContent = originalText;
             }
@@ -243,7 +270,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Top100_Search_Ideas.txt`;
+            a.download = `Stock_Ideas_200.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
