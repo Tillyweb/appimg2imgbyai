@@ -3,420 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Idea Gen 2025 V.4 Ultimate</title>
+    <title>Stock Photo Ideas: Top 100 Search Terms (Fixed Copy)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Sarabun', 'sans-serif'],
-                    }
-                }
-            }
         }
     </script>
     <style>
-        body { transition: background-color 0.3s, color 0.3s; }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; opacity: 0; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; transition: background 0.3s; }
+        .dark body { background-color: #111827; }
+        .dark .bg-white { background-color: #1f2937; }
+        .dark .text-gray-800 { color: #f3f4f6; }
+        .dark .text-gray-500 { color: #9ca3af; }
+        .dark .border-gray-100 { border-color: #374151; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast { visibility: hidden; min-width: 260px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 50; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .toast.show { visibility: visible; opacity: 1; bottom: 60px; }
+        .dark .toast { background-color: #f3f4f6; color: #111827; }
+        .error-toast { background-color: #ef4444; color: white; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        .dark ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
-
-        .toast {
-            visibility: hidden; min-width: 280px; background-color: #1f2937; color: #fff;
-            text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed;
-            z-index: 50; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
-            font-size: 15px; font-weight: 500; opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
-        }
-        .toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); bottom: 50px; }
-        .dark .toast { background-color: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
-        
-        .filter-btn { transition: all 0.2s; border: 1px solid transparent; }
-        .filter-btn:hover { transform: translateY(-2px); }
-        .filter-btn.active { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transform: scale(1.05); font-weight: 700; border-color: rgba(255,255,255,0.2); }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center py-8 px-4 font-sans">
+<body class="min-h-screen flex flex-col items-center py-6 px-4 dark:bg-gray-900">
 
     <!-- Header -->
-    <header class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+    <div class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
         <div class="text-center md:text-left">
-            <h1 class="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-2">
-                Stock Idea Gen 2025
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                Top Search 100 
+                <span class="text-sm font-normal text-gray-500 dark:text-gray-300 bg-yellow-100 dark:bg-yellow-900 px-3 py-1 rounded-full text-yellow-800 dark:text-yellow-100">High Volume Keywords</span>
             </h1>
-            <div class="flex items-center gap-2 justify-center md:justify-start">
-                <span class="text-xs font-semibold bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full text-gray-600 dark:text-gray-300">V.4 Ultimate</span>
-                <span class="text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full border border-green-200 dark:border-green-800">90+ Database</span>
-            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">แก้ไขปุ่มคัดลอก (Robust Copy Fix) ใช้ได้ทุกเบราว์เซอร์</p>
         </div>
 
         <div class="flex flex-wrap gap-3 items-center justify-center">
-            <button onclick="toggleDark()" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full text-sm shadow-sm transition-colors flex items-center gap-2">
-                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            <button onclick="toggleDark()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-full text-sm hover:bg-gray-300 transition-colors">🌙 Dark Mode</button>
+            <button onclick="exportTxt()" class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full text-sm font-bold flex items-center gap-2 transition-transform active:scale-95">
+                📄 Export .txt
             </button>
-            <button onclick="exportTxt()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-md transition-transform active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export Ideas (.txt)
-            </button>
-            <button onclick="generateIdeas()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-transform active:scale-95 group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button onclick="generateIdeas()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 สุ่มชุดใหม่
             </button>
         </div>
-    </header>
+    </div>
 
     <!-- Filters -->
-    <div class="w-full max-w-7xl mb-8">
-        <div class="flex flex-wrap gap-2 justify-center bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <button onclick="filterCategory('all')" class="filter-btn active px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium" data-cat="all">ทั้งหมด</button>
-            <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="tech">🤖 Tech & AI</button>
-            <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="wellness">🌿 Wellness</button>
-            <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="lifestyle">☕ Lifestyle</button>
-            <button onclick="filterCategory('eco')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="eco">♻️ Eco & Green</button>
-            <button onclick="filterCategory('diversity')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="diversity">🤝 Diversity</button>
-            <button onclick="filterCategory('retro')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="retro">📼 Retro</button>
-            <button onclick="filterCategory('business')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="business">💼 Business</button>
+    <div class="w-full max-w-7xl mb-5 flex flex-wrap gap-2 justify-center">
+        <button onclick="filterCategory('all')" class="filter-btn active px-5 py-2 bg-blue-600 text-white rounded-full text-sm transition-colors">ทั้งหมด</button>
+        <button onclick="filterCategory('retro')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Backgrounds</button>
+        <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Festive & Life</button>
+        <button onclick="filterCategory('diversity')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">People & Culture</button>
+        <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Tech & Logos</button>
+        <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Health & Body</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results-container" class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="col-span-full text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+            <p class="text-gray-400">กำลังโหลดข้อมูล...</p>
         </div>
-        <p id="filter-status" class="text-center text-xs text-gray-400 mt-2">แสดงผลจากฐานข้อมูลทั้งหมด 94 รายการ</p>
     </div>
 
-    <!-- Results Grid -->
-    <div id="results-container" class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-20">
-        <!-- Cards will be injected here -->
-    </div>
-
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="toast">
-        <span class="flex items-center justify-center gap-2 text-lg">✅ คัดลอกเรียบร้อย!</span>
+        <span class="flex items-center justify-center gap-2">✅ คัดลอกแล้ว!</span>
     </div>
 
     <script>
-        // === DATABASE (90+ Items) ===
+        // Top 100 Search Queries Database
         const fullDatabase = [
-            // --- TECH & AI ---
-            { t: "EV Charging Station", d: "คนกำลังเสียบสายชาร์จรถยนต์ไฟฟ้าที่สถานีชาร์จสาธารณะ", k: "electric vehicle charging, EV charger station, sustainable transport", th: "ชาร์จรถไฟฟ้า สถานีชาร์จรถEV พลังงานสะอาด", cat: "tech" },
-            { t: "VR Metaverse Gaming", d: "วัยรุ่นสวมแว่น VR เล่นเกมในห้องที่มีไฟ RGB สีสันสดใส", k: "virtual reality headset, metaverse gaming, immersive experience", th: "แว่นVR เมตาเวิร์ส เล่นเกมโลกเสมือน", cat: "tech" },
-            { t: "AI Wellness Coach", d: "ผู้หญิงคุยกับ AI บนหน้าจอสมาร์ทโฟนขณะเล่นโยคะที่บ้าน", k: "ai wellness coach, virtual fitness assistant, smart health app", th: "AI โค้ชสุขภาพ แอพออกกำลังกาย", cat: "tech" },
-            { t: "Smart Home Control", d: "มือคนกดแท็บเล็ตเพื่อควบคุมไฟและอุณหภูมิในบ้าน", k: "smart home automation, controlling lights tablet, iot lifestyle", th: "สมาร์ทโฮม ควบคุมบ้านผ่านมือถือ", cat: "tech" },
-            { t: "Drone Delivery", d: "โดรนส่งของกำลังหย่อนกล่องพัสดุหน้าบ้านลูกค้า", k: "drone delivery service, futuristic logistics, contactless shipping", th: "โดรนส่งของ ขนส่งอนาคต", cat: "tech" },
-            { t: "Cybersecurity Shield", d: "โปรแกรมเมอร์ทำงานหน้าจอที่มีกราฟิกรูปโล่ล็อกความปลอดภัย", k: "cyber security concept, data protection, network safety", th: "ความปลอดภัยไซเบอร์ แฮกเกอร์", cat: "tech" },
-            { t: "Robot Waiter", d: "หุ่นยนต์เสิร์ฟอาหารกำลังนำจานไปที่โต๊ะลูกค้าในร้านอาหาร", k: "robot waiter service, automated restaurant, future dining", th: "หุ่นยนต์เสิร์ฟอาหาร ร้านอาหารอนาคต", cat: "tech" },
-            { t: "3D Printing Architect", d: "สถาปนิกดูโมเดลตึกที่กำลังพิมพ์จากเครื่อง 3D Printer", k: "3d printing architecture, rapid prototyping, engineering tech", th: "เครื่องพิมพ์3มิติ สถาปัตยกรรม", cat: "tech" },
-            { t: "Crypto Trading Desk", d: "หน้าจอหลายจอแสดงกราฟหุ้นและคริปโตในห้องมืด", k: "cryptocurrency trading setup, stock market monitors, fintech", th: "เทรดหุ้น คริปโต กราฟหุ้น", cat: "tech" },
-            { t: "Facial Recognition", d: "การสแกนใบหน้าเพื่อเข้าประตูสำนักงาน", k: "facial recognition security, biometric access control", th: "สแกนใบหน้า ระบบความปลอดภัย", cat: "tech" },
-            { t: "E-Sports Tournament", d: "นักแข่งเกมสวมหูฟังจดจ่อหน้าจอในงานแข่งใหญ่", k: "esports tournament player, professional gamer competition", th: "อีสปอร์ต แข่งเกม", cat: "tech" },
-            { t: "Telehealth Senior", d: "คุณยายคุยกับหมอผ่านแท็บเล็ตที่บ้าน", k: "telehealth for seniors, elderly video consultation, remote doctor", th: "หาหมอออนไลน์ ผู้สูงอายุ", cat: "tech" },
-            { t: "Blockchain Coding", d: "หน้าจอโค้ดโปรแกรมที่มีคำว่า Blockchain และ Smart Contract", k: "blockchain coding, smart contract programming, decentralized finance", th: "เขียนโค้ด บล็อกเชน", cat: "tech" },
-            { t: "Hologram Meeting", d: "นักธุรกิจประชุมกับโฮโลแกรมเพื่อนร่วมงานต่างประเทศ", k: "holographic meeting, futuristic business conference, ar technology", th: "ประชุมโฮโลแกรม เทคโนโลยีอนาคต", cat: "tech" },
+            // --- Rank 1-10 (High Volume) ---
+            { t: "2025 Calendar Concept", d: "ภาพปฏิทินปีใหม่ การวางแผน จัดตารางงาน (Top Rank)", k: "2025 calendar, new year planner, schedule layout, organizer", th: "ปฏิทิน 2025 วางแผนงาน", cat: "lifestyle" },
+            { t: "Blue Background", d: "พื้นหลังสีน้ำเงิน เรียบหรู หรือมี Texture สำหรับงานกราฟิก", k: "blue background, abstract blue texture, navy blue wallpaper, corporate background", th: "พื้นหลังสีน้ำเงิน ฉากสีฟ้า", cat: "retro" },
+            { t: "Islamic Background", d: "ลวดลายอิสลาม มัสยิด หรือศิลปะอาหรับ สำหรับเทศกาล", k: "islamic background, ramadan kareem, arabesque pattern, muslim festival, eid backdrop", th: "พื้นหลังอิสลาม ลายอาหรับ รอมฎอน", cat: "diversity" },
+            { t: "Happy Senior Woman", d: "หญิงชราอารมณ์ดี ยิ้มแย้ม (Keyword: Old Granny)", k: "happy senior woman, old granny smiling, grandmother lifestyle, active elderly, authentic portrait", th: "ยายยิ้ม ยายแก่มีความสุข ผู้สูงอายุ", cat: "diversity" },
+            { t: "Thank You Concept", d: "คำว่า Thank You ป้ายขอบคุณ การ์ด หรือมือไหว้", k: "thank you text, gratitude concept, appreciation card, saying thanks, typography", th: "ขอบคุณ ป้าย Thank you", cat: "lifestyle" },
+            { t: "3D Wallpaper", d: "ภาพพื้นหลัง 3 มิติ รูปทรงเลขาคณิต ล้ำสมัย", k: "3d wallpaper, abstract geometric 3d, futuristic background, depth design, render", th: "วอลเปเปอร์ 3D พื้นหลัง 3 มิติ", cat: "tech" },
+            { t: "Green Screen Background", d: "ฉากเขียว Chroma Key สำหรับตัดต่อวิดีโอ", k: "green screen background, chroma key, blank green backdrop, video production", th: "ฉากเขียว กรีนสกรีน", cat: "tech" },
+            { t: "Large Question Mark", d: "เครื่องหมายคำถามขนาดใหญ่ สื่อถึงความสงสัย การหาคำตอบ", k: "large question mark, problem solving, faq concept, confusion symbol, 3d question mark", th: "เครื่องหมายคำถาม ปัญหา สงสัย", cat: "lifestyle" },
+            { t: "Social Media Logos (Ed.)", d: "ไอคอน Instagram/Facebook แบบ 3D หรือบนมือถือ (Editorial)", k: "instagram logo, facebook icon, social media app, smartphone screen, editorial", th: "โลโก้ไอจี เฟสบุ๊ค โซเชียลมีเดีย", cat: "tech" },
+            { t: "Good Morning Image", d: "ภาพสวัสดีตอนเช้า กาแฟ แสงแดด ดอกไม้ สดใส", k: "good morning, morning coffee, sunrise inspiration, fresh start, breakfast table", th: "สวัสดีตอนเช้า อรุณสวัสดิ์ กาแฟ", cat: "lifestyle" },
 
-            // --- WELLNESS & HEALTH ---
-            { t: "Mental Health Journaling", d: "มือเขียนไดอารี่ขอบคุณ (Gratitude) พร้อมกาแฟเช้า", k: "mental health journaling, gratitude notebook, self care routine", th: "เขียนไดอารี่ บำบัดจิตใจ", cat: "wellness" },
-            { t: "Sound Bowl Healing", d: "การทำสมาธิด้วยขันธิเบต (Singing Bowl) ในห้องสปา", k: "tibetan singing bowl, sound healing therapy, meditation session", th: "ขันธิเบต บำบัดด้วยเสียง สมาธิ", cat: "wellness" },
-            { t: "Plant Based Meal Prep", d: "การเตรียมอาหารคลีนจากพืช ผักหลากสีในกล่องอาหาร", k: "plant based meal prep, vegan lunch box, healthy eating", th: "อาหารคลีน อาหารพืช เตรียมอาหาร", cat: "wellness" },
-            { t: "Senior Yoga Park", d: "กลุ่มผู้สูงอายุเล่นโยคะในสวนสาธารณะตอนเช้า", k: "senior yoga group, active elderly lifestyle, park exercise", th: "โยคะผู้สูงอายุ ออกกำลังกายในสวน", cat: "wellness" },
-            { t: "Digital Detox", d: "โทรศัพท์ถูกวางทิ้งไว้ไกลตัว คนกำลังอ่านหนังสือริมหน้าต่าง", k: "digital detox concept, reading book offline, unplugged lifestyle", th: "ดีท็อกซ์โซเชียล อ่านหนังสือ พักผ่อน", cat: "wellness" },
-            { t: "Aromatherapy Diffuser", d: "เครื่องพ่นไอน้ำอโรมาพร้อมน้ำมันหอมระเหยและเทียน", k: "essential oil diffuser, aromatherapy home spa, relaxation atmosphere", th: "เครื่องพ่นอโรมา สปาบ้าน", cat: "wellness" },
-            { t: "Hiking Solitude", d: "คนเดินป่าคนเดียวบนยอดเขา มองวิวธรรมชาติ", k: "solo hiking adventure, nature therapy, mountain peak view", th: "เดินป่า ปีนเขา ธรรมชาติบำบัด", cat: "wellness" },
-            { t: "Healthy Smoothie Bowl", d: "ถ้วยสมูทตี้ผลไม้ตกแต่งสวยงามวางบนโต๊ะไม้", k: "acai smoothie bowl, healthy breakfast, superfood fruits", th: "สมูทตี้ อาหารเช้าสุขภาพ", cat: "wellness" },
-            { t: "Home Spa Day", d: "ผู้หญิงมาสก์หน้าและแช่เท้าในน้ำอุ่นที่บ้าน", k: "home spa day, self care facial mask, relaxing bath", th: "สปาที่บ้าน มาสก์หน้า", cat: "wellness" },
-            { t: "Post-Workout Stretch", d: "คนยืดกล้ามเนื้อหลังวิ่งเสร็จ เหงื่อออกเล็กน้อย", k: "stretching after run, fitness cooldown, athlete muscle relief", th: "ยืดกล้ามเนื้อ หลังวิ่ง", cat: "wellness" },
+            // --- Backgrounds & Textures (Retro/Bg) ---
+            { t: "Black Background", d: "พื้นหลังสีดำสนิท หรือมี Texture เบาๆ สำหรับงานหรู", k: "black background, dark texture, elegant black wallpaper, luxury backdrop", th: "พื้นหลังสีดำ ฉากดำ", cat: "retro" },
+            { t: "Red Background", d: "สีแดง ตรุษจีน วาเลนไทน์ หรือพลังงาน", k: "red background, abstract red texture, valentine backdrop, chinese new year red", th: "พื้นหลังสีแดง ฉากแดง", cat: "retro" },
+            { t: "HD Wallpapers", d: "ภาพวิว หรือ Abstract ความละเอียดสูง คมชัด", k: "hd wallpapers, 4k background, high resolution nature, desktop wallpaper", th: "วอลเปเปอร์ HD ภาพคมชัด", cat: "retro" },
+            { t: "Background PNG", d: "พื้นหลังโปร่งใส หรือองค์ประกอบกราฟิกที่นำไปตัดต่อได้", k: "background png, transparent background, design element, cutout isolated", th: "พื้นหลังโปร่งใส ไฟล์ PNG", cat: "tech" },
+            { t: "Nature Background", d: "ป่าไม้ ภูเขา ทะเล เน้นความเป็นธรรมชาติ สบายตา", k: "nature background, green forest, landscape scenery, natural beauty, eco friendly", th: "พื้นหลังธรรมชาติ ป่าเขา", cat: "retro" },
+            { t: "Gold Background", d: "สีทอง ประกายทอง ความรวย หรูหรา", k: "gold background, golden texture, luxury gold leaf, shiny metal", th: "พื้นหลังสีทอง ฉากทอง", cat: "retro" },
+            { t: "Plain Background", d: "พื้นหลังสีเรียบๆ (Solid Color) สำหรับไดคัทสินค้า", k: "plain background, solid color, studio backdrop, minimal copy space", th: "พื้นหลังเรียบ สีพื้น", cat: "retro" },
+            { t: "Glitter Background", d: "กากเพชร วิบวับ งานปาร์ตี้", k: "glitter background, sparkles, shiny texture, festive bokeh", th: "พื้นหลังกากเพชร วิบวับ", cat: "retro" },
+            { t: "White Background", d: "ขาวสะอาด ขาวล้วน สำหรับ E-commerce", k: "white background, pure white, studio key light, isolated", th: "พื้นหลังสีขาว ฉากขาว", cat: "retro" },
+            { t: "Wood Texture", d: "ลายไม้ แผ่นไม้เก่าๆ หรือโต๊ะไม้ธรรมชาติ", k: "wood texture, wooden background, rustic wood, timber surface", th: "ลายไม้ พื้นผิวไม้", cat: "retro" },
+            { t: "Smoke PNG / Effect", d: "ควัน ลอยฟุ้ง บนพื้นดำ หรือโปร่งใส", k: "smoke png, smoke effect, abstract wisp, steam isolated", th: "ควัน เอฟเฟกต์ควัน", cat: "retro" },
+            { t: "Fire Background", d: "เปลวไฟ ร้อนแรง การเผาไหม้", k: "fire background, flames, burning texture, hot fire", th: "พื้นหลังไฟ เปลวไฟ", cat: "retro" },
+            { t: "Yellow/Orange Background", d: "สีเหลือง/ส้ม สดใส ฤดูร้อน", k: "yellow background, orange texture, summer vibe, bright color", th: "พื้นหลังสีเหลือง สีส้ม", cat: "retro" },
+            { t: "Galaxy / Space", d: "อวกาศ ดวงดาว ทางช้างเผือก", k: "galaxy background, space nebula, stars, universe wallpaper", th: "อวกาศ กาแล็กซี", cat: "retro" },
+            { t: "Anime/Cartoon Background", d: "ฉากหลังสไตล์อนิเมะ หรือการ์ตูน (วาดเอง)", k: "anime background, manga style scenery, 2d landscape illustration", th: "ฉากอนิเมะ พื้นหลังการ์ตูน", cat: "retro" },
             
-            // --- ECO & GREEN ---
-            { t: "Zero Waste Shopping", d: "การตักธัญพืชใส่ขวดแก้วที่ร้าน Refill Station", k: "zero waste bulk store, plastic free shopping, refill station", th: "ร้านรีฟิล ไร้ขยะ ลดพลาสติก", cat: "eco" },
-            { t: "Rooftop Garden", d: "คนเมืองปลูกผักสวนครัวบนดาดฟ้าตึก", k: "urban rooftop gardening, city agriculture, organic vegetable patch", th: "สวนดาดฟ้า ปลูกผักในเมือง", cat: "eco" },
-            { t: "Solar Panel Installation", d: "ช่างกำลังติดตั้งแผงโซลาร์เซลล์บนหลังคาบ้าน", k: "solar panel installation, renewable energy home, green power", th: "ติดตั้งโซลาร์เซลล์ พลังงานแสงอาทิตย์", cat: "eco" },
-            { t: "Beach Cleanup", d: "กลุ่มอาสาสมัครเก็บขยะพลาสติกริมชายหาด", k: "beach cleanup volunteer, ocean conservation, plastic pollution", th: "เก็บขยะชายหาด รักษ์โลก", cat: "eco" },
-            { t: "Bamboo Toothbrush", d: "แปรงสีฟันไม้ไผ่และของใช้ในห้องน้ำที่เป็นมิตรต่อโลก", k: "bamboo toothbrush, eco friendly bathroom products, sustainable living", th: "แปรงสีฟันไม้ไผ่ ของใช้รักษ์โลก", cat: "eco" },
-            { t: "Electric Scooter Commute", d: "พนักงานออฟฟิศขี่สกู๊ตเตอร์ไฟฟ้าไปทำงาน", k: "electric scooter commuting, urban eco transport, city mobility", th: "สกู๊ตเตอร์ไฟฟ้า เดินทางในเมือง", cat: "eco" },
-            { t: "Upcycling Clothes", d: "วัยรุ่นเย็บผ้าเก่าให้เป็นกระเป๋าใบใหม่", k: "upcycling old clothes, diy fashion project, sustainable textile", th: "รีไซเคิลเสื้อผ้า เย็บผ้า DIY", cat: "eco" },
-            { t: "Composting at Home", d: "การเทเศษอาหารลงในถังหมักปุ๋ยหลังบ้าน", k: "home composting bin, organic waste recycling, fertilizer making", th: "หมักปุ๋ย แยกขยะอินทรีย์", cat: "eco" },
-            { t: "Vertical Forest Building", d: "ตึกสูงที่มีต้นไม้ปลูกเต็มระเบียงทุกชั้น", k: "vertical forest architecture, green building, sustainable city", th: "ตึกป่าแนวตั้ง ตึกเขียว", cat: "eco" },
-            { t: "Reusable Cup Cafe", d: "ยื่นแก้วน้ำส่วนตัวให้บาริสต้าที่ร้านกาแฟ", k: "reusable coffee cup, bring your own cup, sustainable cafe", th: "แก้วส่วนตัว ลดขยะ", cat: "eco" },
+            // --- Festivals & Lifestyle ---
+            { t: "Eid Mubarak", d: "การเฉลิมฉลองวันอีด มุสลิม (High Demand)", k: "eid mubarak, muslim celebration, eid al-fitr, islamic holiday", th: "วันอีด อีดมูบารัก มุสลิม", cat: "diversity" },
+            { t: "Father's Day", d: "วันพ่อ พ่อลูก กิจกรรมครอบครัว หรือเนคไท", k: "fathers day, happy father, dad and son, family love, best dad", th: "วันพ่อ พ่อลูก ของขวัญพ่อ", cat: "lifestyle" },
+            { t: "Diwali Festival", d: "เทศกาลแห่งแสงสว่าง อินเดีย ตะเกียง", k: "diwali festival, deepavali, festival of lights, diya lamp, indian celebration", th: "ดิวาลี เทศกาลไฟ อินเดีย", cat: "diversity" },
+            { t: "Merry Christmas", d: "คริสต์มาส ซานต้า ต้นสน ของขวัญ", k: "merry christmas, xmas decoration, winter holiday, santa claus, festive season", th: "คริสต์มาส ปีใหม่ ของขวัญ", cat: "lifestyle" },
+            { t: "Happy Easter", d: "อีสเตอร์ ไข่ระบายสี กระต่าย ฤดูใบไม้ผลิ", k: "happy easter, easter eggs, bunny rabbit, spring holiday, pastel colors", th: "อีสเตอร์ ไข่อีสเตอร์", cat: "lifestyle" },
+            { t: "Thanksgiving", d: "ไก่งวง อาหารมื้อใหญ่ ครอบครัว ฟักทอง", k: "thanksgiving dinner, turkey, family gathering, autumn harvest, pumpkin", th: "ขอบคุณพระเจ้า ไก่งวง", cat: "lifestyle" },
+            { t: "Happy New Year", d: "ปีใหม่ พลุ ปาร์ตี้ แชมเปญ ตัวเลขปี", k: "happy new year, fireworks, celebration, new year eve party", th: "สวัสดีปีใหม่ งานเลี้ยง", cat: "lifestyle" },
+            { t: "Indian Independence Day", d: "วันชาติอินเดีย ธงชาติ (Tricolor)", k: "indian independence day, india flag, 15 august, patriotism", th: "วันชาติอินเดีย ธงอินเดีย", cat: "diversity" },
+            { t: "Motivational Quotes", d: "คำคมสร้างแรงบันดาลใจ บนวิวสวยๆ", k: "motivational quotes, inspirational text, positive vibes, success mindset", th: "คำคม แรงบันดาลใจ", cat: "lifestyle" },
+            { t: "Birthday Concept", d: "เค้กวันเกิด เทียน ลูกโป่ง ปาร์ตี้", k: "happy birthday, birthday cake, party balloons, celebration background", th: "วันเกิด เค้กวันเกิด", cat: "lifestyle" },
 
-            // --- LIFESTYLE ---
-            { t: "Digital Nomad Cafe", d: "ทำงานในคาเฟ่ต่างประเทศ มี Passport และ Laptop", k: "digital nomad lifestyle, remote work cafe, travel and work", th: "ทำงานร้านกาแฟ ดิจิทัลโนแมด", cat: "lifestyle" },
-            { t: "Van Life Camping", d: "เปิดท้ายรถตู้ที่ดัดแปลงเป็นที่นอน จอดริมทะเลสาบ", k: "van life camping, campervan interior, road trip adventure", th: "แคมป์ปิ้งรถตู้ เที่ยวรถบ้าน", cat: "lifestyle" },
-            { t: "Minimalist Living Room", d: "ห้องนั่งเล่นสไตล์มินิมอล เฟอร์นิเจอร์น้อยชิ้น แสงสวย", k: "minimalist living room, scandinavian interior, clean aesthetics", th: "ห้องนั่งเล่นมินิมอล แต่งบ้าน", cat: "lifestyle" },
-            { t: "Glamping Luxury", d: "เต็นท์หรูติดแอร์กลางป่า มีไฟประดับสวยงาม", k: "luxury glamping tent, forest resort, outdoor staycation", th: "แกลมปิ้ง ที่พักเต็นท์หรู", cat: "lifestyle" },
-            { t: "Solo Dining", d: "คนกินข้าวคนเดียวในร้านราเมง (Solo dining culture)", k: "solo dining restaurant, eating alone, introvert lifestyle", th: "กินข้าวคนเดียว โต๊ะเดี่ยว", cat: "lifestyle" },
-            { t: "Podcast Recording", d: "คนใส่หูฟังพูดใส่ไมโครโฟนในห้องอัดเสียงที่บ้าน", k: "podcast recording setup, content creator audio, home studio", th: "อัดพอดแคสต์ จัดรายการ", cat: "lifestyle" },
-            { t: "Cat Cafe Relax", d: "คนนั่งเล่นกับแมวในคาเฟ่บรรยากาศอบอุ่น", k: "cat cafe customer, playing with kittens, pet therapy", th: "คาเฟ่แมว ทาสแมว", cat: "lifestyle" },
-            { t: "Urban Picnics", d: "กลุ่มเพื่อนนั่งปิกนิกบนดาดฟ้าตึกเห็นวิวเมือง", k: "urban rooftop picnic, city sunset gathering, friends hanging out", th: "ปิกนิกดาดฟ้า วิวเมือง", cat: "lifestyle" },
-            { t: "Ceramy Pottery Class", d: "มือเปื้อนดินเหนียวกำลังปั้นหม้อในคลาสเรียน", k: "pottery wheel hands, ceramic workshop, crafting hobby", th: "ปั้นดินเผา งานฝีมือ", cat: "lifestyle" },
-            { t: "Book Club Meeting", d: "กลุ่มคนนั่งคุยกันพร้อมถือหนังสือในร้านกาแฟ", k: "book club discussion, reading group, literature lovers", th: "ชมรมอ่านหนังสือ กลุ่มนักอ่าน", cat: "lifestyle" },
+            // --- People & Diversity ---
+            { t: "Cute Baby", d: "เด็กทารกน่ารัก ยิ้มแย้ม (High Search)", k: "cute baby, adorable infant, newborn smiling, happy toddler", th: "เด็กทารก เด็กน่ารัก", cat: "diversity" },
+            { t: "Mom and Son", d: "แม่ลูกทำกิจกรรมร่วมกัน ความรัก ความผูกพัน", k: "mom and son, mother love, parenting, family bonding, playing together", th: "แม่ลูก ความรักแม่", cat: "diversity" },
+            { t: "Teenage Girls (15 yo)", d: "กลุ่มวัยรุ่นหญิง เพื่อนฝูง ไลฟ์สไตล์วัยรุ่น", k: "teenage girls, gen z lifestyle, best friends, studying, teen fashion", th: "วัยรุ่นหญิง เพื่อนสาว", cat: "diversity" },
+            { t: "Attractive Chubby Girl", d: "สาวอวบมั่นใจ Body Positivity สวยในแบบตัวเอง", k: "plus size woman, body positivity, confident chubby girl, fashion lifestyle", th: "สาวอวบ มั่นใจ พลัสไซส์", cat: "diversity" },
+            { t: "Character Portrait (Ugly Man/Woman)", d: "ภาพพอร์ตเทรตที่เน้นคาแรคเตอร์ชัดเจน หน้าตาตลก หรือมีเอกลักษณ์ (Keywords เดิม: Ugly...)", k: "character portrait, expressive face, funny expression, unique features, authentic people", th: "หน้าตลก มีเอกลักษณ์ พอร์ตเทรต", cat: "diversity" },
+            { t: "Hindu Gods (Shiva/Krishna)", d: "รูปปั้นหรือภาพวาดเทพเจ้าฮินดู (Shiva, Krishna, Hanuman)", k: "shiva, krishna, hanuman, hindu god, indian religion, spiritual art", th: "พระศิวะ พระกฤษณะ เทพฮินดู", cat: "diversity" },
+            { t: "Radha Krishna", d: "ความรักของพระกฤษณะและนางราธา", k: "radha krishna, divine love, hindu mythology, spiritual couple", th: "ราธา กฤษณะ ความรัก", cat: "diversity" },
 
-            // --- DIVERSITY & INCLUSION ---
-            { t: "Diverse Brainstorm", d: "ทีมงานหลายเชื้อชาติระดมสมองหน้าไวท์บอร์ด", k: "diverse team brainstorming, multicultural workplace, collaboration", th: "ทีมงานหลากเชื้อชาติ ประชุมงาน", cat: "diversity" },
-            { t: "Wheelchair Office", d: "พนักงานนั่งวีลแชร์ทำงานร่วมกับเพื่อนร่วมงานอย่างมีความสุข", k: "wheelchair user office, inclusive workplace, disability employment", th: "คนพิการทำงาน ออฟฟิศเท่าเทียม", cat: "diversity" },
-            { t: "Active Senior Couple", d: "คู่รักสูงวัยเต้นรำในห้องนั่งเล่นอย่างสนุกสนาน", k: "active senior couple dancing, happy elderly retirement, love at old age", th: "คู่รักสูงวัย เต้นรำ", cat: "diversity" },
-            { t: "LGBTQ Pride Office", d: "โต๊ะทำงานที่มีธงสายรุ้งประดับเล็กน้อย", k: "lgbtq pride workplace, inclusive office desk, rainbow flag symbol", th: "ออฟฟิศหลากหลายทางเพศ ธงรุ้ง", cat: "diversity" },
-            { t: "Non-Binary Fashion", d: "นางแบบ/นายแบบ แต่งตัวแฟชั่นที่ไม่จำกัดเพศ (Androgynous)", k: "non-binary fashion model, androgynous style, gender fluid clothing", th: "แฟชั่นไม่จำกัดเพศ ยูนิเซ็กส์", cat: "diversity" },
-            { t: "Vitiligo Beauty", d: "ภาพพอร์ตเทรตคนที่มีผิวเผือกหรือด่างขาว ยิ้มมั่นใจ", k: "vitiligo skin beauty, diverse beauty portrait, skin condition confidence", th: "ผิวเป็นด่างขาว ความงามที่แตกต่าง", cat: "diversity" },
-            { t: "Father on Paternity Leave", d: "คุณพ่อเลี้ยงลูกทารกขณะทำงานที่บ้าน (Work from home)", k: "father paternity leave, dad working with baby, modern parenting", th: "พ่อเลี้ยงลูก ลาคลอดพ่อ", cat: "diversity" },
-            { t: "Multi-Gen Family Dinner", d: "ครอบครัวใหญ่ ปู่ย่าหลาน กินข้าวร่วมกันหัวเราะ", k: "multigenerational family dinner, happy big family eating", th: "ครอบครัวใหญ่ กินข้าวรวมญาติ", cat: "diversity" },
-            { t: "Sign Language Chat", d: "เพื่อนสองคนคุยกันด้วยภาษามือในสวน", k: "sign language conversation, deaf communication, friends signing", th: "ภาษามือ ผู้บกพร่องทางการได้ยิน", cat: "diversity" },
-            { t: "Hijab Businesswoman", d: "นักธุรกิจหญิงสวมฮิญาบพรีเซนต์งานอย่างมั่นใจ", k: "muslim businesswoman presentation, hijab professional, diverse leader", th: "นักธุรกิจมุสลิม หญิงเก่ง", cat: "diversity" },
+            // --- Health & Body (Wellness) ---
+            { t: "BMI Chart / Weight", d: "ตาราง BMI การชั่งน้ำหนัก สายวัดเอว", k: "bmi chart, body mass index, weight loss, healthy weight, measuring tape", th: "ดัชนีมวลกาย ลดน้ำหนัก", cat: "wellness" },
+            { t: "Human Leg / Body Parts", d: "ขา เท้า หรือส่วนต่างๆ ของร่างกาย (Skincare/Pain)", k: "human leg, woman legs, skincare, walking, feet care", th: "ขาคน เท้า ดูแลผิว", cat: "wellness" },
+            { t: "Digestive Health (Toilet)", d: "คนปวดท้อง เข้าห้องน้ำ สุขภาพขับถ่าย (Keywords เดิม: Pooping)", k: "stomach ache, toilet concept, digestive health, constipation, bathroom lifestyle", th: "ปวดท้อง ห้องน้ำ ขับถ่าย", cat: "wellness" },
+            { t: "Scary Face / Horror", d: "หน้าตาน่ากลัว ผี ฮาโลวีน", k: "scary face, horror portrait, halloween makeup, spooky scream", th: "หน้าผี น่ากลัว ฮาโลวีน", cat: "wellness" },
+            { t: "Kiss / Romance", d: "คู่รักจูบกัน โรแมนติก วาเลนไทน์", k: "kissing couple, romantic moment, love intimacy, valentine date", th: "จูบ คู่รัก โรแมนติก", cat: "wellness" },
 
-            // --- RETRO & NOSTALGIA ---
-            { t: "90s Film Aesthetic", d: "ภาพถ่ายสไตล์ฟิล์ม เกรนแตกๆ ของกลุ่มวัยรุ่นยุค 90", k: "90s film grain aesthetic, retro friends hangout, nostalgic vibe", th: "ภาพฟิล์ม90s วินเทจ ย้อนยุค", cat: "retro" },
-            { t: "Vinyl Record Collection", d: "มือคนกำลังเลือกแผ่นเสียงไวนิลจากชั้นวาง", k: "vinyl record collection, browsing records, retro music hobby", th: "แผ่นเสียงไวนิล ฟังเพลงเก่า", cat: "retro" },
-            { t: "Y2K Fashion", d: "วัยรุ่นแต่งตัวสไตล์ Y2K (กิ๊บติดผม เสื้อครอป) ถ่ายรูปหน้ากระจก", k: "y2k fashion style, 2000s aesthetic, gen z retro trend", th: "แฟชั่นY2K แต่งตัวย้อนยุค", cat: "retro" },
-            { t: "Retro Diner", d: "ร้านอาหารสไตล์อเมริกันยุค 50s เบาะหนังสีแดง พื้นลายตาราง", k: "retro diner interior, 50s american restaurant, neon sign vibe", th: "ร้านอาหารย้อนยุค อเมริกันไดเนอร์", cat: "retro" },
-            { t: "Cassette Tape Player", d: "เครื่องเล่นเทปคาสเซ็ทพร้อมหูฟังส้มแบบเก่า", k: "cassette tape player, walkman music, 80s nostalgia", th: "เทปคาสเซ็ท เครื่องเล่นเทป", cat: "retro" },
-            { t: "Polaroid Wall", d: "ผนังห้องที่แปะรูปโพลารอยด์แห่งความทรงจำไว้เต็ม", k: "polaroid photo wall, memories collage, instant camera photos", th: "ผนังรูปโพลารอยด์ ความทรงจำ", cat: "retro" },
-            { t: "Classic Car Trip", d: "ขับรถเปิดประทุนคลาสสิกบนถนนเลียบชายหาด", k: "classic car road trip, vintage convertible driving, retro travel", th: "รถคลาสสิก ขับรถเที่ยว", cat: "retro" },
-            { t: "Neon Arcade Game", d: "ตู้เกมอาเขตในห้องมืดที่มีแสงนีออนสะท้อน", k: "retro arcade cabinet, neon gaming room, 80s arcade vibe", th: "ตู้เกมเก่า เกมอาเขต", cat: "retro" },
-            { t: "Typing on Typewriter", d: "นักเขียนพิมพ์งานบนเครื่องพิมพ์ดีดโบราณ", k: "vintage typewriter typing, retro writer desk, antique author", th: "พิมพ์ดีด เครื่องพิมพ์ดีดเก่า", cat: "retro" },
-            { t: "Flip Phone Comeback", d: "วัยรุ่นใช้มือถือฝาพับรุ่นเก่าถ่ายรูปตัวเอง", k: "flip phone aesthetic, vintage mobile, dumbphone trend", th: "มือถือฝาพับ มือถือเก่า", cat: "retro" },
-
-            // --- BUSINESS & FINANCE (หมวดใหม่) ---
-            { t: "QR Code Payment", d: "สแกนจ่ายเงินผ่าน QR Code ที่ร้านค้าข้างทาง", k: "qr code mobile payment, cashless society, street food scanning", th: "สแกนจ่ายเงิน สังคมไร้เงินสด", cat: "business" },
-            { t: "Start-up Pitching", d: "เจ้าของธุรกิจยืนนำเสนองานให้นักลงทุนดูบนจอใหญ่", k: "startup pitch presentation, entrepreneur meeting, investor deck", th: "พรีเซนต์งาน สตาร์ทอัพ", cat: "business" },
-            { t: "Co-working Space", d: "บรรยากาศ Co-working space ที่คนนั่งทำงานแยกกันแต่พื้นที่เดียวกัน", k: "modern coworking space, shared office environment, freelancer hub", th: "โคเวิร์กกิ้งสเปซ ที่ทำงานรวม", cat: "business" },
-            { t: "Logistics Warehouse", d: "พนักงานคลังสินค้าเช็คของด้วยแท็บเล็ตในโกดัง", k: "warehouse logistics worker, inventory tablet, supply chain", th: "โกดังสินค้า โลจิสติกส์", cat: "business" },
-            { t: "Handshake Deal", d: "การจับมือตกลงธุรกิจแบบ Close-up เห็นแค่ดูมือและสูท", k: "business handshake closeup, corporate deal agreement, partnership", th: "จับมือธุรกิจ ตกลงสัญญา", cat: "business" },
-            { t: "Online Banking App", d: "หน้าจอมือถือโชว์กราฟการออมเงินในแอพธนาคาร", k: "mobile banking app interface, digital finance savings, money transfer", th: "แอพธนาคาร โอนเงินออนไลน์", cat: "business" },
-            { t: "Real Estate Agent", d: "นายหน้ายื่นกุญแจบ้านให้คู่รักใหม่", k: "real estate agent handing keys, new home owners, buying house", th: "นายหน้าขายบ้าน ซื้อบ้านใหม่", cat: "business" },
-            { t: "Manufacturing Robot", d: "แขนกลหุ่นยนต์ประกอบชิ้นส่วนในโรงงาน", k: "industrial robot arm, automated manufacturing, smart factory", th: "หุ่นยนต์โรงงาน สายการผลิต", cat: "business" },
-            { t: "Business Lunch", d: "นักธุรกิจคุยงานไปกินข้าวไปในร้านอาหารหรู", k: "business lunch meeting, corporate dining, discussion meal", th: "คุยงานร้านอาหาร มื้อเที่ยงธุรกิจ", cat: "business" },
-            { t: "Signing Contract", d: "ปากกาหรูจรดลงบนกระดาษสัญญา", k: "signing contract close up, business agreement pen, legal document", th: "เซ็นสัญญา เอกสารธุรกิจ", cat: "business" },
-             
-            // --- EXTRAS (คละหมวด) ---
-            { t: "Camping Coffee", d: "ดริปกาแฟหน้าเต็นท์ตอนเช้า แสงอาทิตย์อ่อนๆ", k: "camping coffee drip, morning outdoor brew, tent lifestyle", th: "กาแฟดริป แคมป์ปิ้ง", cat: "lifestyle" },
-            { t: "Electric Tuk Tuk", d: "รถตุ๊กตุ๊กไฟฟ้าขับผ่านวัดไทย", k: "electric tuk tuk thailand, eco tourism bangkok, modern tradition", th: "ตุ๊กตุ๊กไฟฟ้า เที่ยวไทย", cat: "eco" },
-            { t: "Influencer Unboxing", d: "คนตั้งกล้องถ่ายวิดีโอแกะกล่องพัสดุ", k: "influencer unboxing video, content creator filming, product review", th: "แกะกล่อง รีวิวสินค้า", cat: "tech" },
-            { t: "Pet Friendly Office", d: "สุนัขนอนใต้โต๊ะทำงานในออฟฟิศ", k: "pet friendly office, dog at work, modern workplace culture", th: "ออฟฟิศเลี้ยงหมาได้ สัตว์เลี้ยง", cat: "diversity" },
-            { t: "Hydroponic Farm", d: "เกษตรกรตรวจสอบรากผักสลัดในรางน้ำ", k: "hydroponic lettuce farm, indoor agriculture, smart farming", th: "ผักไฮโดรโปนิกส์ เกษตรในร่ม", cat: "eco" },
-            { t: "Podcast Listener", d: "คนนั่งบนรถไฟฟ้าใส่หูฟังหลับตาฟังพอดแคสต์", k: "commuter listening podcast, subway headphones, urban travel", th: "ฟังเพลงบนรถไฟฟ้า คนเมือง", cat: "lifestyle" },
-            { t: "Messy Desk Creative", d: "โต๊ะทำงานรกๆ ของศิลปิน สี กระดาษ สเก็ตช์", k: "messy creative desk, artist workspace, chaotic inspiration", th: "โต๊ะทำงานศิลปะ รกแต่ติสท์", cat: "lifestyle" },
-            { t: "Virtual Fitting Room", d: "คนลองเสื้อผ่านกระจกอัจฉริยะ (AR Mirror)", k: "virtual fitting room mirror, ar fashion try on, retail tech", th: "ลองเสื้อผ่านจอ กระจกอัจฉริยะ", cat: "tech" },
-            { t: "Recycled Plastic Furniture", d: "เก้าอี้ดีไซน์สวยที่ทำจากพลาสติกรีไซเคิลลายหินอ่อน", k: "recycled plastic furniture, sustainable design chair, eco decor", th: "เฟอร์นิเจอร์รีไซเคิล ของแต่งบ้าน", cat: "eco" },
-            { t: "Asian Street Food Night", d: "ควันจากกระทะร้านอาหารข้างทางตอนกลางคืน ไฟนีออน", k: "asian street food night market, wok cooking steam, neon atmosphere", th: "สตรีทฟู้ด ตลาดกลางคืน", cat: "lifestyle" },
-            { t: "Coding Bootcamp", d: "กลุ่มนักเรียนผู้ใหญ่เรียนเขียนโปรแกรมในห้องเรียน", k: "coding bootcamp class, adult learning programming, tech education", th: "เรียนเขียนโปรแกรม คอร์สไอที", cat: "tech" },
-            { t: "Telemedicine Pill", d: "มือถือโชว์หน้าหมอ พร้อมขวดยาตั้งอยู่ข้างๆ", k: "telemedicine app prescription, digital health doctor, pills bottle", th: "หาหมอออนไลน์ สั่งยา", cat: "tech" },
-            { t: "Electric Bus City", d: "รถเมล์ไฟฟ้าวิ่งในเมืองที่ไม่มีควันไอเสีย", k: "electric city bus, public transport eco, green urban travel", th: "รถเมล์ไฟฟ้า ขนส่งสาธารณะ", cat: "eco" },
-            { t: "Grandma Gamer", d: "คุณยายใส่หูฟังเล่นเกมคอมพิวเตอร์อย่างตั้งใจ", k: "gamer grandma, elderly playing video games, active senior tech", th: "คนแก่เล่นเกม เกมเมอร์สูงวัย", cat: "tech" },
-            { t: "Dad Cooking Dinner", d: "คุณพ่อใส่ผ้ากันเปื้อนทำอาหารให้ลูกกิน", k: "dad cooking dinner, father in kitchen, family meal preparation", th: "พ่อทำอาหาร ครัวครอบครัว", cat: "lifestyle" },
-            { t: "Vertical Garden Balcony", d: "ระเบียงคอนโดเล็กๆ ที่จัดสวนแนวตั้งเขียวชอุ่ม", k: "condo balcony garden, vertical planter, small space oasis", th: "สวนระเบียง จัดสวนพื้นที่เล็ก", cat: "eco" },
-            { t: "Spa Massage Stones", d: "หินร้อนวางบนหลังคนนอนคว่ำ", k: "hot stone massage, spa therapy treatment, relaxing back", th: "นวดหินร้อน สปา", cat: "wellness" },
-            { t: "Blockchain Wallet", d: "สมาร์ทโฟนโชว์ยอดเงินดิจิทัลและ QR Code", k: "crypto wallet app, digital currency balance, blockchain finance", th: "กระเป๋าเงินดิจิทัล คริปโต", cat: "tech" },
-            { t: "Paperless Office", d: "โต๊ะประชุมที่มีแต่แท็บเล็ต ไม่มีกระดาษเลย", k: "paperless meeting room, digital office, sustainable workplace", th: "ออฟฟิศไร้กระดาษ ประชุม", cat: "eco" },
-            { t: "Solo Travel Selfie", d: "ผู้หญิงแบกเป้ถ่ายเซลฟี่กับวิวภูเขา", k: "solo female traveler selfie, backpacker mountain view, wanderlust", th: "เที่ยวคนเดียว แบกเป้", cat: "lifestyle" }
+            // --- Tech & Specific Objects ---
+            { t: "Esports Gaming Logo", d: "โลโก้ทีมแข่งเกม มาสคอตดุดัน", k: "esports logo, gaming mascot, gamer team badge, vector illustration", th: "โลโก้อีสปอร์ต เกมเมอร์", cat: "tech" },
+            { t: "Camera Logo / Icon", d: "ไอคอนกล้องถ่ายรูป สัญลักษณ์การถ่ายภาพ", k: "camera logo, photography icon, lens aperture symbol, photo studio branding", th: "โลโก้กล้อง ไอคอนถ่ายรูป", cat: "tech" },
+            { t: "WhatsApp / Twitter Logo", d: "ไอคอนแอพแชท และทวิตเตอร์ (Editorial)", k: "whatsapp logo, twitter icon, x logo, social media communication", th: "โลโก้ WhatsApp ทวิตเตอร์", cat: "tech" },
+            { t: "Nike Logo Concept", d: "รองเท้า Nike หรือโลโก้ในภาพแนวสตรีท (Editorial)", k: "nike shoes, swoosh logo, sportswear, street fashion editorial", th: "รองเท้าไนกี้ สตรีทแฟชั่น", cat: "tech" },
+            { t: "Pink Dino / Unicorn", d: "ไดโนเสาร์สีชมพู หรือยูนิคอร์น สำหรับงานเด็ก", k: "pink dinosaur, cute dino, unicorn illustration, fantasy animal, kids pattern", th: "ไดโนเสาร์ชมพู ยูนิคอร์น", cat: "retro" },
+            { t: "Curly Braces / Code", d: "วงเล็บปีกกา {} สัญลักษณ์โค้ดโปรแกรม", k: "curly braces, coding bracket, programming syntax, developer symbol", th: "วงเล็บปีกกา เขียนโค้ด", cat: "tech" },
+            { t: "Black Cat Silhouette", d: "เงาแมวดำ ฮาโลวีน หรือความลึกลับ", k: "black cat silhouette, halloween cat, mysterious feline, animal shadow", th: "เงาแมวดำ แมวฮาโลวีน", cat: "retro" },
+            { t: "Red Arrow", d: "ลูกศรสีแดง ชี้เป้า กราฟิกธุรกิจ", k: "red arrow, direction pointer, business growth symbol, target indicator", th: "ลูกศรแดง ชี้ทาง", cat: "tech" }
         ];
 
-        let currentCategory = 'all';
         let currentIdeas = [];
+        let currentCategory = 'all'; 
 
-        // ฟังก์ชันสลับ Array
         function shuffleArray(array) {
-            let arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
+            for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+                [array[i], array[j]] = [array[j], array[i]];
             }
-            return arr;
+            return array;
         }
 
-        // ฟังก์ชันหลัก: สร้างการ์ดไอเดีย
         function generateIdeas() {
             const container = document.getElementById('results-container');
-            const button = document.querySelector('button[onclick="generateIdeas()"] svg');
-            
-            // หมุนไอคอนปุ่ม
-            button.style.transform = 'rotate(360deg)';
-            setTimeout(() => button.style.transform = 'none', 500);
-
-            // Filter ข้อมูล
-            let pool = fullDatabase;
-            if (currentCategory !== 'all') {
-                pool = fullDatabase.filter(item => item.cat === currentCategory);
-            }
-
-            // Shuffle และเลือกมา 12 อัน (หรือทั้งหมดถ้ามีน้อยกว่า 12)
-            const count = Math.min(pool.length, 12);
-            const shuffled = shuffleArray(pool);
-            currentIdeas = shuffled.slice(0, count);
-
-            // เคลียร์และสร้างการ์ดใหม่
             container.innerHTML = '';
             
+            let filteredPool = fullDatabase.filter(item => currentCategory === 'all' || item.cat === currentCategory);
+            let pool = [...filteredPool];
+            
+            shuffleArray(pool);
+            currentIdeas = pool.slice(0, 12);
+
             if (currentIdeas.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">ไม่พบข้อมูลในหมวดหมู่นี้</div>`;
-                return;
+                 container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">ไม่พบข้อมูลในหมวดหมู่นี้</div>`;
+                 return;
             }
 
             currentIdeas.forEach((item, i) => {
-                const delay = i * 0.05;
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in group relative overflow-hidden`;
-                card.style.animationDelay = `${delay}s`;
-                
-                // สีแถบข้างซ้ายตามหมวดหมู่
-                let barColor = 'bg-gray-400';
-                if(item.cat === 'tech') barColor = 'bg-blue-500';
-                if(item.cat === 'eco') barColor = 'bg-green-500';
-                if(item.cat === 'wellness') barColor = 'bg-teal-400';
-                if(item.cat === 'lifestyle') barColor = 'bg-orange-400';
-                if(item.cat === 'diversity') barColor = 'bg-pink-500';
-                if(item.cat === 'retro') barColor = 'bg-purple-500';
-                if(item.cat === 'business') barColor = 'bg-slate-600';
-
+                card.className = `bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-blue-400 dark:hover:border-blue-500 transition-all fade-in`;
+                card.style.animationDelay = `${i * 0.05}s`;
                 card.innerHTML = `
-                    <div class="absolute left-0 top-0 bottom-0 w-1 ${barColor}"></div>
-                    <div class="flex justify-between items-start mb-2 pl-2">
-                        <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400 border border-gray-200 dark:border-gray-600 rounded-md px-1.5 py-0.5">${item.cat}</span>
-                        <span class="text-xs text-gray-300 dark:text-gray-600 font-mono">#${i+1}</span>
-                    </div>
-                    <h3 class="font-bold text-gray-800 dark:text-gray-100 text-lg mb-2 leading-tight pl-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">${item.t}</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-5 flex-grow pl-2 leading-relaxed">${item.d}</p>
-                    
-                    <div class="flex flex-col gap-2 pl-2">
-                        <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this)" class="w-full text-left bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex justify-between items-center group/btn">
-                            <span class="truncate pr-2">🇬🇧 ${item.k}</span>
-                            <span class="opacity-0 group-hover/btn:opacity-100 transition-opacity">📋</span>
-                        </button>
-                        <button onclick="copyText('${item.th.replace(/'/g, "\\'")}', this)" class="w-full text-left bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 text-purple-700 dark:text-purple-300 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex justify-between items-center group/btn">
-                            <span class="truncate pr-2">🇹🇭 ${item.th}</span>
-                            <span class="opacity-0 group-hover/btn:opacity-100 transition-opacity">📋</span>
-                        </button>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 text-sm md:text-base mb-2">${i+1}. ${item.t}</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-xs mb-4 flex-grow">${item.d}</p>
+                    <div class="flex gap-2">
+                        <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this, 'EN')" class="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 py-2 rounded-lg text-xs font-medium transition-colors border border-blue-100 dark:border-blue-800">EN Keywords</button>
+                        <button onclick="copyText('${item.th.replace(/'/g, "\\'")}', this, 'TH')" class="flex-1 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 py-2 rounded-lg text-xs font-medium transition-colors border border-purple-100 dark:border-purple-800">TH Keywords</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
-            
-            // อัพเดทสถานะด้านบน
-            const catName = document.querySelector(`.filter-btn[data-cat="${currentCategory}"]`).innerText;
-            document.getElementById('filter-status').innerText = `กำลังแสดง: ${catName} (${currentIdeas.length} รายการ จากทั้งหมด ${pool.length})`;
         }
 
-        // ฟังก์ชัน Filter
-        function filterCategory(cat) {
-            currentCategory = cat;
+        // UPDATED: Robust Copy Function using execCommand (Best for previews/iframes)
+        function copyText(text, btn, lang) {
+            const originalText = btn.textContent;
+            btn.textContent = '...';
             
-            // Update UI ปุ่ม
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('active', 'bg-blue-600', 'text-white', 'font-medium');
-                b.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
-            });
-            
-            const activeBtn = document.querySelector(`.filter-btn[data-cat="${cat}"]`);
-            activeBtn.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
-            activeBtn.classList.add('active', 'bg-blue-600', 'text-white', 'font-medium');
-
-            generateIdeas();
-        }
-
-        // ฟังก์ชัน Copy แก้ไขให้รองรับ iframe/security policies
-        function copyText(text, btn) {
-            // ใช้ execCommand แทน navigator.clipboard เพื่อรองรับ iframe
+            // Create a temporary textarea
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            textArea.style.position = "fixed";  // Avoid scrolling to bottom
+            
+            // Ensure it's not visible but part of the DOM
+            textArea.style.position = "fixed";
+            textArea.style.left = "0";
+            textArea.style.top = "0";
+            textArea.style.opacity = "0"; 
+
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             try {
+                // The classic method - works in most restrictive environments
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showToast("✅ คัดลอก Keywords แล้ว!");
-                    
-                    // Feedback ที่ปุ่ม
-                    const originalHtml = btn.innerHTML;
+                    showToast('✅ คัดลอก ' + (lang === 'EN' ? 'EN Keywords' : 'TH Keywords') + ' แล้ว!');
+                    btn.textContent = '✓ Copied!';
                     btn.classList.add('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
-                    btn.innerHTML = `<span class="font-bold">✓ Copied!</span>`;
-                    
-                    setTimeout(() => {
-                        btn.innerHTML = originalHtml;
+                    setTimeout(() => { 
+                        btn.textContent = originalText; 
                         btn.classList.remove('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
                     }, 1500);
                 } else {
-                     showToast("❌ คัดลอกไม่สำเร็จ");
+                    throw new Error('Copy command failed');
                 }
             } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-                showToast("❌ เกิดข้อผิดพลาดในการคัดลอก");
+                // Ultimate Fallback: Prompt user to copy manually
+                window.prompt("กด Ctrl+C เพื่อคัดลอก:", text);
+                btn.textContent = originalText;
             }
-            
+
             document.body.removeChild(textArea);
         }
 
-        // ฟังก์ชัน Export
         function exportTxt() {
-            if (currentIdeas.length === 0) return showToast("⚠️ กรุณาสุ่มชุดใหม่ก่อน!");
-            
-            const date = new Date().toLocaleDateString('th-TH');
-            let text = `Stock Idea Gen 2025 (Exported: ${date})\nหมวดหมู่: ${currentCategory}\n----------------------------------\n\n`;
-            
-            currentIdeas.forEach((item, i) => {
-                text += `${i+1}. ${item.t}\n   Idea: ${item.d}\n   EN Keywords: ${item.k}\n   TH Keywords: ${item.th}\n\n`;
-            });
-            
-            text += "----------------------------------\nGenerated by Stock Idea Gen V.4";
-
-            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            if (currentIdeas.length === 0) return showToast('กรุณาสุ่มชุดใหม่ก่อน!', true);
+            let text = currentIdeas.map((item, i) => `${i+1}. ${item.t}\nDesc: ${item.d}\nEN: ${item.k}\nTH: ${item.th}\n---\n`).join('');
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
+            const a = document.createElement('a');
             a.href = url;
-            a.download = `Stock_Ideas_2025_${currentCategory}_${Date.now()}.txt`;
+            a.download = `Top100_Search_Ideas.txt`;
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url); // Clean up
-            showToast("📄 Export ไฟล์สำเร็จ!");
+            document.body.removeChild(a);
+            showToast('📄 Export สำเร็จ!');
         }
 
-        // ฟังก์ชัน Toast
-        let toastTimeout;
-        function showToast(msg) {
-            const toast = document.getElementById("toast");
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
             toast.innerHTML = `<span class="flex items-center justify-center gap-2">${msg}</span>`;
-            toast.className = "toast show";
-            
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.className = toast.className.replace("show", "");
-            }, 2500);
+            toast.className = `toast show ${isError ? 'error-toast' : ''}`;
+            setTimeout(() => toast.className = toast.className.replace(' show', ''), 2500);
         }
 
-        // ฟังก์ชัน Dark Mode
         function toggleDark() {
-            document.documentElement.classList.toggle("dark");
-            const isDark = document.documentElement.classList.contains("dark");
-            
-            const icon = document.getElementById('theme-icon');
-            const text = document.getElementById('theme-text');
-            
-            if(isDark) {
-                icon.innerText = "☀️";
-                text.innerText = "Light Mode";
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.innerText = "🌙";
-                text.innerText = "Dark Mode";
-                localStorage.setItem('theme', 'light');
-            }
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
         }
 
-        // Init Check Theme
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        function filterCategory(cat) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-blue-600', 'text-white');
+                b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'dark:text-gray-300');
+            });
+            event.target.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'dark:text-gray-300');
+            event.target.classList.add('active', 'bg-blue-600', 'text-white');
+            currentCategory = cat;
+            generateIdeas();
+        }
+
+        if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
-            document.getElementById('theme-icon').innerText = "☀️";
-            document.getElementById('theme-text').innerText = "Light Mode";
+            document.body.classList.add('dark');
         }
 
-        // Start
         window.onload = generateIdeas;
     </script>
 </body>
