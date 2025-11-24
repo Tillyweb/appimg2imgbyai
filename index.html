@@ -1,636 +1,423 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Sparkles, 
-  Image as ImageIcon, 
-  Wand2, 
-  Download, 
-  Copy, 
-  RefreshCw, 
-  Zap, 
-  AlertCircle,
-  LayoutTemplate,
-  Check,
-  Camera,
-  Briefcase,
-  Coffee,
-  Palette,
-  X // เพิ่มไอคอน X สำหรับปุ่ม Clear
-} from 'lucide-react';
-
-/**
- * ------------------------------------------------------------------
- * TYPES
- * ------------------------------------------------------------------
- */
-export enum AppState {
-  IDLE = 'IDLE',
-  GENERATING_TEXT = 'GENERATING_TEXT',
-  GENERATING_IMAGE = 'GENERATING_IMAGE',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR'
-}
-
-export interface GeneratedImage {
-  id: string;
-  url: string;
-  prompt: string;
-  createdAt: number;
-}
-
-export type AspectRatio = '1:1' | '3:4' | '4:3' | '16:9' | '9:16';
-export type StockStyle = 'General' | 'Business' | 'Lifestyle' | 'Beauty';
-
-/**
- * ------------------------------------------------------------------
- * SERVICES (Gemini API Integration)
- * ------------------------------------------------------------------
- */
-const apiKey = ""; // API Key injected by environment
-
-// Helper for delays/retries
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-async function generateWithRetry(url: string, payload: any, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(`${url}&key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-      return await response.json();
-    } catch (e) {
-      if (i === retries - 1) throw e;
-      await delay(1000 * Math.pow(2, i));
-    }
-  }
-}
-
-export const generateImage = async (prompt: string, aspectRatio: AspectRatio): Promise<string> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-  
-  const payload = {
-    instances: [
-      { prompt: `${prompt} --aspect-ratio ${aspectRatio}` }
-    ],
-    parameters: {
-      sampleCount: 1,
-      aspectRatio: aspectRatio
-    }
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    const result = await response.json();
-    if (result.error) throw new Error(result.error.message);
-    
-    const base64 = result.predictions?.[0]?.bytesBase64Encoded;
-    if (base64) {
-      return `data:image/png;base64,${base64}`;
-    }
-    throw new Error("No image data returned");
-  } catch (error) {
-    console.error("Image generation error:", error);
-    throw error;
-  }
-};
-
-export const enhancePrompt = async (originalPrompt: string): Promise<string> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`;
-  
-  const systemPrompt = "You are an expert prompt engineer for AI image generation (Imagen/Midjourney). Your goal is to rewrite the user's simple prompt into a highly detailed, descriptive, and artistic prompt that yields high-quality, realistic, or stylized results depending on context. Focus on lighting, texture, composition, and mood. Respond ONLY with the enhanced prompt text.";
-  
-  const payload = {
-    contents: [{ parts: [{ text: `Enhance this prompt for an AI image generator: "${originalPrompt}"` }] }],
-    systemInstruction: { parts: [{ text: systemPrompt }] }
-  };
-
-  try {
-    const data = await generateWithRetry(url, payload);
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || originalPrompt;
-  } catch (error) {
-    console.error("Enhance prompt error:", error);
-    return originalPrompt; // Fallback
-  }
-};
-
-export const generateStockPrompt = async (topic: string, style: StockStyle): Promise<string> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`;
-  
-  const styleGuides = {
-    'General': 'versatile, commercial, high quality',
-    'Business': 'professional, corporate, office setting, confident, success',
-    'Lifestyle': 'candid, authentic, daily life, warm lighting, natural',
-    'Beauty': 'high fashion, skincare, clean lighting, elegant, macro details'
-  };
-
-  const systemPrompt = `You are a professional stock photographer and prompt engineer. Create a commercially viable stock photo prompt for the topic provided. 
-  Style: ${style} (${styleGuides[style]}).
-  Include technical keywords like '8k resolution', 'highly detailed', 'soft lighting', 'depth of field'.
-  Respond ONLY with the prompt text.`;
-
-  const payload = {
-    contents: [{ parts: [{ text: `Create a stock photo prompt for the topic: "${topic}"` }] }],
-    systemInstruction: { parts: [{ text: systemPrompt }] }
-  };
-
-  try {
-    const data = await generateWithRetry(url, payload);
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || topic;
-  } catch (error) {
-    console.error("Stock prompt error:", error);
-    throw error;
-  }
-};
-
-/**
- * ------------------------------------------------------------------
- * COMPONENTS
- * ------------------------------------------------------------------
- */
-
-const Header = () => (
-  <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-    <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 rounded-lg text-white">
-          <Sparkles className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="font-bold text-xl text-slate-800 tracking-tight">Gemini Creative Studio</h1>
-          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">AI Powered Workspace</p>
-        </div>
-      </div>
-      <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-600">
-        <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full border border-slate-200">
-          <Zap className="w-3.5 h-3.5 text-amber-500" />
-          <span>Pro Mode Active</span>
-        </span>
-      </div>
-    </div>
-  </header>
-);
-
-const PromptInput = ({ 
-  prompt, 
-  setPrompt, 
-  aspectRatio, 
-  setAspectRatio, 
-  onGenerate, 
-  onEnhance, 
-  onGenerateStockPrompt, 
-  onAutoRun, 
-  isGenerating, 
-  isEnhancing, 
-  isGeneratingStock, 
-  isAutoRunning 
-}: any) => {
-  const [stockTopic, setStockTopic] = useState('');
-
-  const aspectRatios: { value: AspectRatio; label: string; icon: any }[] = [
-    { value: '1:1', label: 'Square (1:1)', icon: LayoutTemplate },
-    { value: '3:4', label: 'Portrait (3:4)', icon: LayoutTemplate },
-    { value: '4:3', label: 'Landscape (4:3)', icon: LayoutTemplate },
-    { value: '9:16', label: 'Story (9:16)', icon: LayoutTemplate },
-    { value: '16:9', label: 'Cinema (16:9)', icon: LayoutTemplate },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* Main Prompt Area */}
-      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-            <Wand2 className="w-4 h-4 text-indigo-500" />
-            คำสั่งสร้างรูป (Prompt)
-          </label>
-          <button 
-            onClick={onEnhance}
-            disabled={isEnhancing || !prompt}
-            className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-md transition-colors flex items-center gap-1 disabled:opacity-50"
-          >
-            {isEnhancing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-            ช่วยคิดคำให้สวย
-          </button>
-        </div>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="อธิบายรูปภาพที่คุณต้องการ... (เช่น: แมวเปอร์เซียใส่แว่นกันแดด นั่งอยู่ริมชายหาดตอนพระอาทิตย์ตก)"
-          className="w-full h-32 p-4 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none transition-all placeholder:text-slate-400 text-sm leading-relaxed"
-        />
-        
-        <div className="mt-4 flex flex-wrap gap-4 items-center justify-between">
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-              {aspectRatios.map((ratio) => (
-                <button
-                  key={ratio.value}
-                  onClick={() => setAspectRatio(ratio.value)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all whitespace-nowrap ${
-                    aspectRatio === ratio.value
-                      ? 'bg-slate-800 text-white border-slate-800'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <span className={`block w-3 h-3 border border-current rounded-sm ${
-                    ratio.value === '1:1' ? 'aspect-square' :
-                    ratio.value === '3:4' ? 'aspect-[3/4]' :
-                    ratio.value === '4:3' ? 'aspect-[4/3]' :
-                    ratio.value === '9:16' ? 'aspect-[9/16]' : 'aspect-video'
-                  }`} />
-                  {ratio.label}
-                </button>
-              ))}
-            </div>
-        </div>
-
-        <button
-          onClick={onGenerate}
-          disabled={isGenerating || !prompt}
-          className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
-        >
-          {isGenerating ? (
-            <>
-              <RefreshCw className="w-5 h-5 animate-spin" />
-              กำลังสร้างสรรค์ผลงาน...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5" />
-              สร้างรูปภาพ (Generate)
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Stock Photo Helper Section */}
-      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-3 opacity-5 pointer-events-none">
-          <Camera className="w-32 h-32" />
-        </div>
-        
-        <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
-          <Camera className="w-4 h-4 text-emerald-600" />
-          Stock Photo Generator
-        </h3>
-
-        <div className="space-y-3">
-          <div className="relative">
-            <input
-              type="text"
-              value={stockTopic}
-              onChange={(e) => setStockTopic(e.target.value)}
-              placeholder="หัวข้อภาพ Stock (เช่น: ประชุมงาน, กาแฟยามเช้า, ออกกำลังกาย)"
-              className="w-full px-4 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-            />
-            {stockTopic && (
-              <button
-                onClick={() => setStockTopic('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 bg-transparent hover:bg-slate-100 rounded-full transition-colors"
-                title="ล้างข้อความ"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-             {[
-               { id: 'General', icon: ImageIcon, label: 'ทั่วไป' },
-               { id: 'Business', icon: Briefcase, label: 'ธุรกิจ' },
-               { id: 'Lifestyle', icon: Coffee, label: 'ไลฟ์สไตล์' },
-               { id: 'Beauty', icon: Palette, label: 'บิวตี้' }
-             ].map((item) => (
-               <button
-                 key={item.id}
-                 onClick={() => onGenerateStockPrompt(stockTopic || item.label, item.id as StockStyle)}
-                 disabled={isGeneratingStock}
-                 className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 text-slate-600 hover:text-emerald-700 transition-all text-xs font-medium active:scale-95"
-               >
-                 {/* @ts-ignore */}
-                 <item.icon className="w-4 h-4 mb-0.5" />
-                 {item.label}
-               </button>
-             ))}
-          </div>
-
-          <button
-            onClick={async () => {
-              await onAutoRun(stockTopic || 'Business Meeting', 'Business');
-              setStockTopic('');
-            }}
-            disabled={isAutoRunning}
-            className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-             {isAutoRunning ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Auto Running...
-                </>
-             ) : (
-                <>
-                  <Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-                  Run Auto (คิดคำ + สร้างรูป + โหลด)
-                </>
-             )}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ImageResult = ({ image, loading }: { image: GeneratedImage | null, loading: boolean }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyPrompt = () => {
-    if (image?.prompt) {
-      // Use document.execCommand('copy') as a fallback for iframe restrictions
-      // where navigator.clipboard might be blocked
-      const textArea = document.createElement("textarea");
-      textArea.value = image.prompt;
-      
-      // Ensure the textarea is not visible but part of the DOM
-      textArea.style.position = "fixed";
-      textArea.style.left = "-9999px";
-      textArea.style.top = "0";
-      document.body.appendChild(textArea);
-      
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } else {
-           console.error('Fallback: Copying text command was unsuccessful');
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Idea Gen 2025 V.4 Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    }
+                }
+            }
         }
-      } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-      }
-      
-      document.body.removeChild(textArea);
-    }
-  };
+    </script>
+    <style>
+        body { transition: background-color 0.3s, color 0.3s; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        .dark ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
 
-  const handleDownload = () => {
-    if (image?.url) {
-      const link = document.createElement('a');
-      link.href = image.url;
-      link.download = `gemini-create-${image.id}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+        .toast {
+            visibility: hidden; min-width: 280px; background-color: #1f2937; color: #fff;
+            text-align: center; border-radius: 50px; padding: 14px 24px; position: fixed;
+            z-index: 50; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
+            font-size: 15px; font-weight: 500; opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); bottom: 50px; }
+        .dark .toast { background-color: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
+        
+        .filter-btn { transition: all 0.2s; border: 1px solid transparent; }
+        .filter-btn:hover { transform: translateY(-2px); }
+        .filter-btn.active { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transform: scale(1.05); font-weight: 700; border-color: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center py-8 px-4 font-sans">
 
-  return (
-    <div className="h-full min-h-[500px] flex flex-col">
-      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative group">
-        {loading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 z-10">
-            <div className="relative w-20 h-20 mb-4">
-              <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+    <!-- Header -->
+    <header class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <div class="text-center md:text-left">
+            <h1 class="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-2">
+                Stock Idea Gen 2025
+            </h1>
+            <div class="flex items-center gap-2 justify-center md:justify-start">
+                <span class="text-xs font-semibold bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full text-gray-600 dark:text-gray-300">V.4 Ultimate</span>
+                <span class="text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full border border-green-200 dark:border-green-800">90+ Database</span>
             </div>
-            <p className="text-slate-500 font-medium animate-pulse">กำลังวาดภาพจินตนาการ...</p>
-            <p className="text-xs text-slate-400 mt-2">Gemini AI</p>
-          </div>
-        ) : image ? (
-          <div className="relative h-full flex items-center justify-center bg-slate-900">
-             <img 
-               src={image.url} 
-               alt="Generated" 
-               className="max-w-full max-h-full object-contain shadow-2xl"
-             />
-             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button 
-                  onClick={handleDownload}
-                  className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white text-slate-700 shadow-lg transition-all"
-                  title="Download"
-                >
-                  <Download className="w-5 h-5" />
-                </button>
-             </div>
-          </div>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50">
-             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4 border border-slate-200">
-               <ImageIcon className="w-10 h-10 opacity-50" />
-             </div>
-             <p className="font-medium text-slate-500">ยังไม่มีรูปภาพ</p>
-             <p className="text-sm">พิมพ์คำสั่งแล้วกดสร้างรูปได้เลย</p>
-          </div>
-        )}
-      </div>
-
-      {image && !loading && (
-        <div className="mt-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-           <div className="flex justify-between items-start gap-4">
-             <div>
-               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Prompt Used</h4>
-               <p className="text-sm text-slate-700 leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">
-                 {image.prompt}
-               </p>
-             </div>
-             <button 
-               onClick={handleCopyPrompt}
-               className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors flex-shrink-0"
-               title="Copy Prompt"
-             >
-               {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-             </button>
-           </div>
         </div>
-      )}
-    </div>
-  );
-};
 
-/**
- * ------------------------------------------------------------------
- * MAIN APP COMPONENT
- * ------------------------------------------------------------------
- */
-const App: React.FC = () => {
-  const [prompt, setPrompt] = useState<string>('');
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:4'); // Default to 3:4 for stock vertical
-  const [appState, setAppState] = useState<AppState>(AppState.IDLE);
-  const [currentImage, setCurrentImage] = useState<GeneratedImage | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isGeneratingStock, setIsGeneratingStock] = useState(false);
-  const [isAutoRunning, setIsAutoRunning] = useState(false);
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-
-    setAppState(AppState.GENERATING_IMAGE);
-    setError(null);
-
-    try {
-      const imageUrl = await generateImage(prompt, aspectRatio);
-      const newImage: GeneratedImage = {
-        id: crypto.randomUUID(),
-        url: imageUrl,
-        prompt: prompt,
-        createdAt: Date.now(),
-      };
-      setCurrentImage(newImage);
-      setAppState(AppState.SUCCESS);
-    } catch (e: any) {
-      console.error(e);
-      setAppState(AppState.ERROR);
-      setError("เกิดข้อผิดพลาดในการสร้างรูปภาพ กรุณาลองใหม่อีกครั้ง หรือลองเปลี่ยนคำสั่ง (API อาจไม่ตอบสนอง)");
-    }
-  };
-
-  const handleEnhancePrompt = async () => {
-    if (!prompt.trim()) return;
-    
-    setAppState(AppState.GENERATING_TEXT);
-    try {
-      const enhanced = await enhancePrompt(prompt);
-      setPrompt(enhanced);
-      setAppState(AppState.IDLE);
-    } catch (e) {
-      console.error("Enhance failed", e);
-      setAppState(AppState.IDLE);
-    }
-  };
-
-  const handleGenerateStockPrompt = async (topic: string, style: StockStyle) => {
-    setIsGeneratingStock(true);
-    try {
-      const stockPrompt = await generateStockPrompt(topic, style);
-      setPrompt(stockPrompt);
-    } catch (e) {
-      console.error("Stock prompt generation failed", e);
-      setError("ไม่สามารถสร้าง Prompt ได้ กรุณาลองใหม่อีกครั้ง");
-    } finally {
-      setIsGeneratingStock(false);
-    }
-  };
-
-  const handleAutoRun = async (topic: string, style: StockStyle) => {
-    if (!topic.trim()) return;
-
-    setIsAutoRunning(true);
-    setError(null);
-    setAppState(AppState.GENERATING_TEXT); // Start with text generation state
-
-    try {
-      // Step 1: Generate Prompt
-      const stockPrompt = await generateStockPrompt(topic, style);
-      setPrompt(stockPrompt);
-
-      // Step 2: Generate Image
-      setAppState(AppState.GENERATING_IMAGE);
-      // Small delay to ensure state updates visually if needed
-      await new Promise(resolve => setTimeout(resolve, 800)); 
-      
-      const imageUrl = await generateImage(stockPrompt, aspectRatio);
-      const newImage: GeneratedImage = {
-        id: crypto.randomUUID(),
-        url: imageUrl,
-        prompt: stockPrompt,
-        createdAt: Date.now(),
-      };
-      setCurrentImage(newImage);
-      setAppState(AppState.SUCCESS);
-
-      // Step 3: Auto Download
-      // Note: In some iframe environments auto-download might be blocked, but we'll try.
-      try {
-        const link = document.createElement('a');
-        link.href = imageUrl;
-        link.download = `gemini-stock-${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (dlError) {
-        console.warn("Auto download blocked:", dlError);
-      }
-
-    } catch (e) {
-      console.error("Auto Run Failed", e);
-      setAppState(AppState.ERROR);
-      setError("เกิดข้อผิดพลาดในขั้นตอน Auto Run กรุณาลองใหม่");
-    } finally {
-      setIsAutoRunning(false);
-      setIsGeneratingStock(false); 
-      // appState will remain SUCCESS or ERROR based on flow
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] font-sans text-slate-900">
-      <Header />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Error Alert */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn shadow-sm">
-            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="font-medium text-sm">เกิดข้อผิดพลาด</h3>
-              <p className="text-sm mt-1 text-red-600 opacity-90">{error}</p>
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Controls */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="sticky top-24 space-y-6">
-               <PromptInput 
-                 prompt={prompt}
-                 setPrompt={setPrompt}
-                 aspectRatio={aspectRatio}
-                 setAspectRatio={setAspectRatio}
-                 onGenerate={handleGenerate}
-                 onEnhance={handleEnhancePrompt}
-                 onGenerateStockPrompt={handleGenerateStockPrompt}
-                 onAutoRun={handleAutoRun}
-                 isGenerating={appState === AppState.GENERATING_IMAGE}
-                 isEnhancing={appState === AppState.GENERATING_TEXT}
-                 isGeneratingStock={isGeneratingStock}
-                 isAutoRunning={isAutoRunning}
-               />
-               
-               <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-xl p-5 shadow-sm">
-                  <h4 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-600" />
-                    เคล็ดลับมือโปร (Pro Tips)
-                  </h4>
-                  <ul className="text-xs sm:text-sm text-amber-800 space-y-2 list-disc list-inside opacity-90 leading-relaxed">
-                    <li>ฟีเจอร์ใหม่! ใส่แค่ "หัวข้อ" ด้านบน แล้วให้ AI คิด Prompt แบบมืออาชีพให้</li>
-                    <li><strong>ปุ่ม ⚡ Run Auto:</strong> เหมาะสำหรับทำ Stock Photo ระบบจะคิดคำ+สร้าง+โหลดให้ทันที</li>
-                    <li>ระบบจะใส่ Tag สำคัญ (8k resolution, photorealistic) ให้โดยอัตโนมัติในโหมด Stock</li>
-                    <li>สัดส่วนภาพแนะนำ: 3:4 (แนวตั้งขายดี) หรือ 16:9 (Cinematic)</li>
-                  </ul>
-               </div>
-            </div>
-          </div>
-
-          {/* Right Column: Result */}
-          <div className="lg:col-span-7">
-            <ImageResult 
-              image={currentImage} 
-              loading={appState === AppState.GENERATING_IMAGE} 
-            />
-          </div>
+        <div class="flex flex-wrap gap-3 items-center justify-center">
+            <button onclick="toggleDark()" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full text-sm shadow-sm transition-colors flex items-center gap-2">
+                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            </button>
+            <button onclick="exportTxt()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-md transition-transform active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export Ideas (.txt)
+            </button>
+            <button onclick="generateIdeas()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-transform active:scale-95 group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                สุ่มชุดใหม่
+            </button>
         </div>
-      </main>
-    </div>
-  );
-};
+    </header>
 
-export default App;
+    <!-- Filters -->
+    <div class="w-full max-w-7xl mb-8">
+        <div class="flex flex-wrap gap-2 justify-center bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <button onclick="filterCategory('all')" class="filter-btn active px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium" data-cat="all">ทั้งหมด</button>
+            <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="tech">🤖 Tech & AI</button>
+            <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="wellness">🌿 Wellness</button>
+            <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="lifestyle">☕ Lifestyle</button>
+            <button onclick="filterCategory('eco')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="eco">♻️ Eco & Green</button>
+            <button onclick="filterCategory('diversity')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="diversity">🤝 Diversity</button>
+            <button onclick="filterCategory('retro')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="retro">📼 Retro</button>
+            <button onclick="filterCategory('business')" class="filter-btn px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-sm" data-cat="business">💼 Business</button>
+        </div>
+        <p id="filter-status" class="text-center text-xs text-gray-400 mt-2">แสดงผลจากฐานข้อมูลทั้งหมด 94 รายการ</p>
+    </div>
+
+    <!-- Results Grid -->
+    <div id="results-container" class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-20">
+        <!-- Cards will be injected here -->
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span class="flex items-center justify-center gap-2 text-lg">✅ คัดลอกเรียบร้อย!</span>
+    </div>
+
+    <script>
+        // === DATABASE (90+ Items) ===
+        const fullDatabase = [
+            // --- TECH & AI ---
+            { t: "EV Charging Station", d: "คนกำลังเสียบสายชาร์จรถยนต์ไฟฟ้าที่สถานีชาร์จสาธารณะ", k: "electric vehicle charging, EV charger station, sustainable transport", th: "ชาร์จรถไฟฟ้า สถานีชาร์จรถEV พลังงานสะอาด", cat: "tech" },
+            { t: "VR Metaverse Gaming", d: "วัยรุ่นสวมแว่น VR เล่นเกมในห้องที่มีไฟ RGB สีสันสดใส", k: "virtual reality headset, metaverse gaming, immersive experience", th: "แว่นVR เมตาเวิร์ส เล่นเกมโลกเสมือน", cat: "tech" },
+            { t: "AI Wellness Coach", d: "ผู้หญิงคุยกับ AI บนหน้าจอสมาร์ทโฟนขณะเล่นโยคะที่บ้าน", k: "ai wellness coach, virtual fitness assistant, smart health app", th: "AI โค้ชสุขภาพ แอพออกกำลังกาย", cat: "tech" },
+            { t: "Smart Home Control", d: "มือคนกดแท็บเล็ตเพื่อควบคุมไฟและอุณหภูมิในบ้าน", k: "smart home automation, controlling lights tablet, iot lifestyle", th: "สมาร์ทโฮม ควบคุมบ้านผ่านมือถือ", cat: "tech" },
+            { t: "Drone Delivery", d: "โดรนส่งของกำลังหย่อนกล่องพัสดุหน้าบ้านลูกค้า", k: "drone delivery service, futuristic logistics, contactless shipping", th: "โดรนส่งของ ขนส่งอนาคต", cat: "tech" },
+            { t: "Cybersecurity Shield", d: "โปรแกรมเมอร์ทำงานหน้าจอที่มีกราฟิกรูปโล่ล็อกความปลอดภัย", k: "cyber security concept, data protection, network safety", th: "ความปลอดภัยไซเบอร์ แฮกเกอร์", cat: "tech" },
+            { t: "Robot Waiter", d: "หุ่นยนต์เสิร์ฟอาหารกำลังนำจานไปที่โต๊ะลูกค้าในร้านอาหาร", k: "robot waiter service, automated restaurant, future dining", th: "หุ่นยนต์เสิร์ฟอาหาร ร้านอาหารอนาคต", cat: "tech" },
+            { t: "3D Printing Architect", d: "สถาปนิกดูโมเดลตึกที่กำลังพิมพ์จากเครื่อง 3D Printer", k: "3d printing architecture, rapid prototyping, engineering tech", th: "เครื่องพิมพ์3มิติ สถาปัตยกรรม", cat: "tech" },
+            { t: "Crypto Trading Desk", d: "หน้าจอหลายจอแสดงกราฟหุ้นและคริปโตในห้องมืด", k: "cryptocurrency trading setup, stock market monitors, fintech", th: "เทรดหุ้น คริปโต กราฟหุ้น", cat: "tech" },
+            { t: "Facial Recognition", d: "การสแกนใบหน้าเพื่อเข้าประตูสำนักงาน", k: "facial recognition security, biometric access control", th: "สแกนใบหน้า ระบบความปลอดภัย", cat: "tech" },
+            { t: "E-Sports Tournament", d: "นักแข่งเกมสวมหูฟังจดจ่อหน้าจอในงานแข่งใหญ่", k: "esports tournament player, professional gamer competition", th: "อีสปอร์ต แข่งเกม", cat: "tech" },
+            { t: "Telehealth Senior", d: "คุณยายคุยกับหมอผ่านแท็บเล็ตที่บ้าน", k: "telehealth for seniors, elderly video consultation, remote doctor", th: "หาหมอออนไลน์ ผู้สูงอายุ", cat: "tech" },
+            { t: "Blockchain Coding", d: "หน้าจอโค้ดโปรแกรมที่มีคำว่า Blockchain และ Smart Contract", k: "blockchain coding, smart contract programming, decentralized finance", th: "เขียนโค้ด บล็อกเชน", cat: "tech" },
+            { t: "Hologram Meeting", d: "นักธุรกิจประชุมกับโฮโลแกรมเพื่อนร่วมงานต่างประเทศ", k: "holographic meeting, futuristic business conference, ar technology", th: "ประชุมโฮโลแกรม เทคโนโลยีอนาคต", cat: "tech" },
+
+            // --- WELLNESS & HEALTH ---
+            { t: "Mental Health Journaling", d: "มือเขียนไดอารี่ขอบคุณ (Gratitude) พร้อมกาแฟเช้า", k: "mental health journaling, gratitude notebook, self care routine", th: "เขียนไดอารี่ บำบัดจิตใจ", cat: "wellness" },
+            { t: "Sound Bowl Healing", d: "การทำสมาธิด้วยขันธิเบต (Singing Bowl) ในห้องสปา", k: "tibetan singing bowl, sound healing therapy, meditation session", th: "ขันธิเบต บำบัดด้วยเสียง สมาธิ", cat: "wellness" },
+            { t: "Plant Based Meal Prep", d: "การเตรียมอาหารคลีนจากพืช ผักหลากสีในกล่องอาหาร", k: "plant based meal prep, vegan lunch box, healthy eating", th: "อาหารคลีน อาหารพืช เตรียมอาหาร", cat: "wellness" },
+            { t: "Senior Yoga Park", d: "กลุ่มผู้สูงอายุเล่นโยคะในสวนสาธารณะตอนเช้า", k: "senior yoga group, active elderly lifestyle, park exercise", th: "โยคะผู้สูงอายุ ออกกำลังกายในสวน", cat: "wellness" },
+            { t: "Digital Detox", d: "โทรศัพท์ถูกวางทิ้งไว้ไกลตัว คนกำลังอ่านหนังสือริมหน้าต่าง", k: "digital detox concept, reading book offline, unplugged lifestyle", th: "ดีท็อกซ์โซเชียล อ่านหนังสือ พักผ่อน", cat: "wellness" },
+            { t: "Aromatherapy Diffuser", d: "เครื่องพ่นไอน้ำอโรมาพร้อมน้ำมันหอมระเหยและเทียน", k: "essential oil diffuser, aromatherapy home spa, relaxation atmosphere", th: "เครื่องพ่นอโรมา สปาบ้าน", cat: "wellness" },
+            { t: "Hiking Solitude", d: "คนเดินป่าคนเดียวบนยอดเขา มองวิวธรรมชาติ", k: "solo hiking adventure, nature therapy, mountain peak view", th: "เดินป่า ปีนเขา ธรรมชาติบำบัด", cat: "wellness" },
+            { t: "Healthy Smoothie Bowl", d: "ถ้วยสมูทตี้ผลไม้ตกแต่งสวยงามวางบนโต๊ะไม้", k: "acai smoothie bowl, healthy breakfast, superfood fruits", th: "สมูทตี้ อาหารเช้าสุขภาพ", cat: "wellness" },
+            { t: "Home Spa Day", d: "ผู้หญิงมาสก์หน้าและแช่เท้าในน้ำอุ่นที่บ้าน", k: "home spa day, self care facial mask, relaxing bath", th: "สปาที่บ้าน มาสก์หน้า", cat: "wellness" },
+            { t: "Post-Workout Stretch", d: "คนยืดกล้ามเนื้อหลังวิ่งเสร็จ เหงื่อออกเล็กน้อย", k: "stretching after run, fitness cooldown, athlete muscle relief", th: "ยืดกล้ามเนื้อ หลังวิ่ง", cat: "wellness" },
+            
+            // --- ECO & GREEN ---
+            { t: "Zero Waste Shopping", d: "การตักธัญพืชใส่ขวดแก้วที่ร้าน Refill Station", k: "zero waste bulk store, plastic free shopping, refill station", th: "ร้านรีฟิล ไร้ขยะ ลดพลาสติก", cat: "eco" },
+            { t: "Rooftop Garden", d: "คนเมืองปลูกผักสวนครัวบนดาดฟ้าตึก", k: "urban rooftop gardening, city agriculture, organic vegetable patch", th: "สวนดาดฟ้า ปลูกผักในเมือง", cat: "eco" },
+            { t: "Solar Panel Installation", d: "ช่างกำลังติดตั้งแผงโซลาร์เซลล์บนหลังคาบ้าน", k: "solar panel installation, renewable energy home, green power", th: "ติดตั้งโซลาร์เซลล์ พลังงานแสงอาทิตย์", cat: "eco" },
+            { t: "Beach Cleanup", d: "กลุ่มอาสาสมัครเก็บขยะพลาสติกริมชายหาด", k: "beach cleanup volunteer, ocean conservation, plastic pollution", th: "เก็บขยะชายหาด รักษ์โลก", cat: "eco" },
+            { t: "Bamboo Toothbrush", d: "แปรงสีฟันไม้ไผ่และของใช้ในห้องน้ำที่เป็นมิตรต่อโลก", k: "bamboo toothbrush, eco friendly bathroom products, sustainable living", th: "แปรงสีฟันไม้ไผ่ ของใช้รักษ์โลก", cat: "eco" },
+            { t: "Electric Scooter Commute", d: "พนักงานออฟฟิศขี่สกู๊ตเตอร์ไฟฟ้าไปทำงาน", k: "electric scooter commuting, urban eco transport, city mobility", th: "สกู๊ตเตอร์ไฟฟ้า เดินทางในเมือง", cat: "eco" },
+            { t: "Upcycling Clothes", d: "วัยรุ่นเย็บผ้าเก่าให้เป็นกระเป๋าใบใหม่", k: "upcycling old clothes, diy fashion project, sustainable textile", th: "รีไซเคิลเสื้อผ้า เย็บผ้า DIY", cat: "eco" },
+            { t: "Composting at Home", d: "การเทเศษอาหารลงในถังหมักปุ๋ยหลังบ้าน", k: "home composting bin, organic waste recycling, fertilizer making", th: "หมักปุ๋ย แยกขยะอินทรีย์", cat: "eco" },
+            { t: "Vertical Forest Building", d: "ตึกสูงที่มีต้นไม้ปลูกเต็มระเบียงทุกชั้น", k: "vertical forest architecture, green building, sustainable city", th: "ตึกป่าแนวตั้ง ตึกเขียว", cat: "eco" },
+            { t: "Reusable Cup Cafe", d: "ยื่นแก้วน้ำส่วนตัวให้บาริสต้าที่ร้านกาแฟ", k: "reusable coffee cup, bring your own cup, sustainable cafe", th: "แก้วส่วนตัว ลดขยะ", cat: "eco" },
+
+            // --- LIFESTYLE ---
+            { t: "Digital Nomad Cafe", d: "ทำงานในคาเฟ่ต่างประเทศ มี Passport และ Laptop", k: "digital nomad lifestyle, remote work cafe, travel and work", th: "ทำงานร้านกาแฟ ดิจิทัลโนแมด", cat: "lifestyle" },
+            { t: "Van Life Camping", d: "เปิดท้ายรถตู้ที่ดัดแปลงเป็นที่นอน จอดริมทะเลสาบ", k: "van life camping, campervan interior, road trip adventure", th: "แคมป์ปิ้งรถตู้ เที่ยวรถบ้าน", cat: "lifestyle" },
+            { t: "Minimalist Living Room", d: "ห้องนั่งเล่นสไตล์มินิมอล เฟอร์นิเจอร์น้อยชิ้น แสงสวย", k: "minimalist living room, scandinavian interior, clean aesthetics", th: "ห้องนั่งเล่นมินิมอล แต่งบ้าน", cat: "lifestyle" },
+            { t: "Glamping Luxury", d: "เต็นท์หรูติดแอร์กลางป่า มีไฟประดับสวยงาม", k: "luxury glamping tent, forest resort, outdoor staycation", th: "แกลมปิ้ง ที่พักเต็นท์หรู", cat: "lifestyle" },
+            { t: "Solo Dining", d: "คนกินข้าวคนเดียวในร้านราเมง (Solo dining culture)", k: "solo dining restaurant, eating alone, introvert lifestyle", th: "กินข้าวคนเดียว โต๊ะเดี่ยว", cat: "lifestyle" },
+            { t: "Podcast Recording", d: "คนใส่หูฟังพูดใส่ไมโครโฟนในห้องอัดเสียงที่บ้าน", k: "podcast recording setup, content creator audio, home studio", th: "อัดพอดแคสต์ จัดรายการ", cat: "lifestyle" },
+            { t: "Cat Cafe Relax", d: "คนนั่งเล่นกับแมวในคาเฟ่บรรยากาศอบอุ่น", k: "cat cafe customer, playing with kittens, pet therapy", th: "คาเฟ่แมว ทาสแมว", cat: "lifestyle" },
+            { t: "Urban Picnics", d: "กลุ่มเพื่อนนั่งปิกนิกบนดาดฟ้าตึกเห็นวิวเมือง", k: "urban rooftop picnic, city sunset gathering, friends hanging out", th: "ปิกนิกดาดฟ้า วิวเมือง", cat: "lifestyle" },
+            { t: "Ceramy Pottery Class", d: "มือเปื้อนดินเหนียวกำลังปั้นหม้อในคลาสเรียน", k: "pottery wheel hands, ceramic workshop, crafting hobby", th: "ปั้นดินเผา งานฝีมือ", cat: "lifestyle" },
+            { t: "Book Club Meeting", d: "กลุ่มคนนั่งคุยกันพร้อมถือหนังสือในร้านกาแฟ", k: "book club discussion, reading group, literature lovers", th: "ชมรมอ่านหนังสือ กลุ่มนักอ่าน", cat: "lifestyle" },
+
+            // --- DIVERSITY & INCLUSION ---
+            { t: "Diverse Brainstorm", d: "ทีมงานหลายเชื้อชาติระดมสมองหน้าไวท์บอร์ด", k: "diverse team brainstorming, multicultural workplace, collaboration", th: "ทีมงานหลากเชื้อชาติ ประชุมงาน", cat: "diversity" },
+            { t: "Wheelchair Office", d: "พนักงานนั่งวีลแชร์ทำงานร่วมกับเพื่อนร่วมงานอย่างมีความสุข", k: "wheelchair user office, inclusive workplace, disability employment", th: "คนพิการทำงาน ออฟฟิศเท่าเทียม", cat: "diversity" },
+            { t: "Active Senior Couple", d: "คู่รักสูงวัยเต้นรำในห้องนั่งเล่นอย่างสนุกสนาน", k: "active senior couple dancing, happy elderly retirement, love at old age", th: "คู่รักสูงวัย เต้นรำ", cat: "diversity" },
+            { t: "LGBTQ Pride Office", d: "โต๊ะทำงานที่มีธงสายรุ้งประดับเล็กน้อย", k: "lgbtq pride workplace, inclusive office desk, rainbow flag symbol", th: "ออฟฟิศหลากหลายทางเพศ ธงรุ้ง", cat: "diversity" },
+            { t: "Non-Binary Fashion", d: "นางแบบ/นายแบบ แต่งตัวแฟชั่นที่ไม่จำกัดเพศ (Androgynous)", k: "non-binary fashion model, androgynous style, gender fluid clothing", th: "แฟชั่นไม่จำกัดเพศ ยูนิเซ็กส์", cat: "diversity" },
+            { t: "Vitiligo Beauty", d: "ภาพพอร์ตเทรตคนที่มีผิวเผือกหรือด่างขาว ยิ้มมั่นใจ", k: "vitiligo skin beauty, diverse beauty portrait, skin condition confidence", th: "ผิวเป็นด่างขาว ความงามที่แตกต่าง", cat: "diversity" },
+            { t: "Father on Paternity Leave", d: "คุณพ่อเลี้ยงลูกทารกขณะทำงานที่บ้าน (Work from home)", k: "father paternity leave, dad working with baby, modern parenting", th: "พ่อเลี้ยงลูก ลาคลอดพ่อ", cat: "diversity" },
+            { t: "Multi-Gen Family Dinner", d: "ครอบครัวใหญ่ ปู่ย่าหลาน กินข้าวร่วมกันหัวเราะ", k: "multigenerational family dinner, happy big family eating", th: "ครอบครัวใหญ่ กินข้าวรวมญาติ", cat: "diversity" },
+            { t: "Sign Language Chat", d: "เพื่อนสองคนคุยกันด้วยภาษามือในสวน", k: "sign language conversation, deaf communication, friends signing", th: "ภาษามือ ผู้บกพร่องทางการได้ยิน", cat: "diversity" },
+            { t: "Hijab Businesswoman", d: "นักธุรกิจหญิงสวมฮิญาบพรีเซนต์งานอย่างมั่นใจ", k: "muslim businesswoman presentation, hijab professional, diverse leader", th: "นักธุรกิจมุสลิม หญิงเก่ง", cat: "diversity" },
+
+            // --- RETRO & NOSTALGIA ---
+            { t: "90s Film Aesthetic", d: "ภาพถ่ายสไตล์ฟิล์ม เกรนแตกๆ ของกลุ่มวัยรุ่นยุค 90", k: "90s film grain aesthetic, retro friends hangout, nostalgic vibe", th: "ภาพฟิล์ม90s วินเทจ ย้อนยุค", cat: "retro" },
+            { t: "Vinyl Record Collection", d: "มือคนกำลังเลือกแผ่นเสียงไวนิลจากชั้นวาง", k: "vinyl record collection, browsing records, retro music hobby", th: "แผ่นเสียงไวนิล ฟังเพลงเก่า", cat: "retro" },
+            { t: "Y2K Fashion", d: "วัยรุ่นแต่งตัวสไตล์ Y2K (กิ๊บติดผม เสื้อครอป) ถ่ายรูปหน้ากระจก", k: "y2k fashion style, 2000s aesthetic, gen z retro trend", th: "แฟชั่นY2K แต่งตัวย้อนยุค", cat: "retro" },
+            { t: "Retro Diner", d: "ร้านอาหารสไตล์อเมริกันยุค 50s เบาะหนังสีแดง พื้นลายตาราง", k: "retro diner interior, 50s american restaurant, neon sign vibe", th: "ร้านอาหารย้อนยุค อเมริกันไดเนอร์", cat: "retro" },
+            { t: "Cassette Tape Player", d: "เครื่องเล่นเทปคาสเซ็ทพร้อมหูฟังส้มแบบเก่า", k: "cassette tape player, walkman music, 80s nostalgia", th: "เทปคาสเซ็ท เครื่องเล่นเทป", cat: "retro" },
+            { t: "Polaroid Wall", d: "ผนังห้องที่แปะรูปโพลารอยด์แห่งความทรงจำไว้เต็ม", k: "polaroid photo wall, memories collage, instant camera photos", th: "ผนังรูปโพลารอยด์ ความทรงจำ", cat: "retro" },
+            { t: "Classic Car Trip", d: "ขับรถเปิดประทุนคลาสสิกบนถนนเลียบชายหาด", k: "classic car road trip, vintage convertible driving, retro travel", th: "รถคลาสสิก ขับรถเที่ยว", cat: "retro" },
+            { t: "Neon Arcade Game", d: "ตู้เกมอาเขตในห้องมืดที่มีแสงนีออนสะท้อน", k: "retro arcade cabinet, neon gaming room, 80s arcade vibe", th: "ตู้เกมเก่า เกมอาเขต", cat: "retro" },
+            { t: "Typing on Typewriter", d: "นักเขียนพิมพ์งานบนเครื่องพิมพ์ดีดโบราณ", k: "vintage typewriter typing, retro writer desk, antique author", th: "พิมพ์ดีด เครื่องพิมพ์ดีดเก่า", cat: "retro" },
+            { t: "Flip Phone Comeback", d: "วัยรุ่นใช้มือถือฝาพับรุ่นเก่าถ่ายรูปตัวเอง", k: "flip phone aesthetic, vintage mobile, dumbphone trend", th: "มือถือฝาพับ มือถือเก่า", cat: "retro" },
+
+            // --- BUSINESS & FINANCE (หมวดใหม่) ---
+            { t: "QR Code Payment", d: "สแกนจ่ายเงินผ่าน QR Code ที่ร้านค้าข้างทาง", k: "qr code mobile payment, cashless society, street food scanning", th: "สแกนจ่ายเงิน สังคมไร้เงินสด", cat: "business" },
+            { t: "Start-up Pitching", d: "เจ้าของธุรกิจยืนนำเสนองานให้นักลงทุนดูบนจอใหญ่", k: "startup pitch presentation, entrepreneur meeting, investor deck", th: "พรีเซนต์งาน สตาร์ทอัพ", cat: "business" },
+            { t: "Co-working Space", d: "บรรยากาศ Co-working space ที่คนนั่งทำงานแยกกันแต่พื้นที่เดียวกัน", k: "modern coworking space, shared office environment, freelancer hub", th: "โคเวิร์กกิ้งสเปซ ที่ทำงานรวม", cat: "business" },
+            { t: "Logistics Warehouse", d: "พนักงานคลังสินค้าเช็คของด้วยแท็บเล็ตในโกดัง", k: "warehouse logistics worker, inventory tablet, supply chain", th: "โกดังสินค้า โลจิสติกส์", cat: "business" },
+            { t: "Handshake Deal", d: "การจับมือตกลงธุรกิจแบบ Close-up เห็นแค่ดูมือและสูท", k: "business handshake closeup, corporate deal agreement, partnership", th: "จับมือธุรกิจ ตกลงสัญญา", cat: "business" },
+            { t: "Online Banking App", d: "หน้าจอมือถือโชว์กราฟการออมเงินในแอพธนาคาร", k: "mobile banking app interface, digital finance savings, money transfer", th: "แอพธนาคาร โอนเงินออนไลน์", cat: "business" },
+            { t: "Real Estate Agent", d: "นายหน้ายื่นกุญแจบ้านให้คู่รักใหม่", k: "real estate agent handing keys, new home owners, buying house", th: "นายหน้าขายบ้าน ซื้อบ้านใหม่", cat: "business" },
+            { t: "Manufacturing Robot", d: "แขนกลหุ่นยนต์ประกอบชิ้นส่วนในโรงงาน", k: "industrial robot arm, automated manufacturing, smart factory", th: "หุ่นยนต์โรงงาน สายการผลิต", cat: "business" },
+            { t: "Business Lunch", d: "นักธุรกิจคุยงานไปกินข้าวไปในร้านอาหารหรู", k: "business lunch meeting, corporate dining, discussion meal", th: "คุยงานร้านอาหาร มื้อเที่ยงธุรกิจ", cat: "business" },
+            { t: "Signing Contract", d: "ปากกาหรูจรดลงบนกระดาษสัญญา", k: "signing contract close up, business agreement pen, legal document", th: "เซ็นสัญญา เอกสารธุรกิจ", cat: "business" },
+             
+            // --- EXTRAS (คละหมวด) ---
+            { t: "Camping Coffee", d: "ดริปกาแฟหน้าเต็นท์ตอนเช้า แสงอาทิตย์อ่อนๆ", k: "camping coffee drip, morning outdoor brew, tent lifestyle", th: "กาแฟดริป แคมป์ปิ้ง", cat: "lifestyle" },
+            { t: "Electric Tuk Tuk", d: "รถตุ๊กตุ๊กไฟฟ้าขับผ่านวัดไทย", k: "electric tuk tuk thailand, eco tourism bangkok, modern tradition", th: "ตุ๊กตุ๊กไฟฟ้า เที่ยวไทย", cat: "eco" },
+            { t: "Influencer Unboxing", d: "คนตั้งกล้องถ่ายวิดีโอแกะกล่องพัสดุ", k: "influencer unboxing video, content creator filming, product review", th: "แกะกล่อง รีวิวสินค้า", cat: "tech" },
+            { t: "Pet Friendly Office", d: "สุนัขนอนใต้โต๊ะทำงานในออฟฟิศ", k: "pet friendly office, dog at work, modern workplace culture", th: "ออฟฟิศเลี้ยงหมาได้ สัตว์เลี้ยง", cat: "diversity" },
+            { t: "Hydroponic Farm", d: "เกษตรกรตรวจสอบรากผักสลัดในรางน้ำ", k: "hydroponic lettuce farm, indoor agriculture, smart farming", th: "ผักไฮโดรโปนิกส์ เกษตรในร่ม", cat: "eco" },
+            { t: "Podcast Listener", d: "คนนั่งบนรถไฟฟ้าใส่หูฟังหลับตาฟังพอดแคสต์", k: "commuter listening podcast, subway headphones, urban travel", th: "ฟังเพลงบนรถไฟฟ้า คนเมือง", cat: "lifestyle" },
+            { t: "Messy Desk Creative", d: "โต๊ะทำงานรกๆ ของศิลปิน สี กระดาษ สเก็ตช์", k: "messy creative desk, artist workspace, chaotic inspiration", th: "โต๊ะทำงานศิลปะ รกแต่ติสท์", cat: "lifestyle" },
+            { t: "Virtual Fitting Room", d: "คนลองเสื้อผ่านกระจกอัจฉริยะ (AR Mirror)", k: "virtual fitting room mirror, ar fashion try on, retail tech", th: "ลองเสื้อผ่านจอ กระจกอัจฉริยะ", cat: "tech" },
+            { t: "Recycled Plastic Furniture", d: "เก้าอี้ดีไซน์สวยที่ทำจากพลาสติกรีไซเคิลลายหินอ่อน", k: "recycled plastic furniture, sustainable design chair, eco decor", th: "เฟอร์นิเจอร์รีไซเคิล ของแต่งบ้าน", cat: "eco" },
+            { t: "Asian Street Food Night", d: "ควันจากกระทะร้านอาหารข้างทางตอนกลางคืน ไฟนีออน", k: "asian street food night market, wok cooking steam, neon atmosphere", th: "สตรีทฟู้ด ตลาดกลางคืน", cat: "lifestyle" },
+            { t: "Coding Bootcamp", d: "กลุ่มนักเรียนผู้ใหญ่เรียนเขียนโปรแกรมในห้องเรียน", k: "coding bootcamp class, adult learning programming, tech education", th: "เรียนเขียนโปรแกรม คอร์สไอที", cat: "tech" },
+            { t: "Telemedicine Pill", d: "มือถือโชว์หน้าหมอ พร้อมขวดยาตั้งอยู่ข้างๆ", k: "telemedicine app prescription, digital health doctor, pills bottle", th: "หาหมอออนไลน์ สั่งยา", cat: "tech" },
+            { t: "Electric Bus City", d: "รถเมล์ไฟฟ้าวิ่งในเมืองที่ไม่มีควันไอเสีย", k: "electric city bus, public transport eco, green urban travel", th: "รถเมล์ไฟฟ้า ขนส่งสาธารณะ", cat: "eco" },
+            { t: "Grandma Gamer", d: "คุณยายใส่หูฟังเล่นเกมคอมพิวเตอร์อย่างตั้งใจ", k: "gamer grandma, elderly playing video games, active senior tech", th: "คนแก่เล่นเกม เกมเมอร์สูงวัย", cat: "tech" },
+            { t: "Dad Cooking Dinner", d: "คุณพ่อใส่ผ้ากันเปื้อนทำอาหารให้ลูกกิน", k: "dad cooking dinner, father in kitchen, family meal preparation", th: "พ่อทำอาหาร ครัวครอบครัว", cat: "lifestyle" },
+            { t: "Vertical Garden Balcony", d: "ระเบียงคอนโดเล็กๆ ที่จัดสวนแนวตั้งเขียวชอุ่ม", k: "condo balcony garden, vertical planter, small space oasis", th: "สวนระเบียง จัดสวนพื้นที่เล็ก", cat: "eco" },
+            { t: "Spa Massage Stones", d: "หินร้อนวางบนหลังคนนอนคว่ำ", k: "hot stone massage, spa therapy treatment, relaxing back", th: "นวดหินร้อน สปา", cat: "wellness" },
+            { t: "Blockchain Wallet", d: "สมาร์ทโฟนโชว์ยอดเงินดิจิทัลและ QR Code", k: "crypto wallet app, digital currency balance, blockchain finance", th: "กระเป๋าเงินดิจิทัล คริปโต", cat: "tech" },
+            { t: "Paperless Office", d: "โต๊ะประชุมที่มีแต่แท็บเล็ต ไม่มีกระดาษเลย", k: "paperless meeting room, digital office, sustainable workplace", th: "ออฟฟิศไร้กระดาษ ประชุม", cat: "eco" },
+            { t: "Solo Travel Selfie", d: "ผู้หญิงแบกเป้ถ่ายเซลฟี่กับวิวภูเขา", k: "solo female traveler selfie, backpacker mountain view, wanderlust", th: "เที่ยวคนเดียว แบกเป้", cat: "lifestyle" }
+        ];
+
+        let currentCategory = 'all';
+        let currentIdeas = [];
+
+        // ฟังก์ชันสลับ Array
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ฟังก์ชันหลัก: สร้างการ์ดไอเดีย
+        function generateIdeas() {
+            const container = document.getElementById('results-container');
+            const button = document.querySelector('button[onclick="generateIdeas()"] svg');
+            
+            // หมุนไอคอนปุ่ม
+            button.style.transform = 'rotate(360deg)';
+            setTimeout(() => button.style.transform = 'none', 500);
+
+            // Filter ข้อมูล
+            let pool = fullDatabase;
+            if (currentCategory !== 'all') {
+                pool = fullDatabase.filter(item => item.cat === currentCategory);
+            }
+
+            // Shuffle และเลือกมา 12 อัน (หรือทั้งหมดถ้ามีน้อยกว่า 12)
+            const count = Math.min(pool.length, 12);
+            const shuffled = shuffleArray(pool);
+            currentIdeas = shuffled.slice(0, count);
+
+            // เคลียร์และสร้างการ์ดใหม่
+            container.innerHTML = '';
+            
+            if (currentIdeas.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">ไม่พบข้อมูลในหมวดหมู่นี้</div>`;
+                return;
+            }
+
+            currentIdeas.forEach((item, i) => {
+                const delay = i * 0.05;
+                const card = document.createElement('div');
+                card.className = `bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 fade-in group relative overflow-hidden`;
+                card.style.animationDelay = `${delay}s`;
+                
+                // สีแถบข้างซ้ายตามหมวดหมู่
+                let barColor = 'bg-gray-400';
+                if(item.cat === 'tech') barColor = 'bg-blue-500';
+                if(item.cat === 'eco') barColor = 'bg-green-500';
+                if(item.cat === 'wellness') barColor = 'bg-teal-400';
+                if(item.cat === 'lifestyle') barColor = 'bg-orange-400';
+                if(item.cat === 'diversity') barColor = 'bg-pink-500';
+                if(item.cat === 'retro') barColor = 'bg-purple-500';
+                if(item.cat === 'business') barColor = 'bg-slate-600';
+
+                card.innerHTML = `
+                    <div class="absolute left-0 top-0 bottom-0 w-1 ${barColor}"></div>
+                    <div class="flex justify-between items-start mb-2 pl-2">
+                        <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400 border border-gray-200 dark:border-gray-600 rounded-md px-1.5 py-0.5">${item.cat}</span>
+                        <span class="text-xs text-gray-300 dark:text-gray-600 font-mono">#${i+1}</span>
+                    </div>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 text-lg mb-2 leading-tight pl-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">${item.t}</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-5 flex-grow pl-2 leading-relaxed">${item.d}</p>
+                    
+                    <div class="flex flex-col gap-2 pl-2">
+                        <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this)" class="w-full text-left bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex justify-between items-center group/btn">
+                            <span class="truncate pr-2">🇬🇧 ${item.k}</span>
+                            <span class="opacity-0 group-hover/btn:opacity-100 transition-opacity">📋</span>
+                        </button>
+                        <button onclick="copyText('${item.th.replace(/'/g, "\\'")}', this)" class="w-full text-left bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 text-purple-700 dark:text-purple-300 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex justify-between items-center group/btn">
+                            <span class="truncate pr-2">🇹🇭 ${item.th}</span>
+                            <span class="opacity-0 group-hover/btn:opacity-100 transition-opacity">📋</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // อัพเดทสถานะด้านบน
+            const catName = document.querySelector(`.filter-btn[data-cat="${currentCategory}"]`).innerText;
+            document.getElementById('filter-status').innerText = `กำลังแสดง: ${catName} (${currentIdeas.length} รายการ จากทั้งหมด ${pool.length})`;
+        }
+
+        // ฟังก์ชัน Filter
+        function filterCategory(cat) {
+            currentCategory = cat;
+            
+            // Update UI ปุ่ม
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-blue-600', 'text-white', 'font-medium');
+                b.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+            });
+            
+            const activeBtn = document.querySelector(`.filter-btn[data-cat="${cat}"]`);
+            activeBtn.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-300');
+            activeBtn.classList.add('active', 'bg-blue-600', 'text-white', 'font-medium');
+
+            generateIdeas();
+        }
+
+        // ฟังก์ชัน Copy แก้ไขให้รองรับ iframe/security policies
+        function copyText(text, btn) {
+            // ใช้ execCommand แทน navigator.clipboard เพื่อรองรับ iframe
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Avoid scrolling to bottom
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast("✅ คัดลอก Keywords แล้ว!");
+                    
+                    // Feedback ที่ปุ่ม
+                    const originalHtml = btn.innerHTML;
+                    btn.classList.add('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
+                    btn.innerHTML = `<span class="font-bold">✓ Copied!</span>`;
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.classList.remove('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
+                    }, 1500);
+                } else {
+                     showToast("❌ คัดลอกไม่สำเร็จ");
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                showToast("❌ เกิดข้อผิดพลาดในการคัดลอก");
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // ฟังก์ชัน Export
+        function exportTxt() {
+            if (currentIdeas.length === 0) return showToast("⚠️ กรุณาสุ่มชุดใหม่ก่อน!");
+            
+            const date = new Date().toLocaleDateString('th-TH');
+            let text = `Stock Idea Gen 2025 (Exported: ${date})\nหมวดหมู่: ${currentCategory}\n----------------------------------\n\n`;
+            
+            currentIdeas.forEach((item, i) => {
+                text += `${i+1}. ${item.t}\n   Idea: ${item.d}\n   EN Keywords: ${item.k}\n   TH Keywords: ${item.th}\n\n`;
+            });
+            
+            text += "----------------------------------\nGenerated by Stock Idea Gen V.4";
+
+            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Stock_Ideas_2025_${currentCategory}_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url); // Clean up
+            showToast("📄 Export ไฟล์สำเร็จ!");
+        }
+
+        // ฟังก์ชัน Toast
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerHTML = `<span class="flex items-center justify-center gap-2">${msg}</span>`;
+            toast.className = "toast show";
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.className = toast.className.replace("show", "");
+            }, 2500);
+        }
+
+        // ฟังก์ชัน Dark Mode
+        function toggleDark() {
+            document.documentElement.classList.toggle("dark");
+            const isDark = document.documentElement.classList.contains("dark");
+            
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            
+            if(isDark) {
+                icon.innerText = "☀️";
+                text.innerText = "Light Mode";
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.innerText = "🌙";
+                text.innerText = "Dark Mode";
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Init Check Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').innerText = "☀️";
+            document.getElementById('theme-text').innerText = "Light Mode";
+        }
+
+        // Start
+        window.onload = generateIdeas;
+    </script>
+</body>
+</html>
