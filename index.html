@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Photo Ideas: Top 200 Search Terms (Updated)</title>
+    <title>Travel Stock Ideas (Silent Copy)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
@@ -20,11 +20,17 @@
         .dark .border-gray-100 { border-color: #374151; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .toast { visibility: hidden; min-width: 260px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 50; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        /* Toast z-index must be higher than modal */
+        .toast { visibility: hidden; min-width: 260px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 100; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .toast.show { visibility: visible; opacity: 1; bottom: 60px; }
         .dark .toast { background-color: #f3f4f6; color: #111827; }
-        .error-toast { background-color: #ef4444; color: white; }
         
+        /* Modal Styles */
+        .modal { opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 50; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { transform: scale(0.95); transition: all 0.3s ease; }
+        .modal.active .modal-content { transform: scale(1); }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -36,153 +42,121 @@
 <body class="min-h-screen flex flex-col items-center py-6 px-4 dark:bg-gray-900">
 
     <!-- Header -->
-    <div class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+    <div class="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
         <div class="text-center md:text-left">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                Stock Ideas 2025
-                <span class="text-sm font-normal text-gray-500 dark:text-gray-300 bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-green-800 dark:text-green-100">200+ Keywords</span>
+                Stock Prompt Generator
+                <span class="text-xs font-normal text-white bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-1 rounded-full shadow-sm">V.8.1 Silent Copy</span>
             </h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">รวมคำค้นหา Education, Beauty, Tech & Niche Markets ล่าสุด</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">สุ่ม 3 ช่อง (ไม่ซ้ำเดิม) + คัดลอกทันทีไม่มี Pop-up</p>
         </div>
 
         <div class="flex flex-wrap gap-3 items-center justify-center">
-            <button onclick="toggleDark()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-full text-sm hover:bg-gray-300 transition-colors">🌙 Dark Mode</button>
-            <button onclick="exportTxt()" class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full text-sm font-bold flex items-center gap-2 transition-transform active:scale-95">
-                📄 Export .txt
+            <button onclick="openCustomDataModal()" class="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 rounded-full text-sm font-bold flex items-center gap-2 transition-colors border border-yellow-200 dark:border-yellow-800">
+                📝 Custom Data
             </button>
+            <button onclick="toggleDark()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 dark:text-white rounded-full text-sm hover:bg-gray-300 transition-colors">🌙 Dark Mode</button>
             <button onclick="generateIdeas()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                สุ่มชุดใหม่
+                สุ่มใหม่ (3 ช่อง)
             </button>
         </div>
     </div>
 
     <!-- Filters -->
-    <div class="w-full max-w-7xl mb-5 flex flex-wrap gap-2 justify-center">
-        <button onclick="filterCategory('all')" class="filter-btn active px-5 py-2 bg-blue-600 text-white rounded-full text-sm transition-colors">ทั้งหมด</button>
-        <button onclick="filterCategory('retro')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Backgrounds</button>
-        <button onclick="filterCategory('lifestyle')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Edu & Lifestyle</button>
-        <button onclick="filterCategory('diversity')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">People & Culture</button>
-        <button onclick="filterCategory('tech')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Tech & Biz</button>
-        <button onclick="filterCategory('wellness')" class="filter-btn px-5 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Beauty & Health</button>
+    <div class="w-full max-w-5xl mb-5 flex flex-wrap gap-2 justify-center" id="filter-container">
+        <button onclick="filterCategory('all')" class="filter-btn active px-4 py-1.5 bg-blue-600 text-white rounded-full text-xs md:text-sm transition-colors">ทั้งหมด</button>
+        <button onclick="filterCategory('asia')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Asia</button>
+        <button onclick="filterCategory('europe')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Europe</button>
+        <button onclick="filterCategory('north_america')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">America</button>
+        <button onclick="resetToDefault()" class="hidden px-4 py-1.5 bg-red-100 text-red-600 rounded-full text-xs md:text-sm hover:bg-red-200 transition-colors" id="reset-btn">🔄 กลับไปใช้ข้อมูลเดิม</button>
     </div>
 
-    <!-- Results -->
-    <div id="results-container" class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <!-- Results Grid (Adjusted for 3 items centering) -->
+    <div id="results-container" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="col-span-full text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
             <p class="text-gray-400">กำลังโหลดข้อมูล...</p>
         </div>
     </div>
 
+    <!-- Prompt Modal (Hidden/Unused but structure kept for script references just in case) -->
+    <div id="promptModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div class="modal-content bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <span class="text-2xl">🏞️</span> AI Landscape Prompt
+                </h2>
+                <button onclick="closeModal('promptModal')" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <!-- ... content ... -->
+        </div>
+    </div>
+
+    <!-- Custom Data Modal -->
+    <div id="customDataModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div class="modal-content bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col h-[80vh] overflow-hidden">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-yellow-50 dark:bg-gray-800">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <span>📝</span> ใส่ข้อมูลของคุณเอง (Custom Data)
+                </h2>
+                <button onclick="closeModal('customDataModal')" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-6 flex-grow flex flex-col space-y-4 overflow-hidden">
+                <p class="text-sm text-gray-600 dark:text-gray-400">วางรายการที่ต้องการสุ่ม (1 บรรทัด = 1 รายการ) ระบบจะใช้ข้อมูลนี้แทนฐานข้อมูลเดิม</p>
+                <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-500 font-mono">
+                    ตัวอย่าง:<br>
+                    น้ำตกทีลอซู จ.ตาก<br>
+                    ทะเลหมอกภูชี้ฟ้า | misty mountain, sunrise, sea of fog<br>
+                    วัดร่องขุ่น | white temple, intricate details, thai architecture
+                </div>
+                <textarea id="custom-input" class="w-full flex-grow p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500 focus:outline-none resize-none font-mono" placeholder="วางข้อมูลที่นี่..."></textarea>
+            </div>
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                <button onclick="closeModal('customDataModal')" class="px-5 py-2 text-gray-500 hover:text-gray-700 font-medium">ยกเลิก</button>
+                <button onclick="loadCustomData()" class="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-lg shadow-md transition-transform active:scale-95">
+                    🚀 ใช้ข้อมูลนี้สุ่มเลย
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="toast">
-        <span class="flex items-center justify-center gap-2">✅ คัดลอกแล้ว!</span>
+        <span class="flex items-center justify-center gap-2">✅ เรียบร้อย!</span>
     </div>
 
     <script>
-        // Database Updated: Rank 1-200
-        const fullDatabase = [
-            // --- Rank 1-100 (Selected High Volume) ---
-            { t: "2025 Calendar Concept", d: "ภาพปฏิทินปีใหม่ การวางแผน จัดตารางงาน", k: "2025 calendar, new year planner, schedule layout, organizer", th: "ปฏิทิน 2025 วางแผนงาน", cat: "lifestyle" },
-            { t: "Blue Background", d: "พื้นหลังสีน้ำเงิน เรียบหรู หรือมี Texture", k: "blue background, abstract blue texture, navy blue wallpaper", th: "พื้นหลังสีน้ำเงิน ฉากสีฟ้า", cat: "retro" },
-            { t: "Islamic Background", d: "ลวดลายอิสลาม มัสยิด หรือศิลปะอาหรับ", k: "islamic background, ramadan kareem, arabesque pattern, muslim festival", th: "พื้นหลังอิสลาม ลายอาหรับ", cat: "diversity" },
-            { t: "Happy Senior Woman", d: "หญิงชราอารมณ์ดี ยิ้มแย้ม (Active Aging)", k: "happy senior woman, old granny smiling, grandmother lifestyle, active elderly", th: "ยายยิ้ม ยายแก่มีความสุข", cat: "diversity" },
-            { t: "3D Wallpaper", d: "ภาพพื้นหลัง 3 มิติ รูปทรงเลขาคณิต ล้ำสมัย", k: "3d wallpaper, abstract geometric 3d, futuristic background", th: "วอลเปเปอร์ 3D พื้นหลัง 3 มิติ", cat: "tech" },
-            { t: "Green Screen Background", d: "ฉากเขียว Chroma Key สำหรับตัดต่อวิดีโอ", k: "green screen background, chroma key, blank green backdrop", th: "ฉากเขียว กรีนสกรีน", cat: "tech" },
-            { t: "Social Media Logos (Ed.)", d: "ไอคอน Instagram/Facebook แบบ 3D (Editorial)", k: "instagram logo, facebook icon, social media app, smartphone screen", th: "โลโก้ไอจี เฟสบุ๊ค", cat: "tech" },
-            { t: "Good Morning Image", d: "ภาพสวัสดีตอนเช้า กาแฟ แสงแดด ดอกไม้", k: "good morning, morning coffee, sunrise inspiration, fresh start", th: "สวัสดีตอนเช้า อรุณสวัสดิ์", cat: "lifestyle" },
-            { t: "Black Background", d: "พื้นหลังสีดำสนิท หรือมี Texture เบาๆ", k: "black background, dark texture, elegant black wallpaper", th: "พื้นหลังสีดำ ฉากดำ", cat: "retro" },
-            { t: "Nature Background", d: "ป่าไม้ ภูเขา ทะเล เน้นความเป็นธรรมชาติ", k: "nature background, green forest, landscape scenery, natural beauty", th: "พื้นหลังธรรมชาติ ป่าเขา", cat: "retro" },
-            { t: "Gold Background", d: "สีทอง ประกายทอง ความรวย หรูหรา", k: "gold background, golden texture, luxury gold leaf, shiny metal", th: "พื้นหลังสีทอง ฉากทอง", cat: "retro" },
-            { t: "Smoke Effect PNG", d: "ควัน ลอยฟุ้ง บนพื้นดำ หรือโปร่งใส", k: "smoke png, smoke effect, abstract wisp, steam isolated", th: "ควัน เอฟเฟกต์ควัน", cat: "retro" },
-            { t: "Galaxy / Space", d: "อวกาศ ดวงดาว ทางช้างเผือก", k: "galaxy background, space nebula, stars, universe wallpaper", th: "อวกาศ กาแล็กซี", cat: "retro" },
-            { t: "Eid Mubarak", d: "การเฉลิมฉลองวันอีด มุสลิม", k: "eid mubarak, muslim celebration, eid al-fitr, islamic holiday", th: "วันอีด อีดมูบารัก", cat: "diversity" },
-            { t: "Father's Day", d: "วันพ่อ พ่อลูก กิจกรรมครอบครัว", k: "fathers day, happy father, dad and son, family love", th: "วันพ่อ พ่อลูก", cat: "lifestyle" },
-            { t: "Diwali Festival", d: "เทศกาลแห่งแสงสว่าง อินเดีย ตะเกียง", k: "diwali festival, deepavali, festival of lights, diya lamp", th: "ดิวาลี เทศกาลไฟ", cat: "diversity" },
-            { t: "Indian Independence Day", d: "วันชาติอินเดีย ธงชาติ (Tricolor)", k: "indian independence day, india flag, 15 august, patriotism", th: "วันชาติอินเดีย ธงอินเดีย", cat: "diversity" },
-            { t: "Cute Baby", d: "เด็กทารกน่ารัก ยิ้มแย้ม (High Search)", k: "cute baby, adorable infant, newborn smiling, happy toddler", th: "เด็กทารก เด็กน่ารัก", cat: "diversity" },
-            { t: "Teenage Girls (15 yo)", d: "กลุ่มวัยรุ่นหญิง เพื่อนฝูง ไลฟ์สไตล์วัยรุ่น", k: "teenage girls, gen z lifestyle, best friends, studying", th: "วัยรุ่นหญิง เพื่อนสาว", cat: "diversity" },
-            { t: "Hindu Gods", d: "รูปปั้นหรือภาพวาดเทพเจ้าฮินดู (Shiva, Krishna)", k: "shiva, krishna, hanuman, hindu god, indian religion", th: "พระศิวะ พระกฤษณะ", cat: "diversity" },
-            { t: "BMI Chart", d: "ตาราง BMI การชั่งน้ำหนัก สายวัดเอว", k: "bmi chart, body mass index, weight loss, healthy weight", th: "ดัชนีมวลกาย ลดน้ำหนัก", cat: "wellness" },
-            { t: "Scary Face / Horror", d: "หน้าตาน่ากลัว ผี ฮาโลวีน", k: "scary face, horror portrait, halloween makeup, spooky scream", th: "หน้าผี น่ากลัว", cat: "wellness" },
-            { t: "Esports Logo", d: "โลโก้ทีมแข่งเกม มาสคอตดุดัน", k: "esports logo, gaming mascot, gamer team badge", th: "โลโก้อีสปอร์ต เกมเมอร์", cat: "tech" },
-            { t: "Pink Dino / Unicorn", d: "ไดโนเสาร์สีชมพู หรือยูนิคอร์น (งานเด็ก)", k: "pink dinosaur, cute dino, unicorn illustration, fantasy animal", th: "ไดโนเสาร์ชมพู ยูนิคอร์น", cat: "retro" },
-            
-            // --- NEW: Education & Student Life (Rank 101-129) ---
-            { t: "Academic Pressure", d: "นักเรียนเครียด กองหนังสือ สอบ", k: "academic pressure, stressed student, exam anxiety, study burnout", th: "เครียดเรียน สอบหนัก", cat: "lifestyle" },
-            { t: "Achievement & Success", d: "นักเรียนถือถ้วยรางวัล รับปริญญา", k: "student achievement, graduation success, education trophy, scholarship winner", th: "ความสำเร็จการศึกษา รับรางวัล", cat: "lifestyle" },
-            { t: "Group Brainstorming", d: "นักเรียนระดมสมอง แปะ Post-it", k: "group brainstorming, student collaboration, idea sharing, team study", th: "ระดมสมอง นักเรียนกลุ่ม", cat: "lifestyle" },
-            { t: "Child Development", d: "เด็กเล็กเรียนรู้ ของเล่นเสริมพัฒนาการ", k: "child development, early childhood education, learning through play, montessori", th: "พัฒนาการเด็ก ปฐมวัย", cat: "lifestyle" },
-            { t: "Collaboration in Class", d: "การทำงานกลุ่มในห้องเรียนสมัยใหม่", k: "student collaboration, classroom teamwork, group project, active learning", th: "ทำงานกลุ่ม ห้องเรียน", cat: "lifestyle" },
-            { t: "DEI Diversity Education", d: "ความหลากหลายในห้องเรียน (DEI)", k: "dei education, diversity equity inclusion, multicultural classroom, inclusive learning", th: "ความหลากหลายในโรงเรียน", cat: "diversity" },
-            { t: "Digital Learning", d: "เรียนออนไลน์ แท็บเล็ต คอมพิวเตอร์", k: "digital learning, edtech, online classroom, student with tablet, e-learning", th: "เรียนออนไลน์ สื่อดิจิทัล", cat: "tech" },
-            { t: "Diverse Learning Group", d: "กลุ่มนักเรียนหลากหลายเชื้อชาติ", k: "diverse learning group, multiethnic students, global education, international school", th: "นักเรียนนานาชาติ", cat: "diversity" },
-            { t: "Early Childhood", d: "เด็กอนุบาล รอยยิ้ม การเรียนรู้แรกเริ่ม", k: "early childhood, kindergarten student, preschooler learning, happy child school", th: "เด็กอนุบาล ปฐมวัย", cat: "lifestyle" },
-            { t: "Future of Education", d: "ห้องเรียนอนาคต VR, AI ในการเรียน", k: "future of education, ai in classroom, vr learning, innovative school", th: "การศึกษาอนาคต ห้องเรียนล้ำยุค", cat: "tech" },
-            { t: "Lifelong Learning", d: "ผู้ใหญ่เรียนรู้ อ่านหนังสือ อบรม", k: "lifelong learning, adult education, continuous improvement, senior student", th: "เรียนรู้ตลอดชีวิต การศึกษาผู้ใหญ่", cat: "lifestyle" },
-            { t: "STEM Education", d: "วิทย์ คณิต วิศวะ หุ่นยนต์ (STEM)", k: "stem education, science class, robotics coding, math student, technology learning", th: "เรียนวิทย์ STEM หุ่นยนต์", cat: "tech" },
-            { t: "Student Life", d: "ชีวิตนักเรียน ในโรงอาหาร สนามกีฬา", k: "student life, campus lifestyle, university friends, high school hallway", th: "ชีวิตนักเรียน มหาวิทยาลัย", cat: "lifestyle" },
-            { t: "Study Habits", d: "การอ่านหนังสือ จดโน้ต มีสมาธิ", k: "study habits, focused student, taking notes, library session, productivity", th: "นิสัยการเรียน อ่านหนังสือ", cat: "lifestyle" },
-            { t: "Youth Empowerment", d: "วัยรุ่นทำกิจกรรมจิตอาสา เป็นผู้นำ", k: "youth empowerment, young leader, student activist, confident teen", th: "พลังวัยรุ่น ผู้นำนักเรียน", cat: "diversity" },
-
-            // --- NEW: Beauty, Skincare & Dermatology (Rank 130-154) ---
-            { t: "Acne & Skincare", d: "ปัญหาสิว ผิวหน้า การรักษา", k: "acne skin, dermatology treatment, problem skin, pimple care, facial closeup", th: "สิว รักษาผิวหน้า", cat: "wellness" },
-            { t: "Modern Beauty Salon", d: "ร้านเสริมสวย ช่างทำผม อุปกรณ์ครบ", k: "beauty salon interior, hairdresser at work, hair styling tools, spa salon", th: "ร้านทำผม ช่างทำผม", cat: "wellness" },
-            { t: "Diverse Beauty Faces", d: "ใบหน้าผู้หญิงหลากหลายสีผิว (Natural)", k: "diverse beauty portraits, natural skin texture, multicultural women, no makeup look", th: "ใบหน้าสวยธรรมชาติ หลากหลายผิว", cat: "diversity" },
-            { t: "Fashion Model (Niche)", d: "นางแบบแฟชั่นที่มีเอกลักษณ์ ไม่ซ้ำใคร", k: "unique fashion model, unconventional beauty, edgy style, high fashion editorial", th: "นางแบบแฟชั่น มีเอกลักษณ์", cat: "wellness" },
-            { t: "Cosmetics & Makeup", d: "เครื่องสำอาง ลิปสติก แป้งพัฟ", k: "cosmetics background, makeup products, lipstick texture, beauty supply, makeup artist", th: "เครื่องสำอาง แต่งหน้า", cat: "wellness" },
-            { t: "Facial Treatment", d: "นวดหน้า มาร์คหน้า คลินิกความงาม", k: "facial treatment, spa facial, dermatology clinic, skin rejuvenation, relaxing spa", th: "นวดหน้า มาร์คหน้า", cat: "wellness" },
-            { t: "Hairdresser & Salon", d: "ช่างตัดผมกำลังไดร์ผม ทำสี", k: "hairdresser, hair stylist, salon service, blow dry, hair coloring", th: "ช่างตัดผม ทำสีผม", cat: "wellness" },
-            { t: "Collagen & Anti-Aging", d: "ผลิตภัณฑ์คอลลาเจน ผิวเต่งตึง", k: "collagen supplement, anti aging skincare, youthful skin, beauty serum", th: "คอลลาเจน ชะลอวัย", cat: "wellness" },
-            { t: "Laser Hair Removal", d: "เลเซอร์กำจัดขน คลินิกผิวหนัง", k: "laser hair removal, smooth skin, dermatology laser, beauty procedure", th: "เลเซอร์กำจัดขน", cat: "wellness" },
-            { t: "Self Care Routine", d: "การดูแลตัวเอง ทาครีม แปรงฟัน", k: "self care routine, applying moisturizer, morning skincare, wellness habit", th: "ดูแลตัวเอง ทาครีม", cat: "wellness" },
-            { t: "Plastic Surgery Concept", d: "ศัลยกรรม ปรึกษาหมอ เส้นมาร์คหน้า", k: "plastic surgery consultation, cosmetic surgery, beauty transformation, doctor checkup", th: "ศัลยกรรม ความงาม", cat: "wellness" },
-            { t: "Diverse Hairstyles", d: "ทรงผมหลากหลาย ผมหยิก ผมตรง ผมสั้น", k: "diverse hairstyles, curly hair, afro hair, straight hair, hair texture", th: "ทรงผมหลากหลาย", cat: "wellness" },
-
-            // --- NEW: Tech & Future Trends (Rank 155-159) ---
-            { t: "Artificial Intelligence", d: "AI ทำงานร่วมกับมนุษย์ หุ่นยนต์", k: "artificial intelligence, ai robot, human and machine, future technology, generative ai", th: "ปัญญาประดิษฐ์ หุ่นยนต์ AI", cat: "tech" },
-            { t: "Digital Transformation", d: "ธุรกิจเปลี่ยนสู่ดิจิทัล กราฟโฮโลแกรม", k: "digital transformation, business innovation, cloud computing, tech growth, virtualization", th: "การเปลี่ยนแปลงดิจิทัล", cat: "tech" },
-            { t: "Virtual Conference", d: "ประชุมออนไลน์ หน้าจอ Zoom หลายคน", k: "virtual conference, online meeting, video call grid, remote team work", th: "ประชุมออนไลน์ วิดีโอคอล", cat: "tech" },
-            { t: "Hologram Tech", d: "โฮโลแกรม 3 มิติ ล้ำสมัย Sci-fi", k: "hologram technology, futuristic interface, 3d projection, sci-fi hud", th: "โฮโลแกรม เทคโนโลยีอนาคต", cat: "tech" },
-            { t: "Sustainability Tech", d: "เทคโนโลยีรักษ์โลก พลังงานสะอาด", k: "sustainability technology, green tech, eco friendly innovation, renewable energy", th: "เทคโนโลยีรักษ์โลก", cat: "tech" },
-
-            // --- NEW: Specific Niche & Symbols (Rank 160-171) ---
-            { t: "Christmas Color Palette", d: "โทนสีคริสต์มาส แดง-เขียว-ทอง (Flat lay)", k: "christmas color palette, festive colors, holiday mood board, red green gold", th: "โทนสีคริสต์มาส", cat: "retro" },
-            { t: "Happy New Year 2026", d: "เตรียมรับปี 2026 ตัวเลข พลุ", k: "happy new year 2026, 2026 celebration, future new year, fireworks text", th: "ปีใหม่ 2026 สวัสดีปีใหม่", cat: "lifestyle" },
-            { t: "Cat Paw (Niche)", d: "อุ้งเท้าแมวระยะใกล้ (Macro)", k: "cat paw, kitten feet, cute animal parts, paw beans, pet detail", th: "อุ้งเท้าแมว เท้าแมว", cat: "lifestyle" },
-            { t: "Luxury Brand Logo (Ed.)", d: "โลโก้แบรนด์หรู เช่น Chanel (Editorial Only)", k: "luxury fashion brand, chanel logo, fashion boutique sign, editorial illustration", th: "โลโก้แบรนด์เนม", cat: "tech" },
-            { t: "Math Symbols (>)", d: "เครื่องหมายมากกว่า (Greater Than) กราฟิก", k: "greater than sign, math symbol, inequality concept, comparison icon", th: "เครื่องหมายมากกว่า", cat: "tech" },
-            { t: "Financial Logos (Ed.)", d: "ป้าย Western Union หรือธนาคาร (Editorial)", k: "western union sign, money transfer logo, bank signage, financial service", th: "ป้ายโอนเงิน ธนาคาร", cat: "tech" },
-            { t: "Poland Flag", d: "ธงชาติโปแลนด์ ปลิวไสว", k: "poland flag, polish national symbol, flag of poland, warsaw patriot", th: "ธงชาติโปแลนด์", cat: "diversity" },
-            { t: "Chloroplast Diagram", d: "ไดอะแกรมเซลล์พืช วิทยาศาสตร์", k: "chloroplast diagram, plant cell biology, photosynthesis structure, science education", th: "คลอโรพลาสต์ เซลล์พืช", cat: "tech" },
-            { t: "Toucan Bird", d: "นกทูแคน ปากใหญ่ สีสดใส", k: "toucan bird, tropical wildlife, exotic bird, rainforest animal", th: "นกทูแคน นกเงือก", cat: "retro" },
-            { t: "Presentation Templates", d: "หน้าจอ PowerPoint กราฟิกนำเสนอ", k: "powerpoint template, presentation slide, business deck, layout design", th: "เทมเพลตนำเสนอ พาวเวอร์พอยท์", cat: "tech" },
-            { t: "Permanent Teeth", d: "ฟันแท้ ทันตกรรม รากฟัน", k: "permanent teeth, dental anatomy, tooth structure, dentistry model", th: "ฟันแท้ ทันตกรรม", cat: "wellness" },
-            { t: "Ivory Color", d: "สีงาช้าง พื้นหลังเรียบหรู", k: "ivory color background, cream texture, neutral palette, soft white", th: "สีงาช้าง สีครีม", cat: "retro" },
-
-            // --- NEW: Finance & Stock Industry (Rank 172-180) ---
-            { t: "Money & Currency", d: "ธนบัตร เหรียญ กราฟการเงิน", k: "money background, currency exchange, financial growth, banknotes, coins", th: "เงิน สกุลเงิน การเงิน", cat: "tech" },
-            { t: "Buy/Sell Stock Photos", d: "คนเลือกซื้อรูปในคอม ช่างภาพขายรูป", k: "buy stock photos, selling photography, digital licensing, media market concept", th: "ซื้อภาพสต็อก ขายภาพ", cat: "tech" },
-            { t: "Affordable Stock Photo", d: "โปรโมชั่นภาพราคาถูก ความคุ้มค่า", k: "affordable stock photography, budget images, discount pricing, value deal", th: "ภาพสต็อกราคาถูก", cat: "tech" },
-            { t: "Global Stock Market", d: "แผนที่โลก กราฟหุ้น การค้าสากล", k: "international stock photography, global market, world trade, business map", th: "ตลาดหุ้นทั่วโลก", cat: "tech" },
-            { t: "Small Business Stock", d: "เจ้าของกิจการเล็กๆ ใช้รูปทำงาน", k: "stock photography for small business, sme marketing, startup assets", th: "ภาพสำหรับ SME", cat: "tech" },
-
-            // --- NEW: Specific Visuals & Evergreen (Rank 181-200) ---
-            { t: "Aerial Sea Landscape", d: "ภาพมุมสูง ทะเล ชายหาด (Drone)", k: "aerial sea landscape, drone ocean view, blue water top down, beach scenery", th: "ทะเลมุมสูง โดรนถ่ายทะเล", cat: "retro" },
-            { t: "City Data Connection", d: "เมืองมีเส้นกราฟิกเชื่อมต่อ (Smart City)", k: "city photo with data connection, smart city overlay, network lines, urban tech", th: "เมืองอัจฉริยะ ข้อมูลเชื่อมต่อ", cat: "tech" },
-            { t: "Smiling Young Woman", d: "ผู้หญิงยิ้ม สดใส เป็นธรรมชาติ (Portrait)", k: "smiling young woman, happy female portrait, authentic smile, joy face", th: "ผู้หญิงยิ้ม พอร์ตเทรต", cat: "diversity" },
-            { t: "Young Business People", d: "คนทำงานรุ่นใหม่ หลากหลายเชื้อชาติ", k: "young business people, diverse coworkers, office team, startup group", th: "คนทำงานรุ่นใหม่", cat: "lifestyle" },
-            { t: "Diversity Hands", d: "มือหลายสีผิวรวมพลังกัน (Unity)", k: "diversity hands, unity concept, teamwork circle, multiracial hands together", th: "มือหลากหลายสีผิว สามัคคี", cat: "diversity" },
-            { t: "White Background (High)", d: "ฉากขาวล้วน ยอดนิยมตลอดกาล", k: "white background, isolated, pure white, clean space, studio shot", th: "พื้นหลังขาว", cat: "retro" },
-            { t: "Abstract Patterns", d: "ลวดลาย Abstract ใช้งานง่าย", k: "abstract background, geometric pattern, texture design, modern art", th: "ลวดลายนามธรรม", cat: "retro" },
-            { t: "Travel & Adventure", d: "ท่องเที่ยว แบกเป้ ธรรมชาติ", k: "travel lifestyle, adventure holiday, wanderlust, exploring nature", th: "ท่องเที่ยว ผจญภัย", cat: "lifestyle" },
-            { t: "Family Gathering", d: "ครอบครัวรวมตัว อบอุ่น", k: "family gathering, happy relatives, reunion dinner, multi generation love", th: "ครอบครัวรวมญาติ", cat: "lifestyle" },
-            { t: "Happy Holidays Text", d: "ข้อความอวยพรวันหยุด ตกแต่งสวยงาม", k: "happy holidays text, season greetings, festive typography, holiday card", th: "สุขสันต์วันหยุด", cat: "lifestyle" },
-            { t: "American Flag", d: "ธงชาติอเมริกา วันสำคัญสหรัฐฯ", k: "american flag, usa patriotism, 4th of july, stars and stripes", th: "ธงชาติอเมริกา", cat: "diversity" },
-            { t: "Memorial Day", d: "วันระลึกถึงทหารผ่านศึก (USA)", k: "memorial day, remembrance, usa soldier honor, cemetery flags", th: "วันรำลึกทหารผ่านศึก", cat: "diversity" }
+        // Default Database
+        const defaultDatabase = [
+            { t: "Komodo National Park", loc: "Indonesia", d: "เกาะสวรรค์ดิบเถื่อน หาดทรายขาว", k: "Komodo National Park, Padar Island, savanna hills, turquoise ocean, pink beach", cat: "asia" },
+            { t: "Li River", loc: "China", d: "ภูเขาหินปูนทรงแปลกตา", k: "Li River Guilin, karst mountains, bamboo raft, misty landscape, traditional chinese scenery", cat: "asia" },
+            { t: "Laamu Atoll", loc: "Maldives", d: "ลากูนน้ำใสราวกระจก", k: "Laamu Atoll Maldives, crystal clear lagoon, overwater bungalow, white sandbar", cat: "asia" },
+            { t: "James Bond Island", loc: "Thailand", d: "เขาตะปูหินปูนกลางทะเล", k: "James Bond Island, Phang Nga Bay, limestone karst, emerald water, longtail boat", cat: "asia" },
+            { t: "Oludeniz Lagoon", loc: "Turkey", d: "ลากูนสีฟ้าเทอร์ควอยซ์", k: "Oludeniz Blue Lagoon, paragliding view, turquoise mediterranean sea, white sand spit", cat: "asia" },
+            { t: "Zhangjiajie National Park", loc: "China", d: "เสาหินควอตซ์ไซต์ (Avatar)", k: "Zhangjiajie National Forest Park, floating mountains, quartzite pillars, misty forest", cat: "asia" },
+            { t: "Rhossili Bay", loc: "Wales, UK", d: "หาดทรายสีทองทอดยาว", k: "Rhossili Bay, Gower Peninsula, golden sand beach, dramatic cliffs, coastal path", cat: "europe" },
+            { t: "Vestrahorn", loc: "Iceland", d: "ภูเขาทรงเขี้ยวสัตว์บนหาดดำ", k: "Vestrahorn mountain, Stokksnes black sand beach, dramatic peaks, reflection in water", cat: "europe" },
+            { t: "Santorini Caldera", loc: "Greece", d: "บ้านสีขาวโดมฟ้า วิวทะเล", k: "Santorini Caldera, Oia village, white houses blue domes, volcanic cliffs, aegean sea sunset", cat: "europe" },
+            { t: "The Pitons", loc: "St. Lucia", d: "ยอดเขาภูเขาไฟคู่", k: "The Pitons St Lucia, twin volcanic spires, lush rainforest, caribbean sea, luxury resort view", cat: "north_america" },
+            { t: "Monument Valley", loc: "USA", d: "แท่งหินทรายสีแดง", k: "Monument Valley, red sandstone buttes, desert landscape, navajo tribal park, western movie scenery", cat: "north_america" },
+            { t: "Great Barrier Reef", loc: "Australia", d: "แนวปะการังที่ใหญ่ที่สุด", k: "Great Barrier Reef, aerial view coral, turquoise water, marine life, underwater split shot", cat: "oceania" },
+            { t: "Milford Sound", loc: "New Zealand", d: "ฟยอร์ดสูงชัน", k: "Milford Sound, new zealand fiord, mitre peak, waterfalls cascading, misty cliff", cat: "oceania" }
         ];
+
+        // Active Database
+        let fullDatabase = [...defaultDatabase];
+        let isCustomMode = false;
+        
+        // State for repetition prevention
+        let lastDisplayedTitles = [];
+
+        const MAGIC_QUALITY = "raw photo, photorealistic, hyperrealistic, highly detailed, 8k uhd, dslr, wide angle lens, sharp focus, cinematic lighting, volumetric lighting, ray tracing, hdr, nature photography, national geographic style";
 
         let currentIdeas = [];
         let currentCategory = 'all'; 
@@ -199,45 +173,168 @@
             const container = document.getElementById('results-container');
             container.innerHTML = '';
             
-            let filteredPool = fullDatabase.filter(item => currentCategory === 'all' || item.cat === currentCategory);
-            let pool = [...filteredPool];
+            let filteredPool = fullDatabase;
+            // Filter by Category (if not custom)
+            if (!isCustomMode) {
+                filteredPool = fullDatabase.filter(item => currentCategory === 'all' || item.cat === currentCategory);
+            }
+
+            // Filter out PREVIOUSLY displayed items (Anti-Repetition)
+            let availablePool = filteredPool.filter(item => !lastDisplayedTitles.includes(item.t));
             
+            // If pool is exhausted or too small, reset restriction
+            if (availablePool.length < 3) {
+                availablePool = filteredPool;
+                lastDisplayedTitles = []; // Clear history
+            }
+            
+            let pool = [...availablePool];
             shuffleArray(pool);
-            currentIdeas = pool.slice(0, 12);
+            currentIdeas = pool.slice(0, 3); // Show ONLY 3 cards
+
+            // Update Last Displayed
+            lastDisplayedTitles = currentIdeas.map(item => item.t);
 
             if (currentIdeas.length === 0) {
-                 container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">ไม่พบข้อมูลในหมวดหมู่นี้</div>`;
+                 container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">ไม่พบข้อมูล...</div>`;
                  return;
             }
 
             currentIdeas.forEach((item, i) => {
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-blue-400 dark:hover:border-blue-500 transition-all fade-in`;
+                // Using h-full and flex flex-col ensuring equal height
+                card.className = `bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-blue-400 dark:hover:border-blue-500 transition-all fade-in relative group`;
                 card.style.animationDelay = `${i * 0.05}s`;
+                
+                // HTML Structure ensuring fixed layout height for content
                 card.innerHTML = `
-                    <h3 class="font-bold text-gray-800 dark:text-gray-100 text-sm md:text-base mb-2">${i+1}. ${item.t}</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-xs mb-4 flex-grow">${item.d}</p>
-                    <div class="flex gap-2">
-                        <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this, 'EN')" class="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 py-2 rounded-lg text-xs font-medium transition-colors border border-blue-100 dark:border-blue-800">EN Keywords</button>
-                        <button onclick="copyText('${item.th.replace(/'/g, "\\'")}', this, 'TH')" class="flex-1 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 py-2 rounded-lg text-xs font-medium transition-colors border border-purple-100 dark:border-purple-800">TH Keywords</button>
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-start mb-2 h-8"> 
+                            <h3 class="font-bold text-gray-800 dark:text-gray-100 text-base md:text-lg line-clamp-1" title="${item.t}">${item.t}</h3>
+                            ${item.loc ? `<span class="text-[10px] bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500 whitespace-nowrap ml-2">${item.loc}</span>` : ''}
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3 h-8 overflow-hidden leading-4 line-clamp-2">${item.d}</p>
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-700 mb-4 flex-grow-0 h-16 overflow-hidden">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Keywords:</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300 font-mono leading-relaxed line-clamp-2">${item.k}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
+                        <button onclick="openPromptModal(${i})" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>🏞️</span> สร้าง Prompt
+                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this)" class="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 py-2 rounded-lg text-xs font-medium border border-blue-100 dark:border-blue-800 transition-colors">Copy Keys</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Robust Copy Function using execCommand (Best for previews/iframes)
-        function copyText(text, btn, lang) {
-            const originalText = btn.textContent;
-            btn.textContent = '...';
+        // --- Custom Data Logic ---
+        function openCustomDataModal() {
+            document.getElementById('customDataModal').classList.add('active');
+            document.getElementById('custom-input').focus();
+        }
+
+        function loadCustomData() {
+            const rawText = document.getElementById('custom-input').value;
+            if (!rawText.trim()) {
+                showToast("⚠️ กรุณาใส่ข้อมูลก่อนครับ");
+                return;
+            }
+
+            const lines = rawText.split('\n');
+            const newDatabase = [];
+
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const parts = line.split('|');
+                    const title = parts[0].trim();
+                    const keywords = parts[1] ? parts[1].trim() : title;
+                    
+                    newDatabase.push({
+                        t: title,
+                        loc: "Custom",
+                        d: "ข้อมูลจากผู้ใช้",
+                        k: keywords,
+                        cat: "custom"
+                    });
+                }
+            });
+
+            if (newDatabase.length > 0) {
+                fullDatabase = newDatabase;
+                isCustomMode = true;
+                currentCategory = 'all';
+                lastDisplayedTitles = []; 
+                
+                document.getElementById('reset-btn').classList.remove('hidden');
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.add('hidden'));
+                
+                closeModal('customDataModal');
+                generateIdeas();
+                showToast(`✅ โหลดข้อมูล ${newDatabase.length} รายการแล้ว!`);
+            } else {
+                showToast("⚠️ ไม่พบข้อมูลที่ถูกต้อง");
+            }
+        }
+
+        function resetToDefault() {
+            fullDatabase = [...defaultDatabase];
+            isCustomMode = false;
+            lastDisplayedTitles = [];
             
+            document.getElementById('reset-btn').classList.add('hidden');
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('hidden'));
+            
+            generateIdeas();
+            showToast("🔄 กลับสู่ข้อมูลเริ่มต้น");
+        }
+
+        // --- Prompt Logic (MODIFIED: NO MODAL) ---
+        function openPromptModal(index) {
+            const item = currentIdeas[index];
+            // We don't use modal UI anymore, just generate logic
+            
+            let subject = `Spectacular landscape photography of ${item.t},`;
+            if (item.loc && item.loc !== "Custom") {
+                subject += ` located in ${item.loc},`;
+            }
+            
+            let details = `${item.k}, vast panoramic view, breathtaking scenery,`;
+            const times = ["golden hour", "sunset", "blue hour", "sunrise", "dramatic daylight", "clear blue sky"];
+            const selectedTime = times[Math.floor(Math.random() * times.length)];
+            let atmosphere = `${selectedTime}, vivid colors, atmospheric depth,`;
+            
+            const fullPrompt = `${subject} ${details} ${atmosphere} ${MAGIC_QUALITY}`;
+            
+            // Direct copy without opening modal
+            copyToClipboardRaw(fullPrompt, "Prompt");
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function copyModalText(elementId) {
+            const text = document.getElementById(elementId).value;
+            copyToClipboardRaw(text, "Prompt");
+        }
+
+        function copyText(text, btn) {
+            copyToClipboardRaw(text, "Location Keywords", btn);
+        }
+
+        function copyToClipboardRaw(text, label, btnElement = null) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
             textArea.style.left = "0";
             textArea.style.top = "0";
-            textArea.style.opacity = "0"; 
-
+            textArea.style.opacity = "0";
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
@@ -245,42 +342,25 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showToast('✅ คัดลอก ' + (lang === 'EN' ? 'EN Keywords' : 'TH Keywords') + ' แล้ว!');
-                    btn.textContent = '✓ Copied!';
-                    btn.classList.add('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
-                    setTimeout(() => { 
-                        btn.textContent = originalText; 
-                        btn.classList.remove('bg-green-100', 'text-green-700', 'dark:bg-green-900', 'dark:text-green-300');
-                    }, 1500);
+                    showToast(`✅ คัดลอก ${label} แล้ว!`);
+                    if(btnElement) {
+                        const originalText = btnElement.textContent;
+                        btnElement.textContent = '✓ Copied!';
+                        setTimeout(() => { btnElement.textContent = originalText; }, 1000);
+                    }
                 } else {
-                    throw new Error('Copy command failed');
+                    window.prompt("กด Ctrl+C เพื่อคัดลอก:", text);
                 }
             } catch (err) {
                 window.prompt("กด Ctrl+C เพื่อคัดลอก:", text);
-                btn.textContent = originalText;
             }
-
             document.body.removeChild(textArea);
         }
 
-        function exportTxt() {
-            if (currentIdeas.length === 0) return showToast('กรุณาสุ่มชุดใหม่ก่อน!', true);
-            let text = currentIdeas.map((item, i) => `${i+1}. ${item.t}\nDesc: ${item.d}\nEN: ${item.k}\nTH: ${item.th}\n---\n`).join('');
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Stock_Ideas_200.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast('📄 Export สำเร็จ!');
-        }
-
-        function showToast(msg, isError = false) {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerHTML = `<span class="flex items-center justify-center gap-2">${msg}</span>`;
-            toast.className = `toast show ${isError ? 'error-toast' : ''}`;
+            toast.className = `toast show`;
             setTimeout(() => toast.className = toast.className.replace(' show', ''), 2500);
         }
 
@@ -291,6 +371,8 @@
         }
 
         function filterCategory(cat) {
+            if (isCustomMode) return;
+            
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.classList.remove('active', 'bg-blue-600', 'text-white');
                 b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'dark:text-gray-300');
@@ -304,6 +386,15 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
             document.body.classList.add('dark');
+        }
+
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target == modal) {
+                    modal.classList.remove('active');
+                }
+            });
         }
 
         window.onload = generateIdeas;
