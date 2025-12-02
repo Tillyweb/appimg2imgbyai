@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Stock Ideas (Silent Copy)</title>
+    <title>Travel Stock Ideas (Close-up 17:9)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
@@ -46,9 +46,9 @@
         <div class="text-center md:text-left">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap justify-center md:justify-start">
                 Stock Prompt Generator
-                <span class="text-xs font-normal text-white bg-gradient-to-r from-blue-500 to-cyan-500 px-3 py-1 rounded-full shadow-sm">V.8.1 Silent Copy</span>
+                <span class="text-xs font-normal text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 px-3 py-1 rounded-full shadow-sm">V.12.1 Close-up 17:9</span>
             </h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">สุ่ม 3 ช่อง (ไม่ซ้ำเดิม) + คัดลอกทันทีไม่มี Pop-up</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">เน้นถ่ายเจาะรายละเอียด (Close-up/Macro) อัตราส่วน 17:9</p>
         </div>
 
         <div class="flex flex-wrap gap-3 items-center justify-center">
@@ -60,7 +60,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                สุ่มใหม่ (3 ช่อง)
+                สุ่มไอเดีย (3 ช่อง)
             </button>
         </div>
     </div>
@@ -68,31 +68,23 @@
     <!-- Filters -->
     <div class="w-full max-w-5xl mb-5 flex flex-wrap gap-2 justify-center" id="filter-container">
         <button onclick="filterCategory('all')" class="filter-btn active px-4 py-1.5 bg-blue-600 text-white rounded-full text-xs md:text-sm transition-colors">ทั้งหมด</button>
-        <button onclick="filterCategory('asia')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Asia</button>
-        <button onclick="filterCategory('europe')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Europe</button>
-        <button onclick="filterCategory('north_america')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">America</button>
+        <button onclick="filterCategory('mountain')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Mountains</button>
+        <button onclick="filterCategory('beach')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Beaches & Coast</button>
+        <button onclick="filterCategory('forest')" class="filter-btn px-4 py-1.5 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Forests & Nature</button>
         <button onclick="resetToDefault()" class="hidden px-4 py-1.5 bg-red-100 text-red-600 rounded-full text-xs md:text-sm hover:bg-red-200 transition-colors" id="reset-btn">🔄 กลับไปใช้ข้อมูลเดิม</button>
     </div>
 
-    <!-- Results Grid (Adjusted for 3 items centering) -->
+    <!-- Results Grid -->
     <div id="results-container" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="col-span-full text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
             <p class="text-gray-400">กำลังโหลดข้อมูล...</p>
         </div>
     </div>
 
-    <!-- Prompt Modal (Hidden/Unused but structure kept for script references just in case) -->
+    <!-- Prompt Modal (Hidden - Logic Only) -->
     <div id="promptModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-        <div class="modal-content bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                    <span class="text-2xl">🏞️</span> AI Landscape Prompt
-                </h2>
-                <button onclick="closeModal('promptModal')" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <!-- ... content ... -->
+        <div class="modal-content bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden hidden">
+            <textarea id="modal-positive"></textarea>
         </div>
     </div>
 
@@ -101,19 +93,19 @@
         <div class="modal-content bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col h-[80vh] overflow-hidden">
             <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-yellow-50 dark:bg-gray-800">
                 <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                    <span>📝</span> ใส่ข้อมูลของคุณเอง (Custom Data)
+                    <span>📝</span> ใส่ข้อมูลสถานที่/วิว (Custom Data)
                 </h2>
                 <button onclick="closeModal('customDataModal')" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
             <div class="p-6 flex-grow flex flex-col space-y-4 overflow-hidden">
-                <p class="text-sm text-gray-600 dark:text-gray-400">วางรายการที่ต้องการสุ่ม (1 บรรทัด = 1 รายการ) ระบบจะใช้ข้อมูลนี้แทนฐานข้อมูลเดิม</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">วางรายชื่อสถานที่ (1 บรรทัด = 1 รายการ) <br><span class="text-red-500 text-xs">*ควรใส่ Keywords ภาษาอังกฤษหลังเครื่องหมาย |</span></p>
                 <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-500 font-mono">
                     ตัวอย่าง:<br>
-                    น้ำตกทีลอซู จ.ตาก<br>
-                    ทะเลหมอกภูชี้ฟ้า | misty mountain, sunrise, sea of fog<br>
-                    วัดร่องขุ่น | white temple, intricate details, thai architecture
+                    ภูเขาไฟฟูจิ | Mount Fuji Japan, snow cap, cherry blossom<br>
+                    อ่าวมาหยา | Maya Bay Thailand, limestone texture, turquoise water<br>
+                    ป่าไผ่ | Arashiyama Bamboo Grove, bamboo patterns, green details
                 </div>
                 <textarea id="custom-input" class="w-full flex-grow p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500 focus:outline-none resize-none font-mono" placeholder="วางข้อมูลที่นี่..."></textarea>
             </div>
@@ -134,29 +126,87 @@
     <script>
         // Default Database
         const defaultDatabase = [
-            { t: "Komodo National Park", loc: "Indonesia", d: "เกาะสวรรค์ดิบเถื่อน หาดทรายขาว", k: "Komodo National Park, Padar Island, savanna hills, turquoise ocean, pink beach", cat: "asia" },
-            { t: "Li River", loc: "China", d: "ภูเขาหินปูนทรงแปลกตา", k: "Li River Guilin, karst mountains, bamboo raft, misty landscape, traditional chinese scenery", cat: "asia" },
-            { t: "Laamu Atoll", loc: "Maldives", d: "ลากูนน้ำใสราวกระจก", k: "Laamu Atoll Maldives, crystal clear lagoon, overwater bungalow, white sandbar", cat: "asia" },
-            { t: "James Bond Island", loc: "Thailand", d: "เขาตะปูหินปูนกลางทะเล", k: "James Bond Island, Phang Nga Bay, limestone karst, emerald water, longtail boat", cat: "asia" },
-            { t: "Oludeniz Lagoon", loc: "Turkey", d: "ลากูนสีฟ้าเทอร์ควอยซ์", k: "Oludeniz Blue Lagoon, paragliding view, turquoise mediterranean sea, white sand spit", cat: "asia" },
-            { t: "Zhangjiajie National Park", loc: "China", d: "เสาหินควอตซ์ไซต์ (Avatar)", k: "Zhangjiajie National Forest Park, floating mountains, quartzite pillars, misty forest", cat: "asia" },
-            { t: "Rhossili Bay", loc: "Wales, UK", d: "หาดทรายสีทองทอดยาว", k: "Rhossili Bay, Gower Peninsula, golden sand beach, dramatic cliffs, coastal path", cat: "europe" },
-            { t: "Vestrahorn", loc: "Iceland", d: "ภูเขาทรงเขี้ยวสัตว์บนหาดดำ", k: "Vestrahorn mountain, Stokksnes black sand beach, dramatic peaks, reflection in water", cat: "europe" },
-            { t: "Santorini Caldera", loc: "Greece", d: "บ้านสีขาวโดมฟ้า วิวทะเล", k: "Santorini Caldera, Oia village, white houses blue domes, volcanic cliffs, aegean sea sunset", cat: "europe" },
-            { t: "The Pitons", loc: "St. Lucia", d: "ยอดเขาภูเขาไฟคู่", k: "The Pitons St Lucia, twin volcanic spires, lush rainforest, caribbean sea, luxury resort view", cat: "north_america" },
-            { t: "Monument Valley", loc: "USA", d: "แท่งหินทรายสีแดง", k: "Monument Valley, red sandstone buttes, desert landscape, navajo tribal park, western movie scenery", cat: "north_america" },
-            { t: "Great Barrier Reef", loc: "Australia", d: "แนวปะการังที่ใหญ่ที่สุด", k: "Great Barrier Reef, aerial view coral, turquoise water, marine life, underwater split shot", cat: "oceania" },
-            { t: "Milford Sound", loc: "New Zealand", d: "ฟยอร์ดสูงชัน", k: "Milford Sound, new zealand fiord, mitre peak, waterfalls cascading, misty cliff", cat: "oceania" }
+            { 
+                t: "Mount Fuji Details", loc: "Japan", 
+                d: "รายละเอียดหิมะและพื้นผิวภูเขาไฟฟูจิ", 
+                k: "Mount Fuji peak, snow texture close-up, volcanic rock details, cherry blossom petals macro, lake water ripples, japan nature patterns, serene atmosphere, icy surface, morning frost, pink floral bokeh, fujisan details, nature abstraction", 
+                cat: "mountain" 
+            },
+            { 
+                t: "Dolomites Rock Texture", loc: "Italy", 
+                d: "พื้นผิวหินภูเขาโดโลไมท์และดอกไม้ป่า", 
+                k: "Dolomites limestone texture, jagged rock details, alpine wild flowers macro, green grass blades, mountain stone patterns, italian alps geology, weathered rock surface, dramatic lighting contrasts, nature details, south tyrol close-up", 
+                cat: "mountain" 
+            },
+            { 
+                t: "Maya Bay Water", loc: "Thailand", 
+                d: "พื้นผิวน้ำทะเลสีเทอร์ควอยซ์และทรายขาว", 
+                k: "Maya Bay water texture, turquoise ocean ripples, white sand grains macro, limestone cliff texture, crystal clear water, sunlight refraction, tropical beach details, shell fragments, andaman sea colors, thailand nature patterns", 
+                cat: "beach" 
+            },
+            { 
+                t: "Lofoten Red Cabins", loc: "Norway", 
+                d: "รายละเอียดบ้านไม้สีแดงและหิมะ", 
+                k: "Lofoten red wood texture, rorbuer cabin details, snow flakes macro, icy water reflection, fishing net texture, norwegian wood patterns, arctic frost, weathered paint, winter details, scandinavian architecture close-up", 
+                cat: "beach" 
+            },
+            { 
+                t: "Arashiyama Bamboo", loc: "Japan", 
+                d: "ลวดลายปล้องไผ่และใบไม้สีเขียว", 
+                k: "Bamboo stalk texture, green bamboo patterns, bamboo leaves macro, sunlight through leaves, vertical lines nature, forest details, zen garden texture, natural green shades, plant macro photography, kyoto nature", 
+                cat: "forest" 
+            },
+            { 
+                t: "Banff Glacial Water", loc: "Canada", 
+                d: "สีน้ำทะเลสาบมรกตและหินกรวด", 
+                k: "Moraine Lake water color, glacial silt texture, pine needle macro, rocky shore details, turquoise water patterns, canadian rockies nature, lake reflection abstract, alpine flora close-up, clean water surface, pebble texture", 
+                cat: "mountain" 
+            },
+            { 
+                t: "Santorini Blue & White", loc: "Greece", 
+                d: "พื้นผิวปูนขาวและโดมสีน้ำเงิน", 
+                k: "Santorini white wall texture, blue dome detail, bougainvillea flowers macro, volcanic rock texture, aegean sea background bokeh, greek architecture details, cobblestone patterns, white plaster texture, vibrant colors, summer details", 
+                cat: "beach" 
+            },
+            { 
+                t: "Grand Canyon Layers", loc: "USA", 
+                d: "ชั้นหินสีแดงและการกัดเซาะ", 
+                k: "Grand Canyon rock layers, red sandstone texture, geological strata details, erosion patterns, desert plant macro, colorado river water texture, arid soil details, cliff face close-up, natural abstract art, arizona landscape details", 
+                cat: "mountain" 
+            },
+            { 
+                t: "Plitvice Waterfalls", loc: "Croatia", 
+                d: "สายน้ำตกและมอสสีเขียว", 
+                k: "Plitvice waterfall motion blur, flowing water texture, green moss on rocks, turquoise pool details, wooden boardwalk texture, splashing water macro, nature freshness, lush vegetation patterns, croatia nature close-up, clear stream", 
+                cat: "forest" 
+            },
+            { 
+                t: "Cinque Terre Colors", loc: "Italy", 
+                d: "สีสันบ้านเรือนและหน้าผา", 
+                k: "Cinque Terre colorful wall texture, peeling paint details, coastal rock texture, mediterranean plant macro, italian window shutter, fishing boat details, sea foam texture, vibrant village colors, rustic wall patterns", 
+                cat: "beach" 
+            },
+            { 
+                t: "Zhangjiajie Stone", loc: "China", 
+                d: "พื้นผิวเสาหินและหมอก", 
+                k: "Zhangjiajie quartz sandstone texture, mountain mist close-up, pine tree branch macro, rock pillar details, avatar mountain patterns, mossy stone surface, atmospheric fog, nature textures china, vertical rock face", 
+                cat: "mountain" 
+            },
+            { 
+                t: "Milford Sound Mist", loc: "New Zealand", 
+                d: "ละอองน้ำตกและเฟิร์น", 
+                k: "Milford Sound mist texture, fern leaf macro, wet rock details, waterfall spray, deep blue water ripples, mossy forest floor, new zealand flora, atmospheric details, moody nature texture, fiordland patterns", 
+                cat: "beach" 
+            }
         ];
 
         // Active Database
         let fullDatabase = [...defaultDatabase];
         let isCustomMode = false;
-        
-        // State for repetition prevention
         let lastDisplayedTitles = [];
 
-        const MAGIC_QUALITY = "raw photo, photorealistic, hyperrealistic, highly detailed, 8k uhd, dslr, wide angle lens, sharp focus, cinematic lighting, volumetric lighting, ray tracing, hdr, nature photography, national geographic style";
+        // Magic Words for Cinematic Close-up 17:9
+        const MAGIC_QUALITY = "macro photography, extreme close-up, intricate details, texture focus, shallow depth of field, bokeh, 8k uhd, raw photo, professional photograph, national geographic style, cinematic lighting, sharp focus on subject, soft background blur";
 
         let currentIdeas = [];
         let currentCategory = 'all'; 
@@ -174,25 +224,21 @@
             container.innerHTML = '';
             
             let filteredPool = fullDatabase;
-            // Filter by Category (if not custom)
             if (!isCustomMode) {
                 filteredPool = fullDatabase.filter(item => currentCategory === 'all' || item.cat === currentCategory);
             }
 
-            // Filter out PREVIOUSLY displayed items (Anti-Repetition)
             let availablePool = filteredPool.filter(item => !lastDisplayedTitles.includes(item.t));
             
-            // If pool is exhausted or too small, reset restriction
             if (availablePool.length < 3) {
                 availablePool = filteredPool;
-                lastDisplayedTitles = []; // Clear history
+                lastDisplayedTitles = [];
             }
             
             let pool = [...availablePool];
             shuffleArray(pool);
-            currentIdeas = pool.slice(0, 3); // Show ONLY 3 cards
+            currentIdeas = pool.slice(0, 3); // Show 3 items
 
-            // Update Last Displayed
             lastDisplayedTitles = currentIdeas.map(item => item.t);
 
             if (currentIdeas.length === 0) {
@@ -202,11 +248,9 @@
 
             currentIdeas.forEach((item, i) => {
                 const card = document.createElement('div');
-                // Using h-full and flex flex-col ensuring equal height
-                card.className = `bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-blue-400 dark:hover:border-blue-500 transition-all fade-in relative group`;
+                card.className = `bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-purple-400 dark:hover:border-purple-500 transition-all fade-in relative group`;
                 card.style.animationDelay = `${i * 0.05}s`;
                 
-                // HTML Structure ensuring fixed layout height for content
                 card.innerHTML = `
                     <div class="flex-grow flex flex-col">
                         <div class="flex justify-between items-start mb-2 h-8"> 
@@ -215,14 +259,14 @@
                         </div>
                         <p class="text-xs text-gray-400 mb-3 h-8 overflow-hidden leading-4 line-clamp-2">${item.d}</p>
                         <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-700 mb-4 flex-grow-0 h-16 overflow-hidden">
-                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Keywords:</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Keywords (Detail):</p>
                             <p class="text-xs text-gray-600 dark:text-gray-300 font-mono leading-relaxed line-clamp-2">${item.k}</p>
                         </div>
                     </div>
                     
                     <div class="flex flex-col gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-                        <button onclick="openPromptModal(${i})" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                            <span>🏞️</span> สร้าง Prompt
+                        <button onclick="openPromptModal(${i})" class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>📸</span> สร้าง Prompt (Close-up)
                         </button>
                         <div class="flex gap-2">
                             <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this)" class="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 py-2 rounded-lg text-xs font-medium border border-blue-100 dark:border-blue-800 transition-colors">Copy Keys</button>
@@ -233,10 +277,30 @@
             });
         }
 
-        // --- Custom Data Logic ---
+        // --- Prompt Logic (Cinematic Close-up + AR 17:9) ---
+        function openPromptModal(index) {
+            const item = currentIdeas[index];
+            
+            // Close-up Landscape Structure:
+            // Subject: Cinematic close-up shot capturing details of [Location]
+            // Detail: [Keywords], texture focus
+            // Lighting: Soft lighting, etc.
+            
+            let locationPhrase = (item.loc && item.loc !== "Custom") ? `, located in ${item.loc}` : "";
+            
+            const fullPrompt = `A cinematic close-up photograph capturing the intricate details of ${item.t}${locationPhrase}, featuring ${item.k}, focus on textures and patterns, nature macro, soft bokeh background, ${MAGIC_QUALITY} --ar 17:9`;
+            
+            copyToClipboardRaw(fullPrompt, "Prompt");
+        }
+
+        // --- Custom Data & Utils ---
         function openCustomDataModal() {
             document.getElementById('customDataModal').classList.add('active');
             document.getElementById('custom-input').focus();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
 
         function loadCustomData() {
@@ -245,35 +309,23 @@
                 showToast("⚠️ กรุณาใส่ข้อมูลก่อนครับ");
                 return;
             }
-
             const lines = rawText.split('\n');
             const newDatabase = [];
-
             lines.forEach(line => {
                 if (line.trim()) {
                     const parts = line.split('|');
                     const title = parts[0].trim();
                     const keywords = parts[1] ? parts[1].trim() : title;
-                    
-                    newDatabase.push({
-                        t: title,
-                        loc: "Custom",
-                        d: "ข้อมูลจากผู้ใช้",
-                        k: keywords,
-                        cat: "custom"
-                    });
+                    newDatabase.push({ t: title, loc: "Custom", d: "ข้อมูลจากผู้ใช้", k: keywords, cat: "custom" });
                 }
             });
-
             if (newDatabase.length > 0) {
                 fullDatabase = newDatabase;
                 isCustomMode = true;
                 currentCategory = 'all';
                 lastDisplayedTitles = []; 
-                
                 document.getElementById('reset-btn').classList.remove('hidden');
                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.add('hidden'));
-                
                 closeModal('customDataModal');
                 generateIdeas();
                 showToast(`✅ โหลดข้อมูล ${newDatabase.length} รายการแล้ว!`);
@@ -286,42 +338,10 @@
             fullDatabase = [...defaultDatabase];
             isCustomMode = false;
             lastDisplayedTitles = [];
-            
             document.getElementById('reset-btn').classList.add('hidden');
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('hidden'));
-            
             generateIdeas();
             showToast("🔄 กลับสู่ข้อมูลเริ่มต้น");
-        }
-
-        // --- Prompt Logic (MODIFIED: NO MODAL) ---
-        function openPromptModal(index) {
-            const item = currentIdeas[index];
-            // We don't use modal UI anymore, just generate logic
-            
-            let subject = `Spectacular landscape photography of ${item.t},`;
-            if (item.loc && item.loc !== "Custom") {
-                subject += ` located in ${item.loc},`;
-            }
-            
-            let details = `${item.k}, vast panoramic view, breathtaking scenery,`;
-            const times = ["golden hour", "sunset", "blue hour", "sunrise", "dramatic daylight", "clear blue sky"];
-            const selectedTime = times[Math.floor(Math.random() * times.length)];
-            let atmosphere = `${selectedTime}, vivid colors, atmospheric depth,`;
-            
-            const fullPrompt = `${subject} ${details} ${atmosphere} ${MAGIC_QUALITY}`;
-            
-            // Direct copy without opening modal
-            copyToClipboardRaw(fullPrompt, "Prompt");
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function copyModalText(elementId) {
-            const text = document.getElementById(elementId).value;
-            copyToClipboardRaw(text, "Prompt");
         }
 
         function copyText(text, btn) {
@@ -338,7 +358,6 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
@@ -372,7 +391,6 @@
 
         function filterCategory(cat) {
             if (isCustomMode) return;
-            
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.classList.remove('active', 'bg-blue-600', 'text-white');
                 b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'dark:text-gray-300');
