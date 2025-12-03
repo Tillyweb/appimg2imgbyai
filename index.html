@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Stock Ideas (Close-up 17:9)</title>
+    <title>Portrait Stock Ideas (Medium Shot 17:9)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script>
@@ -46,9 +46,9 @@
         <div class="text-center md:text-left">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap justify-center md:justify-start">
                 Stock Prompt Generator
-                <span class="text-xs font-normal text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 px-3 py-1 rounded-full shadow-sm">V.12.1 Close-up 17:9</span>
+                <span class="text-xs font-normal text-white bg-gradient-to-r from-pink-500 to-purple-500 px-3 py-1 rounded-full shadow-sm">V.13 Portrait Medium Shot</span>
             </h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">เน้นถ่ายเจาะรายละเอียด (Close-up/Macro) อัตราส่วน 17:9</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ภาพถ่ายนางแบบครึ่งตัว (Medium Shot) ฉากหลังตามสถานที่สุ่ม เน้นใบหน้าคมชัด ฉากหลังเบลอ (17:9)</p>
         </div>
 
         <div class="flex flex-wrap gap-3 items-center justify-center">
@@ -127,75 +127,75 @@
         // Default Database
         const defaultDatabase = [
             { 
-                t: "Mount Fuji Details", loc: "Japan", 
-                d: "รายละเอียดหิมะและพื้นผิวภูเขาไฟฟูจิ", 
-                k: "Mount Fuji peak, snow texture close-up, volcanic rock details, cherry blossom petals macro, lake water ripples, japan nature patterns, serene atmosphere, icy surface, morning frost, pink floral bokeh, fujisan details, nature abstraction", 
+                t: "Mount Fuji", loc: "Japan", 
+                d: "นางแบบสาวญี่ปุ่นหน้าภูเขาไฟฟูจิ", 
+                k: "Mount Fuji peak, snow capped mountain, Lake Kawaguchi, cherry blossoms, serene atmosphere, japan landmark, clear blue sky", 
                 cat: "mountain" 
             },
             { 
-                t: "Dolomites Rock Texture", loc: "Italy", 
-                d: "พื้นผิวหินภูเขาโดโลไมท์และดอกไม้ป่า", 
-                k: "Dolomites limestone texture, jagged rock details, alpine wild flowers macro, green grass blades, mountain stone patterns, italian alps geology, weathered rock surface, dramatic lighting contrasts, nature details, south tyrol close-up", 
+                t: "Dolomites", loc: "Italy", 
+                d: "นางแบบสาวอิตาลีบนเทือกเขาโดโลไมท์", 
+                k: "Dolomites mountains, Tre Cime di Lavaredo, jagged peaks, alpine meadow, green valleys, limestone rocks, italian alps, dramatic scenery", 
                 cat: "mountain" 
             },
             { 
-                t: "Maya Bay Water", loc: "Thailand", 
-                d: "พื้นผิวน้ำทะเลสีเทอร์ควอยซ์และทรายขาว", 
-                k: "Maya Bay water texture, turquoise ocean ripples, white sand grains macro, limestone cliff texture, crystal clear water, sunlight refraction, tropical beach details, shell fragments, andaman sea colors, thailand nature patterns", 
+                t: "Maya Bay", loc: "Thailand", 
+                d: "นางแบบสาวไทยที่อ่าวมาหยา", 
+                k: "Maya Bay beach, turquoise water, limestone cliffs, white sand, tropical lagoon, andaman sea, crystal clear ocean, paradise island", 
                 cat: "beach" 
             },
             { 
-                t: "Lofoten Red Cabins", loc: "Norway", 
-                d: "รายละเอียดบ้านไม้สีแดงและหิมะ", 
-                k: "Lofoten red wood texture, rorbuer cabin details, snow flakes macro, icy water reflection, fishing net texture, norwegian wood patterns, arctic frost, weathered paint, winter details, scandinavian architecture close-up", 
+                t: "Lofoten Islands", loc: "Norway", 
+                d: "นางแบบสาวนอร์เวย์ในหมู่บ้านชาวประมง", 
+                k: "Lofoten islands landscape, red fishing cabins, dramatic mountains, arctic fjord, reflection in water, norway nature, winter scenery, rorbuer village", 
                 cat: "beach" 
             },
             { 
                 t: "Arashiyama Bamboo", loc: "Japan", 
-                d: "ลวดลายปล้องไผ่และใบไม้สีเขียว", 
-                k: "Bamboo stalk texture, green bamboo patterns, bamboo leaves macro, sunlight through leaves, vertical lines nature, forest details, zen garden texture, natural green shades, plant macro photography, kyoto nature", 
+                d: "นางแบบสาวญี่ปุ่นในป่าไผ่", 
+                k: "Arashiyama Bamboo Grove, towering bamboo stalks, green forest path, sunlight filtering through, zen atmosphere, nature walkway, kyoto landmark", 
                 cat: "forest" 
             },
             { 
-                t: "Banff Glacial Water", loc: "Canada", 
-                d: "สีน้ำทะเลสาบมรกตและหินกรวด", 
-                k: "Moraine Lake water color, glacial silt texture, pine needle macro, rocky shore details, turquoise water patterns, canadian rockies nature, lake reflection abstract, alpine flora close-up, clean water surface, pebble texture", 
+                t: "Moraine Lake", loc: "Canada", 
+                d: "นางแบบสาวแคนาดาที่ทะเลสาบสีมรกต", 
+                k: "Moraine Lake, turquoise water, glacial lake, valley of the ten peaks, canadian rockies, pine forest, alpine landscape, banff national park", 
                 cat: "mountain" 
             },
             { 
-                t: "Santorini Blue & White", loc: "Greece", 
-                d: "พื้นผิวปูนขาวและโดมสีน้ำเงิน", 
-                k: "Santorini white wall texture, blue dome detail, bougainvillea flowers macro, volcanic rock texture, aegean sea background bokeh, greek architecture details, cobblestone patterns, white plaster texture, vibrant colors, summer details", 
+                t: "Santorini", loc: "Greece", 
+                d: "นางแบบสาวกรีกบนเกาะซานโตรินี", 
+                k: "Santorini architecture, white houses blue domes, caldera cliff view, aegean sea background, oia village, greek island scenery, mediterranean landscape", 
                 cat: "beach" 
             },
             { 
-                t: "Grand Canyon Layers", loc: "USA", 
-                d: "ชั้นหินสีแดงและการกัดเซาะ", 
-                k: "Grand Canyon rock layers, red sandstone texture, geological strata details, erosion patterns, desert plant macro, colorado river water texture, arid soil details, cliff face close-up, natural abstract art, arizona landscape details", 
+                t: "Grand Canyon", loc: "USA", 
+                d: "นางแบบสาวอเมริกันที่แกรนด์แคนยอน", 
+                k: "Grand Canyon landscape, red rock formations, deep gorge, colorado river view, vast desert scenery, geological layers, erosion patterns, arizona landmark", 
                 cat: "mountain" 
             },
             { 
-                t: "Plitvice Waterfalls", loc: "Croatia", 
-                d: "สายน้ำตกและมอสสีเขียว", 
-                k: "Plitvice waterfall motion blur, flowing water texture, green moss on rocks, turquoise pool details, wooden boardwalk texture, splashing water macro, nature freshness, lush vegetation patterns, croatia nature close-up, clear stream", 
+                t: "Plitvice Lakes", loc: "Croatia", 
+                d: "นางแบบสาวโครเอเชียที่น้ำตกพลิตวิเซ่", 
+                k: "Plitvice Lakes waterfalls, cascading water, turquoise lakes, lush green forest, wooden boardwalk, croatia nature, national park scenery", 
                 cat: "forest" 
             },
             { 
-                t: "Cinque Terre Colors", loc: "Italy", 
-                d: "สีสันบ้านเรือนและหน้าผา", 
-                k: "Cinque Terre colorful wall texture, peeling paint details, coastal rock texture, mediterranean plant macro, italian window shutter, fishing boat details, sea foam texture, vibrant village colors, rustic wall patterns", 
+                t: "Cinque Terre", loc: "Italy", 
+                d: "นางแบบสาวอิตาลีที่หมู่บ้านริมทะเล", 
+                k: "Cinque Terre coast, colorful village houses, cliffside buildings, ligurian sea view, italian riviera, rugged coastline, manarola scenic view", 
                 cat: "beach" 
             },
             { 
-                t: "Zhangjiajie Stone", loc: "China", 
-                d: "พื้นผิวเสาหินและหมอก", 
-                k: "Zhangjiajie quartz sandstone texture, mountain mist close-up, pine tree branch macro, rock pillar details, avatar mountain patterns, mossy stone surface, atmospheric fog, nature textures china, vertical rock face", 
+                t: "Zhangjiajie", loc: "China", 
+                d: "นางแบบสาวจีนท่ามกลางเสาหินอวตาร", 
+                k: "Zhangjiajie stone pillars, quartzite sandstone peaks, floating mountains, misty forest, avatar landscape, hunan china nature, vertical rock formations", 
                 cat: "mountain" 
             },
             { 
-                t: "Milford Sound Mist", loc: "New Zealand", 
-                d: "ละอองน้ำตกและเฟิร์น", 
-                k: "Milford Sound mist texture, fern leaf macro, wet rock details, waterfall spray, deep blue water ripples, mossy forest floor, new zealand flora, atmospheric details, moody nature texture, fiordland patterns", 
+                t: "Milford Sound", loc: "New Zealand", 
+                d: "นางแบบสาวนิวซีแลนด์ที่ฟยอร์ด", 
+                k: "Milford Sound fjord, mitre peak, waterfalls cascading, steep cliffs, moody atmosphere, new zealand landscape, deep water reflection, rain forest", 
                 cat: "beach" 
             }
         ];
@@ -205,8 +205,8 @@
         let isCustomMode = false;
         let lastDisplayedTitles = [];
 
-        // Magic Words for Cinematic Close-up 17:9
-        const MAGIC_QUALITY = "macro photography, extreme close-up, intricate details, texture focus, shallow depth of field, bokeh, 8k uhd, raw photo, professional photograph, national geographic style, cinematic lighting, sharp focus on subject, soft background blur";
+        // Magic Words for Professional Portrait
+        const MAGIC_QUALITY = "professional portrait photography, highly detailed, natural lighting, beautiful bokeh, shallow depth of field, 8k uhd, raw photo, rule of thirds composition";
 
         let currentIdeas = [];
         let currentCategory = 'all'; 
@@ -248,7 +248,7 @@
 
             currentIdeas.forEach((item, i) => {
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-purple-400 dark:hover:border-purple-500 transition-all fade-in relative group`;
+                card.className = `bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:border-pink-400 dark:hover:border-pink-500 transition-all fade-in relative group`;
                 card.style.animationDelay = `${i * 0.05}s`;
                 
                 card.innerHTML = `
@@ -259,14 +259,14 @@
                         </div>
                         <p class="text-xs text-gray-400 mb-3 h-8 overflow-hidden leading-4 line-clamp-2">${item.d}</p>
                         <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-700 mb-4 flex-grow-0 h-16 overflow-hidden">
-                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Keywords (Detail):</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Location Keywords:</p>
                             <p class="text-xs text-gray-600 dark:text-gray-300 font-mono leading-relaxed line-clamp-2">${item.k}</p>
                         </div>
                     </div>
                     
                     <div class="flex flex-col gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-                        <button onclick="openPromptModal(${i})" class="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                            <span>📸</span> สร้าง Prompt (Close-up)
+                        <button onclick="openPromptModal(${i})" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>📸</span> สร้าง Prompt (Portrait)
                         </button>
                         <div class="flex gap-2">
                             <button onclick="copyText('${item.k.replace(/'/g, "\\'")}', this)" class="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 py-2 rounded-lg text-xs font-medium border border-blue-100 dark:border-blue-800 transition-colors">Copy Keys</button>
@@ -277,18 +277,35 @@
             });
         }
 
-        // --- Prompt Logic (Cinematic Close-up + AR 17:9) ---
+        // --- Prompt Logic (Portrait Medium Shot + AR 17:9) ---
         function openPromptModal(index) {
             const item = currentIdeas[index];
             
-            // Close-up Landscape Structure:
-            // Subject: Cinematic close-up shot capturing details of [Location]
-            // Detail: [Keywords], texture focus
-            // Lighting: Soft lighting, etc.
+            // Portrait Structure:
+            // Subject: Medium shot of a beautiful 20-year-old female idol, [Nationality based on loc], fair skin, charming, well-proportioned body
+            // Vibe: Interesting outfit matching the location, engaging perspective
+            // Focus: Sharp focus on face, blurred background of [Location Keywords]
             
-            let locationPhrase = (item.loc && item.loc !== "Custom") ? `, located in ${item.loc}` : "";
+            let nationality = "asian"; // Default
+            if (item.loc) {
+                const locLower = item.loc.toLowerCase();
+                if (locLower.includes("japan")) nationality = "japanese";
+                else if (locLower.includes("italy")) nationality = "italian";
+                else if (locLower.includes("thailand")) nationality = "thai";
+                else if (locLower.includes("norway")) nationality = "norwegian";
+                else if (locLower.includes("canada")) nationality = "canadian";
+                else if (locLower.includes("greece")) nationality = "greek";
+                else if (locLower.includes("usa")) nationality = "american";
+                else if (locLower.includes("croatia")) nationality = "croatian";
+                else if (locLower.includes("china")) nationality = "chinese";
+                else if (locLower.includes("new zealand")) nationality = "new zealander";
+            }
+
+            let subject = `A professional medium shot portrait of a charming 20-year-old ${nationality} female idol, fair and flawless skin, well-proportioned body, extremely attractive,`;
+            let outfitAndVibe = `wearing an interesting outfit that perfectly matches the ${item.t} atmosphere, captured from an engaging perspective,`;
+            let details = `sharp focus on her beautiful, clear face and charming expression, detailed skin texture, with a softly blurred background of ${item.k},`;
             
-            const fullPrompt = `A cinematic close-up photograph capturing the intricate details of ${item.t}${locationPhrase}, featuring ${item.k}, focus on textures and patterns, nature macro, soft bokeh background, ${MAGIC_QUALITY} --ar 17:9`;
+            const fullPrompt = `${subject} ${outfitAndVibe} ${details} ${MAGIC_QUALITY} --ar 17:9`;
             
             copyToClipboardRaw(fullPrompt, "Prompt");
         }
